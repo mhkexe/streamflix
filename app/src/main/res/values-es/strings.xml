@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Streamflix</string>
+    <string name="app_name">NextVision</string>
 
     <string name="loading_error_title">Ha ocurrido un error</string>
     <string name="loading_error_retry">Reintentar</string>
@@ -28,7 +28,6 @@
     <string name="providers_choose_title">Elige tu idioma</string>
 
     <string name="main_menu_change_provider">Cambiar proveedor</string>
-    <string name="main_menu_search">Buscar</string>
     <string name="main_menu_home">Inicio</string>
     <string name="main_menu_movies">Películas</string>
     <string name="main_menu_tv_shows">Series</string>
@@ -261,7 +260,7 @@
     <string name="settings_screen_network_summary">DNS, bypass para TV y claves de servicios de subtitulos</string>
     <string name="settings_scan_resolver_qr_title">Escanear QR de bypass TV</string>
     <string name="settings_scan_resolver_qr_summary">Abre la cámara y escanea el código QR mostrado en la TV</string>
-    <string name="settings_scan_resolver_invalid_qr">Este código QR no es un enlace de bypass de StreamFlix.</string>
+    <string name="settings_scan_resolver_invalid_qr">Este código QR no es un enlace de bypass de NextVision.</string>
     <string name="settings_scan_resolver_failed">No se pudo iniciar el escáner QR en este dispositivo.</string>
     <string name="settings_scan_resolver_camera_permission_denied">Se necesita permiso de la cámara para escanear el codigo QR.</string>
     <string name="settings_scan_resolver_camera_unavailable">No hay una cámara disponible en este dispositivo.</string>
@@ -415,15 +414,6 @@
     <string name="settings_category_appearance">Apariencia</string>
     <string name="settings_screen_appearance_summary">Tema, modo inmersivo y ajustes del diseño de pantalla</string>
     <string name="settings_theme_title">Tema de la aplicación</string>
-    <string name="settings_app_language_title">Idioma de la app</string>
-    <string name="settings_app_language_summary">Elige qué traducción incluida debe usar la app</string>
-    <string name="settings_app_language_system">Predeterminado del sistema</string>
-    <string name="settings_app_language_english">Inglés</string>
-    <string name="settings_app_language_arabic">Árabe</string>
-    <string name="settings_app_language_german">Alemán</string>
-    <string name="settings_app_language_spanish">Español</string>
-    <string name="settings_app_language_french">Francés</string>
-    <string name="settings_app_language_italian">Italiano</string>
     <string name="player_settings_gestures_title">Gestos</string>
     <string name="player_settings_keep_screen_on_title">Mantener pantalla encendida en pausa</string>
 
@@ -505,6 +495,4 @@
     <string name="settings_parental_tmdb_disable_blocked">Debes desbloquear el control parental antes de desactivar TMDB.</string>
     <string name="settings_force_extra_buffer_title">Búfer extra global</string>
     <string name="settings_force_extra_buffer_summary">Activa búfer extra para todos los servidores de forma predeterminada</string>
-    <string name="supabase_instructions_title">Instrucciones</string>
-    <string name="supabase_instructions_summary">Abrir en el navegador la guía detallada para configurar la cuenta y la sincronización de Supabase</string>
 </resources>

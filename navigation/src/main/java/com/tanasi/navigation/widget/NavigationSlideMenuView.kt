@@ -61,6 +61,8 @@ class NavigationSlideMenuView(
 
 
     init {
+        clipChildren = false
+        clipToPadding = false
         orientation = VERTICAL
         setLayoutParams(layoutParams)
     }
@@ -92,9 +94,6 @@ class NavigationSlideMenuView(
             child.initialize(item as MenuItemImpl, 0)
             child.itemPosition = i
 
-            if (orientation == HORIZONTAL && i == menu.size() - 1) {
-                addView(Space(context), LinearLayout.LayoutParams(0, 1, 1f))
-            }
             addView(child)
         }
 

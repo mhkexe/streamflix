@@ -7,6 +7,7 @@
     <!-- Colore di sfondo dinamico per TV -->
     <color name="app_background">#000000</color>
     <color name="favorite_selected">#00E5FF</color>
+    <color name="search_loading_red">#E50914</color>
 
     <array name="genres">
         <item>#E13300</item>

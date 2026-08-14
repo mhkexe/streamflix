@@ -1,0 +1,1 @@
+package com.nextservices.nextvision.models.cinecalidad

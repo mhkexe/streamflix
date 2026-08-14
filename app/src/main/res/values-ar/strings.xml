@@ -26,7 +26,6 @@
 	<string name="providers_choose_title">اختر لغتك</string>
 
 	<string name="main_menu_change_provider">تغيير المزود</string>
-	<string name="main_menu_search">بحث</string>
 	<string name="main_menu_home">الرئيسية</string>
 	<string name="main_menu_movies">أفلام</string>
 	<string name="main_menu_tv_shows">مسلسلات</string>
@@ -368,7 +367,7 @@
     <string name="settings_category_streamingcommunity_dnsOverHttps">استخدام DNS آمن</string>
     <string name="settings_scan_resolver_qr_title">مسح رمز تجاوز التلفاز</string>
     <string name="settings_scan_resolver_qr_summary">افتح الكاميرا وامسح رمز QR المعروض على التلفاز</string>
-    <string name="settings_scan_resolver_invalid_qr">رمز QR هذا ليس رابط تجاوز StreamFlix.</string>
+    <string name="settings_scan_resolver_invalid_qr">رمز QR هذا ليس رابط تجاوز NextVision.</string>
     <string name="settings_scan_resolver_failed">تعذر تشغيل ماسح QR على هذا الجهاز.</string>
     <string name="settings_category_provider_url_manual">إدخال يدوي</string>
     <string name="settings_autoplay_buffer_title">مهلة التشغيل التلقائي</string>
@@ -460,15 +459,6 @@
     <string name="settings_parental_remove_pin_summary">يعطّل الحماية برمز PIN ويمسح حد العمر</string>
     <string name="settings_parental_remove_admin_pin_title">إزالة رمز PIN للمشرف</string>
     <string name="settings_parental_remove_admin_pin_summary">يزيل رمز الاسترداد المستخدم لإلغاء قفل الرقابة الأبوية</string>
-    <string name="settings_app_language_title">لغة التطبيق</string>
-    <string name="settings_app_language_summary">اختر الترجمة المضمنة التي يجب أن يستخدمها التطبيق</string>
-    <string name="settings_app_language_system">افتراضي النظام</string>
-    <string name="settings_app_language_english">الإنجليزية</string>
-    <string name="settings_app_language_arabic">العربية</string>
-    <string name="settings_app_language_german">الألمانية</string>
-    <string name="settings_app_language_spanish">الإسبانية</string>
-    <string name="settings_app_language_french">الفرنسية</string>
-    <string name="settings_app_language_italian">الإيطالية</string>
     <string name="settings_scan_resolver_camera_permission_denied">مطلوب إذن الكاميرا لمسح رمز QR.</string>
     <string name="settings_scan_resolver_camera_unavailable">لا توجد كاميرا متاحة على هذا الجهاز.</string>
     <string name="backup_import_action">استيراد</string>
@@ -498,6 +488,4 @@
     <string name="settings_refresh_cache_confirm">تحديث ذاكرة التخزين المؤقت؟</string>
     <string name="settings_refresh_cache_message">سيؤدي ذلك إلى إعادة تحميل سجل المشاهدة وبيانات التطبيق من قاعدة البيانات.</string>
     <string name="settings_refresh_cache_success">تم تحديث ذاكرة التخزين المؤقت بنجاح</string>
-    <string name="supabase_instructions_title">التعليمات</string>
-    <string name="supabase_instructions_summary">فتح الدليل التفصيلي لإعداد حساب ومزامنة Supabase في المتصفح</string>
 </resources>

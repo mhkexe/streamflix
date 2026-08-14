@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="AppTheme.Mobile" parent="Theme.AppCompat">
+    <style name="AppTheme.Mobile" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="fontFamily">@font/sf_pro_display_regular</item>
@@ -136,13 +136,14 @@
     </style>
 
     <!-- Tema di Default per TV -->
-    <style name="AppTheme.Tv.Base" parent="Theme.Leanback">
+    <style name="AppTheme.Tv.Base" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="fontFamily">@font/sf_pro_display_regular</item>
         <item name="android:fontFamily">@font/sf_pro_display_regular</item>
     </style>
 
     <style name="AppTheme.Tv" parent="AppTheme.Tv.Base">
         <item name="app_background_color">#000000</item>
+        <item name="defaultBrandColor">#000000</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlayLeanback</item>
         <item name="alertDialogTheme">@style/Theme.AppCompat.Dialog.Alert</item>
         <item name="colorAccent">#FFFFFF</item>
@@ -348,7 +349,7 @@
     </style>
 
     <style name="AppTheme.SplashScreen" parent="Theme.AppCompat">
-        <item name="android:windowBackground">@drawable/bg_splash_screen</item>
+        <item name="android:windowBackground">@drawable/nextvision_logo</item>
     </style>
 
 </resources>

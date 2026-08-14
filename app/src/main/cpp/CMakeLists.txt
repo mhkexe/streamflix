@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.22.1)
 
-project("streamflix-keys")
+project("nextvision-keys")
 
 add_library(
-        streamflix-keys
+        nextvision-keys
         SHARED
         native-lib.cpp)
 
@@ -12,5 +12,5 @@ find_library(
         log)
 
 target_link_libraries(
-        streamflix-keys
+        nextvision-keys
         ${log-lib})

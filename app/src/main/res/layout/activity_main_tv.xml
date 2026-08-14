@@ -4,37 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_tv_screen"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:background="?attr/app_background_color"
     tools:context=".activities.main.MainTvActivity"
     tools:deviceIds="tv"
     tools:ignore="MergeRootFrame">
-
-    <com.tanasi.navigation.widget.NavigationSlideView
-        android:id="@+id/nav_main"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:paddingStart="20dp"
-        android:paddingTop="8dp"
-        android:paddingEnd="20dp"
-        android:paddingBottom="8dp"
-        android:background="#000000"
-        app:headerLayout="@layout/content_header_menu_main_tv"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:menu="@menu/menu_main_activity_tv"
-        app:menuGravity="center"
-        app:menuOrientation="horizontal"
-        app:menuSpacing="8dp" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_main_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="?attr/app_background_color"
+        android:background="@android:color/transparent"
         android:descendantFocusability="afterDescendants"
         android:focusable="true"
         android:focusableInTouchMode="true"
@@ -42,22 +24,76 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/nav_main"
-        app:navGraph="@navigation/nav_main_graph_tv" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:navGraph="@navigation/nav_main_graph_tv" />
 
-    <!-- Overlay per mostrare la "S" del logo durante il caricamento -->
-    <ImageView
-        android:id="@+id/iv_splash_overlay"
+    <com.tanasi.navigation.widget.NavigationSlideView
+        android:id="@+id/nav_main"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="96dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:visibility="gone"
+        android:layout_marginBottom="8dp"
+        android:paddingStart="20dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:menu="@menu/menu_main_activity_tv"
+        android:gravity="center"
+        app:headerLayout="@layout/content_header_menu_main_tv"
+        app:menuGravity="center"
+        app:menuOrientation="horizontal"
+        app:menuSpacing="8dp" />
+
+    <FrameLayout
+        android:id="@+id/startup_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?android:attr/windowBackground"
-        android:clickable="false"
-        android:focusable="false"
-        android:importantForAccessibility="no"
-        android:visibility="visible"
+        android:background="?attr/app_background_color"
+        android:clickable="true"
+        android:elevation="20dp"
+        android:focusable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/startup_logo"
+                android:layout_width="220dp"
+                android:layout_height="220dp"
+                android:contentDescription="@string/app_name"
+                android:scaleType="centerInside"
+                android:src="@drawable/logo_transparent"
+                android:layout_marginBottom="28dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/startup_progress"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+            <ProgressBar
+                android:id="@+id/startup_progress"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginTop="32dp"
+                android:indeterminateTint="#F44336"
+                android:visibility="visible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/startup_logo"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

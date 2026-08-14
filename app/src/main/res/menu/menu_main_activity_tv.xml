@@ -4,10 +4,10 @@
     tools:showIn="@layout/activity_main_tv">
 
     <item
-        android:id="@id/search"
+        android:id="@+id/search"
+        android:contentDescription="Search"
         android:icon="@drawable/ic_menu_search"
-        android:title=""
-        android:contentDescription="@string/main_menu_search" />
+        android:title="" />
 
     <item
         android:id="@id/home"
@@ -24,11 +24,5 @@
     <item
         android:id="@id/favorites"
         android:title="@string/main_menu_favorites" />
-
-    <item
-        android:id="@id/settings"
-        android:icon="@drawable/ic_menu_settings"
-        android:title=""
-        android:contentDescription="@string/main_menu_settings" />
 
 </menu>

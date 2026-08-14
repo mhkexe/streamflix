@@ -29,7 +29,7 @@
         android:descendantFocusability="afterDescendants"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:paddingTop="16dp"
+        android:paddingTop="112dp"
         android:paddingBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

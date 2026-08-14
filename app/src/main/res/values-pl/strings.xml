@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Streamflix</string>
+    <string name="app_name">NextVision</string>
 
     <string name="loading_error_title">Wystapil blad</string>
     <string name="loading_error_retry">Sprobuj ponownie</string>
@@ -20,7 +20,6 @@
     <string name="providers_choose_title">Wybierz swój język</string>
 
     <string name="main_menu_change_provider">Zmien dostawce</string>
-    <string name="main_menu_search">Szukaj</string>
     <string name="main_menu_home">Start</string>
     <string name="main_menu_movies">Filmy</string>
     <string name="main_menu_tv_shows">Seriale</string>
@@ -154,16 +153,4 @@
 
     <string name="settings_category_appearance">Wyglad</string>
     <string name="settings_theme_title">Motyw aplikacji</string>
-    <string name="settings_app_language_title">Jezyk aplikacji</string>
-    <string name="settings_app_language_summary">Wybierz dolaczone tlumaczenie, z ktorego ma korzystac aplikacja</string>
-    <string name="settings_app_language_system">Domyslny systemowy</string>
-    <string name="settings_app_language_english">Angielski</string>
-    <string name="settings_app_language_arabic">Arabski</string>
-    <string name="settings_app_language_german">Niemiecki</string>
-    <string name="settings_app_language_spanish">Hiszpanski</string>
-    <string name="settings_app_language_french">Francuski</string>
-    <string name="settings_app_language_italian">Wloski</string>
-    <string name="settings_app_language_polish">Polski</string>
-    <string name="supabase_instructions_title">Instrukcje</string>
-    <string name="supabase_instructions_summary">Otwórz w przeglądarce szczegółową instrukcję konfiguracji konta i synchronizacji Supabase</string>
 </resources>

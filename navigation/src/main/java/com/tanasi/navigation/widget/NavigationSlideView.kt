@@ -9,6 +9,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.Space
 import androidx.annotation.LayoutRes
 import androidx.appcompat.view.SupportMenuInflater
 import androidx.appcompat.view.menu.MenuBuilder
@@ -69,6 +70,11 @@ class NavigationSlideView @JvmOverloads constructor(
 
 
     init {
+        clipChildren = false
+        clipToPadding = false
+        menuView.clipChildren = false
+        menuView.clipToPadding = false
+
         val attributes = context.theme.obtainStyledAttributes(
             attrs,
             R.styleable.NavigationSlideView,
@@ -106,10 +112,14 @@ class NavigationSlideView @JvmOverloads constructor(
         orientation = if (horizontalMenu) HORIZONTAL else VERTICAL
         menuView.setHorizontal(horizontalMenu)
         if (horizontalMenu) {
-            menuView.layoutParams = LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f)
-            headerView?.layoutParams = LinearLayout.LayoutParams(
+            menuView.layoutParams = LinearLayout.LayoutParams(
                 LayoutParams.WRAP_CONTENT,
                 LayoutParams.WRAP_CONTENT
+            )
+            headerView?.layoutParams = LinearLayout.LayoutParams(
+                0,
+                LayoutParams.WRAP_CONTENT,
+                1f
             )
         }
 
@@ -119,8 +129,7 @@ class NavigationSlideView @JvmOverloads constructor(
 
         addView(menuView)
         if (orientation == HORIZONTAL && headerView != null) {
-            removeView(headerView)
-            addView(headerView)
+            addView(Space(context), LinearLayout.LayoutParams(0, 1, 1f))
         }
 
         menu.setCallback(object : MenuBuilder.Callback {
@@ -236,8 +245,9 @@ class NavigationSlideView @JvmOverloads constructor(
         this.headerView = headerView
         if (orientation == HORIZONTAL) {
             headerView.layoutParams = LinearLayout.LayoutParams(
+                0,
                 LayoutParams.WRAP_CONTENT,
-                LayoutParams.WRAP_CONTENT
+                1f
             )
         }
         addView(headerView, 0)

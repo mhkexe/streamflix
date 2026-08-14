@@ -34,8 +34,6 @@ fun NavigationUI.setupWithNavController(
         true
     }
     navigationSlideView.setOnItemReselectedListener { item ->
-        navController.popBackStack(item.itemId, inclusive = true)
-        navController.navigate(item.itemId)
         true
     }
     val weakReference = WeakReference(navigationSlideView)

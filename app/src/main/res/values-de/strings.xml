@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name">Streamflix</string>
+    <string name="app_name">NextVision</string>
 
     <string name="loading_error_title">Ein Fehler ist aufgetreten</string>
     <string name="loading_error_retry">Erneut versuchen</string>
@@ -27,7 +27,6 @@
     <string name="providers_choose_title">Sprache auswählen</string>
 
     <string name="main_menu_change_provider">Anbieter wechseln</string>
-    <string name="main_menu_search">Suche</string>
     <string name="main_menu_home">Startseite</string>
     <string name="main_menu_movies">Filme</string>
     <string name="main_menu_tv_shows">Serien</string>
@@ -375,7 +374,7 @@
     <string name="settings_category_poseidon_domain">Poseidonhd2-Domainname</string>
     <string name="settings_scan_resolver_qr_title">TV-Bypass-QR scannen</string>
     <string name="settings_scan_resolver_qr_summary">Öffne die Kamera und scanne den auf dem TV angezeigten QR-Code</string>
-    <string name="settings_scan_resolver_invalid_qr">Dieser QR-Code ist kein StreamFlix-Bypass-Link.</string>
+    <string name="settings_scan_resolver_invalid_qr">Dieser QR-Code ist kein NextVision-Bypass-Link.</string>
     <string name="settings_scan_resolver_failed">QR-Scanner konnte auf diesem Gerät nicht gestartet werden.</string>
     <string name="settings_category_provider_url_manual">Manuell eingeben</string>
     <string name="player_skip_intro">Intro überspringen</string>
@@ -456,15 +455,6 @@
     <string name="settings_parental_remove_pin_summary">PIN-Schutz deaktivieren und die Altersgrenze löschen</string>
     <string name="settings_parental_remove_admin_pin_title">Admin-PIN entfernen</string>
     <string name="settings_parental_remove_admin_pin_summary">Die Wiederherstellungs-PIN zum Entsperren der Kindersicherung entfernen</string>
-    <string name="settings_app_language_title">App-Sprache</string>
-    <string name="settings_app_language_summary">Waehle, welche mitgelieferte Uebersetzung die App verwenden soll</string>
-    <string name="settings_app_language_system">Systemstandard</string>
-    <string name="settings_app_language_english">Englisch</string>
-    <string name="settings_app_language_arabic">Arabisch</string>
-    <string name="settings_app_language_german">Deutsch</string>
-    <string name="settings_app_language_spanish">Spanisch</string>
-    <string name="settings_app_language_french">Franzoesisch</string>
-    <string name="settings_app_language_italian">Italienisch</string>
     <string name="settings_scan_resolver_camera_permission_denied">Kameraberechtigung ist erforderlich, um den QR-Code zu scannen.</string>
     <string name="settings_scan_resolver_camera_unavailable">Auf diesem Geraet ist keine Kamera verfuegbar.</string>
     <string name="backup_import_action">Importieren</string>
@@ -494,6 +484,4 @@
     <string name="settings_refresh_cache_confirm">Cache aktualisieren?</string>
     <string name="settings_refresh_cache_message">Dadurch werden dein Wiedergabeverlauf und die App-Daten aus der Datenbank neu geladen.</string>
     <string name="settings_refresh_cache_success">Cache erfolgreich aktualisiert</string>
-    <string name="supabase_instructions_title">Anleitung</string>
-    <string name="supabase_instructions_summary">Die ausführliche Anleitung zur Einrichtung von Supabase-Konto und Synchronisierung im Browser öffnen</string>
 </resources>
