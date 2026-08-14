@@ -149,11 +149,7 @@ class SettingsMobileFragment : PreferenceFragmentCompat() {
         currentScreenState = SettingsScreenState(rootKey = rootKey, title = null)
         renderCurrentScreen()
 
-        val allProvidersToBackup = Provider.providers.keys.toMutableList().apply {
-            listOf("it", "en", "es", "de", "fr").forEach { lang ->
-                add(TmdbProvider(lang))
-            }
-        }
+        val allProvidersToBackup = listOf("en", "es", "it", "fr", "de", "pl", "ar").map { TmdbProvider(it) }
 
         backupRestoreManager = BackupRestoreManager(
             requireContext(),
@@ -854,22 +850,7 @@ class SettingsMobileFragment : PreferenceFragmentCompat() {
     }
 
     private fun updateProviderVisibilityState() {
-        val isStreamingCommunity = UserPreferences.currentProvider is StreamingCommunityProvider
-        val isSerienStream = UserPreferences.currentProvider is SerienStreamProvider
-        val isMoflix = UserPreferences.currentProvider is MStreamProvider
-        val isCuevana = UserPreferences.currentProvider?.name == "Cuevana 3"
-        val isPoseidon = UserPreferences.currentProvider?.name == "Poseidonhd2"
-        val isAnimeOnlineNinja = UserPreferences.currentProvider is AnimeOnlineNinjaProvider
-        val hasConfigProvider = UserPreferences.currentProvider is ProviderConfigUrl
-        val hasSpecificOptions = isStreamingCommunity || isCuevana || isPoseidon || isAnimeOnlineNinja
-
-        findPreference<PreferenceCategory>("pc_streamingcommunity_settings")?.isVisible = isStreamingCommunity
-        findPreference<PreferenceCategory>("pc_serienstream_settings")?.isVisible = isSerienStream
-        findPreference<PreferenceCategory>("pc_moflix_settings")?.isVisible = isMoflix
-        findPreference<PreferenceCategory>("pc_cuevana_settings")?.isVisible = isCuevana
-        findPreference<PreferenceCategory>("pc_poseidon_settings")?.isVisible = isPoseidon
-        findPreference<PreferenceCategory>("pc_animeonlineninja_settings")?.isVisible = isAnimeOnlineNinja
-        findPreference<PreferenceCategory>("pc_provider_empty_state")?.isVisible = !hasConfigProvider && !hasSpecificOptions
+        findPreference<PreferenceCategory>("pc_provider_empty_state")?.isVisible = true
     }
 
     private fun bindAnimeOnlineNinjaPreferredServer() {

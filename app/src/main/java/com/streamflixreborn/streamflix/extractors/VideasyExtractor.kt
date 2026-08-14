@@ -2,6 +2,7 @@ package com.streamflixreborn.streamflix.extractors
 
 import com.streamflixreborn.streamflix.models.Video
 import androidx.media3.common.MimeTypes
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -10,7 +11,7 @@ import org.json.JSONObject
 
 class VideasyExtractor : Extractor() {
     override val name = "Videasy"
-    override val mainUrl = "https://api.videasy.net"
+    override val mainUrl = "https://api.speedracelight.com"
 
     data class ServerConfig(
         val name: String,
@@ -36,11 +37,11 @@ class VideasyExtractor : Extractor() {
                     val url = when (videoType) {
                         is Video.Type.Movie -> {
                             val year = videoType.releaseDate.split("-").firstOrNull() ?: ""
-                            "$mainUrl/${config.endpoint}/sources-with-title?title=${videoType.title}&mediaType=movie&year=$year&tmdbId=${videoType.id}&imdbId=${videoType.imdbId ?: ""}"
+                            "$mainUrl/${config.endpoint}/sources-with-title?title=${videoType.title}&mediaType=movie&year=$year&tmdbId=${videoType.id}&imdbId=${videoType.imdbId ?: ""}&enc=2"
                         }
                         is Video.Type.Episode -> {
                             val year = videoType.tvShow.releaseDate?.split("-")?.firstOrNull() ?: ""
-                            "$mainUrl/${config.endpoint}/sources-with-title?title=${videoType.tvShow.title}&mediaType=tv&year=$year&tmdbId=${videoType.tvShow.id}&imdbId=${videoType.tvShow.imdbId ?: ""}&episodeId=${videoType.number}&seasonId=${videoType.season.number}"
+                            "$mainUrl/${config.endpoint}/sources-with-title?title=${videoType.tvShow.title}&mediaType=tv&year=$year&tmdbId=${videoType.tvShow.id}&imdbId=${videoType.tvShow.imdbId ?: ""}&episodeId=${videoType.number}&seasonId=${videoType.season.number}&enc=2"
                         }
                     }
                     
@@ -67,11 +68,11 @@ class VideasyExtractor : Extractor() {
                 val url = when (videoType) {
                     is Video.Type.Movie -> {
                         val year = videoType.releaseDate.split("-").firstOrNull() ?: ""
-                        "$mainUrl/$endpoint/sources-with-title?title=${videoType.title}&mediaType=movie&year=$year&tmdbId=${videoType.id}&imdbId=${videoType.imdbId ?: ""}&language=$videasyLang"
+                        "$mainUrl/$endpoint/sources-with-title?title=${videoType.title}&mediaType=movie&year=$year&tmdbId=${videoType.id}&imdbId=${videoType.imdbId ?: ""}&language=$videasyLang&enc=2"
                     }
                     is Video.Type.Episode -> {
                         val year = videoType.tvShow.releaseDate?.split("-")?.firstOrNull() ?: ""
-                        "$mainUrl/$endpoint/sources-with-title?title=${videoType.tvShow.title}&mediaType=tv&year=$year&tmdbId=${videoType.tvShow.id}&imdbId=${videoType.tvShow.imdbId ?: ""}&episodeId=${videoType.number}&seasonId=${videoType.season.number}&language=$videasyLang"
+                        "$mainUrl/$endpoint/sources-with-title?title=${videoType.tvShow.title}&mediaType=tv&year=$year&tmdbId=${videoType.tvShow.id}&imdbId=${videoType.tvShow.imdbId ?: ""}&episodeId=${videoType.number}&seasonId=${videoType.season.number}&language=$videasyLang&enc=2"
                     }
                 }
 
@@ -91,22 +92,41 @@ class VideasyExtractor : Extractor() {
     override suspend fun extract(link: String): Video {
         val client = OkHttpClient()
 
-        // 1. Get encrypted data from api.videasy.net
+        // 1. Extract IDs from link
+        val url = link.toHttpUrlOrNull() ?: throw Exception("Invalid link")
+        val tmdbId = url.queryParameter("tmdbId") ?: ""
+        
+        // 2. Get Seed
+        val seedRequest = Request.Builder()
+            .url("$mainUrl/seed?mediaId=$tmdbId")
+            .header("Accept", "*/*")
+            .header("Origin", "https://player.videasy.to")
+            .header("Referer", "https://player.videasy.to/")
+            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36")
+            .build()
+        
+        val seedResponse = client.newCall(seedRequest).execute()
+        val seedBody = seedResponse.body?.string() ?: throw Exception("Failed to get seed")
+        val seed = JSONObject(seedBody).optString("seed")
+
+        // 3. Get encrypted data from API with seed
+        val finalLink = if (link.contains("seed=")) link else "$link&seed=$seed"
         val request = Request.Builder()
-            .url(link)
+            .url(finalLink)
+            .header("Accept", "*/*")
+            .header("Origin", "https://player.videasy.to")
+            .header("Referer", "https://player.videasy.to/")
             .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36")
             .build()
         
         val response = client.newCall(request).execute()
         val encData = response.body?.string() ?: throw Exception("Failed to get encrypted data")
 
-        // 2. Extract tmdbId from link to use it for decryption
-        val tmdbId = link.split("tmdbId=").getOrNull(1)?.split("&")?.getOrNull(0) ?: ""
-
-        // 3. Post to decryption API
+        // 4. Post to decryption API
         val json = JSONObject()
         json.put("text", encData)
         json.put("id", tmdbId)
+        json.put("seed", seed)
 
         val body = json.toString().toRequestBody("application/json".toMediaType())
         val decRequest = Request.Builder()
@@ -119,7 +139,7 @@ class VideasyExtractor : Extractor() {
         val decJson = JSONObject(decBody)
         val result = decJson.optString("result")
 
-        // 4. Parse result (JSON string containing sources)
+        // 5. Parse result (JSON string containing sources)
         val resultJson = JSONObject(result)
         val sources = resultJson.optJSONArray("sources")
         val subtitles = mutableListOf<Video.Subtitle>()
@@ -129,11 +149,11 @@ class VideasyExtractor : Extractor() {
             for (i in 0 until tracks.length()) {
                 val track = tracks.getJSONObject(i)
                 val label = track.optString("lang", "Unknown")
-                val url = track.optString("url")
-                if (url.isNotEmpty()) {
+                val subtitleUrl = track.optString("url")
+                if (subtitleUrl.isNotEmpty()) {
                     subtitles.add(Video.Subtitle(
                         label = label,
-                        file = url
+                        file = subtitleUrl
                     ))
                 }
             }
@@ -153,7 +173,7 @@ class VideasyExtractor : Extractor() {
                 source = source.optString("url"),
                 type = mimeType,
                 subtitles = subtitles,
-                headers = mapOf("Referer" to "https://player.videasy.net/")
+                headers = mapOf("Referer" to "https://player.videasy.to/")
             )
         }
 

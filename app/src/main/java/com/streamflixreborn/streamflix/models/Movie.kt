@@ -24,6 +24,12 @@ class Movie(
     var banner: String? = null,
 
     @Ignore
+    var logo: String? = null,
+
+    @Ignore
+    var ageRating: String? = null,
+
+    @Ignore
     var imdbId: String? = null,
 
     @Ignore
@@ -87,6 +93,8 @@ class Movie(
         rating: Double? = this.rating,
         poster: String? = this.poster,
         banner: String? = this.banner,
+        logo: String? = this.logo,
+        ageRating: String? = this.ageRating,
         imdbId: String? = this.imdbId,
         genres: List<Genre> = this.genres,
         directors: List<People> = this.directors,
@@ -94,23 +102,25 @@ class Movie(
         recommendations: List<Show> = this.recommendations,
         isFavorite: Boolean = this.isFavorite,
     ) = Movie(
-        id,
-        title,
-        overview,
-        released,
-        runtime,
-        trailer,
-        quality,
-        rating,
-        poster,
-        banner,
-        imdbId,
-        providerName,
-        genres,
-        directors,
-        cast,
-        recommendations,
-        isFavorite,
+        id = id,
+        title = title,
+        overview = overview,
+        released = released,
+        runtime = runtime,
+        trailer = trailer,
+        quality = quality,
+        rating = rating,
+        poster = poster,
+        banner = banner,
+        logo = logo,
+        ageRating = ageRating,
+        imdbId = imdbId,
+        providerName = providerName,
+        genres = genres,
+        directors = directors,
+        cast = cast,
+        recommendations = recommendations,
+        isFavorite = isFavorite,
     ).apply {
         lastPlayedAtMillis = this@Movie.lastPlayedAtMillis
     }

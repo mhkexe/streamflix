@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -17,9 +15,7 @@ import com.streamflixreborn.streamflix.R
 import com.streamflixreborn.streamflix.adapters.AppAdapter
 import com.streamflixreborn.streamflix.databinding.FragmentProvidersMobileBinding
 import com.streamflixreborn.streamflix.models.Provider as ModelProvider
-import com.streamflixreborn.streamflix.providers.Provider
 import com.streamflixreborn.streamflix.ui.SpacingItemDecoration
-import com.streamflixreborn.streamflix.utils.UserPreferences
 import com.streamflixreborn.streamflix.utils.dp
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -85,84 +81,14 @@ class ProvidersMobileFragment : Fragment() {
 
 
     private fun initializeProviders() {
-        binding.sProvidersLanguage.apply {
-            class Language(
-                val code: String,
-                val name: String,
-            )
-
-            val languages = Provider.providers.keys
-                .distinctBy { it.language }
-                .map {
-                    val locale = Locale.forLanguageTag(it.language)
-
-                    Language(
-                        code = it.language,
-                        name = locale.getDisplayLanguage(locale)
-                            .replaceFirstChar { char -> char.titlecase() },
-                    )
-                }
-                .sortedBy { it.name.lowercase() }
-
-            val spinnerAdapter = ArrayAdapter(
-                this.context,
-                android.R.layout.simple_spinner_item,
-                mutableListOf(
-                    context.getString(R.string.providers_all_languages),
-                    context.getString(R.string.providers_favorites)
-                ).apply {
-                    addAll(languages.map { it.name })
-                }.toTypedArray()
-            ).also {
-                it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            }
-            setAdapter(spinnerAdapter)
-
-            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    when (position) {
-                        0 -> {
-                            viewModel.getProviders()
-                            UserPreferences.providerLanguage = null
-                        }
-                        1 -> {
-                            viewModel.getProviders("favorites")
-                            UserPreferences.providerLanguage = "favorites"
-                        }
-                        else -> {
-                            val langCode = languages[position - 2].code
-                            viewModel.getProviders(langCode)
-                            UserPreferences.providerLanguage = langCode
-                        }
-                    }
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {}
-            }
-
-            setSelection(
-                when (val lang = UserPreferences.providerLanguage) {
-                    null -> 0
-                    "favorites" -> 1
-                    else -> {
-                        val index = languages.indexOfFirst { it.code == lang }
-                        if (index != -1) index + 2 else 0
-                    }
-                }
-            )
-        }
-
         binding.rvProviders.apply {
+            setHasFixedSize(true)
+            itemAnimator = null
             adapter = appAdapter.apply {
                 stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             }
             addItemDecoration(
-                SpacingItemDecoration(32.dp(requireContext()))
+                SpacingItemDecoration(10.dp(requireContext()))
             )
         }
     }

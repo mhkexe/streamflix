@@ -2,10 +2,14 @@ package com.streamflixreborn.streamflix.fragments.player.settings
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
+import android.view.animation.DecelerateInterpolator
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnNextLayout
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -57,9 +61,67 @@ class PlayerSettingsTvView @JvmOverloads constructor(
 
     init {
         binding.rvSettings.addItemDecoration(SpacingItemDecoration(6.dp(context)))
+        binding.rvSettings.layoutAnimation =
+            AnimationUtils.loadLayoutAnimation(context, R.anim.layout_anim_settings)
+    }
+
+    private var pendingItem: Item? = null
+    private var pendingBinding: ItemSettingTvBinding? = null
+    private val pendingHandler = Handler(Looper.getMainLooper())
+    private val pendingTimeout = Runnable { onPendingSelectionResult(false) }
+
+    fun hasPendingSelection() = pendingItem != null
+
+    private fun beginPendingSelection(item: Item, itemBinding: ItemSettingTvBinding): Boolean {
+        if (pendingItem != null) return false
+        pendingItem = item
+        pendingBinding = itemBinding
+        applyPendingState(itemBinding, loading = true, error = false)
+        pendingHandler.removeCallbacks(pendingTimeout)
+        pendingHandler.postDelayed(pendingTimeout, PENDING_TIMEOUT_MS)
+        return true
+    }
+
+    /** Called by the player once the requested change has been applied (or has failed). */
+    fun onPendingSelectionResult(success: Boolean) {
+        if (pendingItem == null) return
+        pendingHandler.removeCallbacks(pendingTimeout)
+        val itemBinding = pendingBinding
+        pendingItem = null
+        if (success) {
+            pendingBinding = null
+            itemBinding?.let { applyPendingState(it, loading = false, error = false) }
+            hide()
+        } else {
+            itemBinding?.let { applyPendingState(it, loading = false, error = true) }
+        }
+    }
+
+    private fun completePendingSelectionSoon() {
+        pendingHandler.postDelayed({ onPendingSelectionResult(true) }, PENDING_MIN_FEEDBACK_MS)
+    }
+
+    private fun clearPendingSelection() {
+        pendingHandler.removeCallbacksAndMessages(null)
+        pendingItem = null
+        pendingBinding = null
+    }
+
+    private fun applyPendingState(
+        itemBinding: ItemSettingTvBinding,
+        loading: Boolean,
+        error: Boolean,
+    ) {
+        itemBinding.pbSettingLoading.visibility = if (loading) View.VISIBLE else View.GONE
+        itemBinding.ivSettingError.visibility = if (error) View.VISIBLE else View.GONE
+        if (loading || error) {
+            itemBinding.ivSettingIsSelected.visibility = View.GONE
+            itemBinding.ivSettingEnter.visibility = View.GONE
+        }
     }
 
     fun onBackPressed(): Boolean {
+        clearPendingSelection()
         when (currentSettings) {
             Setting.MAIN -> hide()
             Setting.QUALITY,
@@ -98,13 +160,27 @@ class PlayerSettingsTvView @JvmOverloads constructor(
 
 
     fun show() {
+        isHiding = false
         this.visibility = View.VISIBLE
+
+        binding.clSettingsPanel.apply {
+            animate().cancel()
+            alpha = 0f
+            translationX = PANEL_SLIDE_PX.dp(context).toFloat()
+            animate()
+                .alpha(1f)
+                .translationX(0f)
+                .setDuration(PANEL_ANIMATION_MS)
+                .setInterpolator(DecelerateInterpolator())
+                .start()
+        }
 
         displaySettings(Setting.MAIN)
     }
 
     private fun displaySettings(setting: Setting) {
         currentSettings = setting
+        clearPendingSelection()
 
         if (setting == Setting.SUBTITLES) {
             onSubtitlesClicked?.invoke()
@@ -164,6 +240,8 @@ class PlayerSettingsTvView @JvmOverloads constructor(
             else -> settingsAdapter
         }
 
+        binding.rvSettings.scheduleLayoutAnimation()
+
         if (setting == Setting.SUBTITLE_OFFSET) {
             focusSelectedSubtitleOffset()
         } else {
@@ -193,8 +271,32 @@ class PlayerSettingsTvView @JvmOverloads constructor(
         }
     }
 
+    private var isHiding = false
+
     fun hide() {
-        this.visibility = View.GONE
+        clearPendingSelection()
+        if (visibility != View.VISIBLE || isHiding) return
+        isHiding = true
+        binding.clSettingsPanel.apply {
+            animate().cancel()
+            animate()
+                .alpha(0f)
+                .translationX(PANEL_SLIDE_PX.dp(context).toFloat())
+                .setDuration(PANEL_ANIMATION_MS)
+                .setInterpolator(DecelerateInterpolator())
+                .withEndAction {
+                    isHiding = false
+                    this@PlayerSettingsTvView.visibility = View.GONE
+                }
+                .start()
+        }
+    }
+
+    private companion object {
+        const val PENDING_TIMEOUT_MS = 25_000L
+        const val PENDING_MIN_FEEDBACK_MS = 250L
+        const val PANEL_ANIMATION_MS = 180L
+        const val PANEL_SLIDE_PX = 24
     }
 
 
@@ -226,6 +328,9 @@ class PlayerSettingsTvView @JvmOverloads constructor(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun displaySettings(item: Item) {
+            binding.pbSettingLoading.visibility = View.GONE
+            binding.ivSettingError.visibility = View.GONE
+
             binding.root.apply {
                 when (item) {
                     Settings.Subtitle.Style,
@@ -234,6 +339,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                     else -> margin(bottom = 0, top = 0)
                 }
                 setOnClickListener {
+                    if (settingsView.hasPendingSelection()) return@setOnClickListener
                     when (item) {
                         is Settings -> {
                             when (item) {
@@ -253,8 +359,9 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                         }
 
                         is Settings.Quality -> {
-                            settingsView.onQualitySelected.invoke(item)
-                            settingsView.hide()
+                            if (settingsView.beginPendingSelection(item, binding)) {
+                                settingsView.onQualitySelected.invoke(item)
+                            }
                         }
 
                         is Settings.Audio -> {
@@ -274,8 +381,10 @@ class PlayerSettingsTvView @JvmOverloads constructor(
 
                                 is Settings.Subtitle.None,
                                 is Settings.Subtitle.TextTrackInformation -> {
-                                    settingsView.onSubtitleSelected.invoke(item)
-                                    settingsView.hide()
+                                    if (settingsView.beginPendingSelection(item, binding)) {
+                                        settingsView.onSubtitleSelected.invoke(item)
+                                        settingsView.completePendingSelectionSoon()
+                                    }
                                 }
 
                                 Settings.Subtitle.LocalSubtitles -> {
@@ -381,13 +490,15 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                         }
 
                         is Settings.Subtitle.OpenSubtitles.Subtitle -> {
-                            settingsView.onOpenSubtitleSelected?.invoke(item)
-                            settingsView.hide()
+                            if (settingsView.beginPendingSelection(item, binding)) {
+                                settingsView.onOpenSubtitleSelected?.invoke(item)
+                            }
                         }
 
                         is Settings.Subtitle.SubDLSubtitles.Subtitle -> {
-                            settingsView.onSubDLSubtitleSelected?.invoke(item)
-                            settingsView.hide()
+                            if (settingsView.beginPendingSelection(item, binding)) {
+                                settingsView.onSubDLSubtitleSelected?.invoke(item)
+                            }
                         }
 
                         is Settings.Speed -> {
@@ -408,8 +519,9 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                         }
 
                         is Settings.Server -> {
-                            settingsView.onServerSelected?.invoke(item)
-                            settingsView.hide()
+                            if (settingsView.beginPendingSelection(item, binding)) {
+                                settingsView.onServerSelected?.invoke(item)
+                            }
                         }
                         else -> {}
                     }

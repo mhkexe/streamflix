@@ -84,7 +84,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="start"
-        app:constraint_referenced_ids="iv_setting_enter,iv_setting_is_selected" />
+        app:constraint_referenced_ids="iv_setting_enter,iv_setting_is_selected,pb_setting_loading,iv_setting_error" />
 
     <ImageView
         android:id="@+id/iv_setting_enter"
@@ -113,5 +113,31 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ContentDescription,UseAppTint"
         tools:visibility="visible" />
+
+    <ProgressBar
+        android:id="@+id/pb_setting_loading"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_marginEnd="10dp"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/setting_text"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/iv_setting_error"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_marginEnd="10dp"
+        android:src="@drawable/ic_player_settings_close"
+        android:tint="#FF5252"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription,UseAppTint" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

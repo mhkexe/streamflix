@@ -21,6 +21,8 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import androidx.leanback.widget.BaseGridView
+import androidx.leanback.widget.OnChildViewHolderSelectedListener
 import com.streamflixreborn.streamflix.providers.IptvProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -251,10 +253,6 @@ class TvShowViewHolder(
         }
         setPoster(binding.ivTvShowPoster)
         bindRibbons(binding.ivTvShowFavoriteRibbon, binding.ivTvShowWatchedRibbon)
-        binding.tvTvShowQuality.apply {
-            text = tvShow.quality ?: ""
-            isVisible = !text.isNullOrEmpty()
-        }
         binding.pbTvShowProgress.apply {
             val watchHistory = tvShow.episodeToWatch?.watchHistory
             progress = when {
@@ -264,8 +262,6 @@ class TvShowViewHolder(
             }
             isVisible = watchHistory != null
         }
-        binding.tvTvShowLastEpisode.text = episodeBadgeText()
-        binding.tvTvShowTitle.text = tvShow.title
     }
 
     private fun displayTvItem(binding: ItemTvShowTvBinding) {
@@ -306,10 +302,6 @@ class TvShowViewHolder(
         }
         setPoster(binding.ivTvShowPoster)
         bindRibbons(binding.ivTvShowFavoriteRibbon, binding.ivTvShowWatchedRibbon)
-        binding.tvTvShowQuality.apply {
-            text = tvShow.quality ?: ""
-            isVisible = !text.isNullOrEmpty()
-        }
         binding.pbTvShowProgress.apply {
             val watchHistory = tvShow.episodeToWatch?.watchHistory
             progress = when {
@@ -319,8 +311,6 @@ class TvShowViewHolder(
             }
             isVisible = watchHistory != null
         }
-        binding.tvTvShowLastEpisode.text = episodeBadgeText()
-        binding.tvTvShowTitle.text = tvShow.title
     }
 
     private fun displayGridMobileItem(binding: ItemTvShowGridMobileBinding) {
@@ -351,10 +341,6 @@ class TvShowViewHolder(
         }
         setPoster(binding.ivTvShowPoster)
         bindRibbons(binding.ivTvShowFavoriteRibbon, binding.ivTvShowWatchedRibbon)
-        binding.tvTvShowQuality.apply {
-            text = tvShow.quality ?: ""
-            isVisible = !text.isNullOrEmpty()
-        }
         binding.pbTvShowProgress.apply {
             val watchHistory = tvShow.episodeToWatch?.watchHistory
             progress = when {
@@ -364,8 +350,6 @@ class TvShowViewHolder(
             }
             isVisible = watchHistory != null
         }
-        binding.tvTvShowLastEpisode.text = episodeBadgeText()
-        binding.tvTvShowTitle.text = tvShow.title
     }
 
     private fun displayGridTvItem(binding: ItemTvShowGridBinding) {
@@ -401,11 +385,15 @@ class TvShowViewHolder(
             }
         }
         setPoster(binding.ivTvShowPoster)
-        bindRibbons(binding.ivTvShowFavoriteRibbon, binding.ivTvShowWatchedRibbon)
-        binding.tvTvShowQuality.apply {
-            text = tvShow.quality ?: ""
-            isVisible = !text.isNullOrEmpty()
+        binding.tvTvShowYearOverlay.apply {
+            text = tvShow.released?.format("yyyy") ?: ""
+            visibility = if (text.isNullOrEmpty()) View.GONE else View.VISIBLE
         }
+        binding.tvTvShowRatingOverlay.apply {
+            text = tvShow.rating?.let { "★ ${String.format(Locale.ROOT, "%.1f", it)}" } ?: ""
+            visibility = if (text.isNullOrEmpty()) View.GONE else View.VISIBLE
+        }
+        bindRibbons(binding.ivTvShowFavoriteRibbon, binding.ivTvShowWatchedRibbon)
         binding.pbTvShowProgress.apply {
             val watchHistory = tvShow.episodeToWatch?.watchHistory
             progress = when {
@@ -415,8 +403,6 @@ class TvShowViewHolder(
             }
             isVisible = watchHistory != null
         }
-        binding.tvTvShowLastEpisode.text = episodeBadgeText()
-        binding.tvTvShowTitle.text = tvShow.title
     }
 
     private fun applyMobileSelection(view: View) {
@@ -651,6 +637,7 @@ class TvShowViewHolder(
         }
 
         binding.tvTvShowOverview.text = tvShow.overview
+        binding.tvTvShowOverview.setTextColor(ContextCompat.getColor(context, R.color.detail_description))
         val episodeToWatch = tvShow.episodeToWatch
         val episodeSeason = resolveEpisodeSeason(episodeToWatch)
         binding.btnTvShowWatchNow.apply {
@@ -727,6 +714,7 @@ class TvShowViewHolder(
                             tvShow.poster = resolvedTvShow.poster
                             tvShow.banner = resolvedTvShow.banner
                             tvShow.isFavorite = newValue
+                            isSelected = newValue
                             setImageDrawable(
                                 ContextCompat.getDrawable(context, newValue.drawable())
                             )
@@ -735,6 +723,8 @@ class TvShowViewHolder(
                 }
             }
 
+            isSelected = tvShow.isFavorite
+            isSelected = tvShow.isFavorite
             setImageDrawable(
                 ContextCompat.getDrawable(context, tvShow.isFavorite.drawable())
             )
@@ -749,42 +739,46 @@ class TvShowViewHolder(
             }
             visibility = if (tvShow.poster.isNullOrEmpty()) View.GONE else View.VISIBLE
         }
-        binding.tvTvShowTitle.text = tvShow.title
-
-        binding.tvTvShowRating.apply {
-            text = tvShow.rating?.let { String.format(Locale.ROOT, "%.1f", it) } ?: "N/A"
-            isVisible = !text.isNullOrEmpty()
-        }
-        binding.ivTvShowRatingIcon.isVisible = binding.tvTvShowRating.isVisible
-
-        binding.tvTvShowQuality.apply {
-            text = tvShow.quality
-            isVisible = !text.isNullOrEmpty()
-        }
-
-        binding.tvTvShowReleased.apply {
-            text = tvShow.released?.format("yyyy")
-            isVisible = !text.isNullOrEmpty()
-        }
-
-        binding.tvTvShowRuntime.apply {
-            text = tvShow.runtime?.let {
-                val hours = it / 60
-                val minutes = it % 60
-                when {
-                    hours > 0 -> context.getString(R.string.tv_show_runtime_hours_minutes, hours, minutes)
-                    else -> context.getString(R.string.tv_show_runtime_minutes, minutes)
-                }
+        binding.tvTvShowLogo.apply {
+            visibility = if (tvShow.logo.isNullOrEmpty()) View.GONE else View.VISIBLE
+            if (visibility == View.VISIBLE) {
+                Glide.with(context)
+                    .load(tvShow.logo)
+                    .into(this)
             }
-            isVisible = !text.isNullOrEmpty()
+        }
+        binding.tvTvShowTitle.apply {
+            text = tvShow.title
+            visibility = if (tvShow.logo.isNullOrEmpty()) View.VISIBLE else View.GONE
         }
 
-        binding.tvTvShowGenres.apply {
-            text = tvShow.genres.joinToString(", ") { it.name }
-            isVisible = tvShow.genres.isNotEmpty()
+        val seasonCount = tvShow.seasons.count { it.number > 0 }
+        binding.tvTvShowMetadata.apply {
+            text = listOfNotNull(
+                tvShow.rating?.let { String.format(Locale.ROOT, "%.1f", it) },
+                tvShow.released?.format("yyyy"),
+                tvShow.genres.takeIf { it.isNotEmpty() }?.joinToString(", ") { it.name },
+                seasonCount.takeIf { it > 0 }?.let { "$it ${if (it == 1) "Season" else "Seasons"}" },
+                tvShow.runtime?.let { runtime ->
+                    val hours = runtime / 60
+                    val minutes = runtime % 60
+                    if (hours > 0) context.getString(R.string.tv_show_runtime_hours_minutes, hours, minutes)
+                    else context.getString(R.string.tv_show_runtime_minutes, minutes)
+                },
+                tvShow.ageRating,
+            ).joinToString("  •  ")
+            isVisible = text.isNotEmpty()
         }
+        binding.ivTvShowRatingIcon.visibility = View.GONE
+        binding.tvTvShowRating.visibility = View.GONE
+        binding.tvTvShowQuality.visibility = View.GONE
+        binding.tvTvShowReleased.visibility = View.GONE
+        binding.tvTvShowRuntime.visibility = View.GONE
+        binding.tvTvShowAgeRating.visibility = View.GONE
+        binding.tvTvShowGenres.visibility = View.GONE
 
         binding.tvTvShowOverview.text = tvShow.overview
+        binding.tvTvShowOverview.setTextColor(ContextCompat.getColor(context, R.color.detail_description))
         val episodeToWatch = tvShow.episodeToWatch
         val episodeSeason = resolveEpisodeSeason(episodeToWatch)
         binding.btnTvShowWatchNow.apply {
@@ -861,6 +855,7 @@ class TvShowViewHolder(
                             tvShow.poster = resolvedTvShow.poster
                             tvShow.banner = resolvedTvShow.banner
                             tvShow.isFavorite = newValue
+                            isSelected = newValue
                             setImageDrawable(
                                 ContextCompat.getDrawable(context, newValue.drawable())
                             )
@@ -935,17 +930,67 @@ class TvShowViewHolder(
     }
 
     private fun displayRecommendationsTv(binding: ContentTvShowRecommendationsTvBinding) {
+        val recommendations = tvShow.recommendations.take(10).onEach {
+            when (it) {
+                is Movie -> it.itemType = AppAdapter.Type.MOVIE_TV_ITEM
+                is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_TV_ITEM
+            }
+        }
+        val loopedRecommendations = if (recommendations.size > 1) {
+            buildList {
+                repeat(3) { addAll(recommendations) }
+            }
+        } else {
+            recommendations
+        }
         binding.hgvTvShowRecommendations.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
+            windowAlignment = BaseGridView.WINDOW_ALIGN_NO_EDGE
+            windowAlignmentOffsetPercent = 50f
+            itemAlignmentOffsetPercent = 50f
             adapter = AppAdapter().apply {
-                submitList(tvShow.recommendations.onEach {
-                    when (it) {
-                        is Movie -> it.itemType = AppAdapter.Type.MOVIE_TV_ITEM
-                        is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_TV_ITEM
-                    }
-                })
+                setHasStableIds(false)
+                submitList(loopedRecommendations)
             }
             setItemSpacing(20)
+            addOnChildAttachStateChangeListener(object : RecyclerView.OnChildAttachStateChangeListener {
+                override fun onChildViewAttachedToWindow(view: View) {
+                    view.findViewById<View>(R.id.tv_movie_quality)?.visibility = View.GONE
+                    view.findViewById<View>(R.id.tv_movie_released_year)?.visibility = View.GONE
+                    view.findViewById<View>(R.id.tv_movie_title)?.visibility = View.GONE
+                    view.findViewById<View>(R.id.tv_tv_show_quality)?.visibility = View.GONE
+                    view.findViewById<View>(R.id.tv_tv_show_last_episode)?.visibility = View.GONE
+                    view.findViewById<View>(R.id.tv_tv_show_title)?.visibility = View.GONE
+                }
+
+                override fun onChildViewDetachedFromWindow(view: View) = Unit
+            })
+            addOnChildViewHolderSelectedListener(object : OnChildViewHolderSelectedListener() {
+                override fun onChildViewHolderSelected(
+                    parent: RecyclerView,
+                    child: RecyclerView.ViewHolder?,
+                    position: Int,
+                    subposition: Int,
+                ) {
+                    val selected = recommendations.getOrNull(position % recommendations.size) ?: return
+                    binding.tvTvShowRecommendationsSelected.text = recommendationLabel(selected)
+                    if (recommendations.size > 1 && (position < recommendations.size || position >= recommendations.size * 2)) {
+                        post { setSelectedPosition(position + if (position < recommendations.size) recommendations.size else -recommendations.size) }
+                    }
+                }
+            })
         }
+        if (recommendations.size > 1) {
+            binding.hgvTvShowRecommendations.post {
+                binding.hgvTvShowRecommendations.setSelectedPosition(recommendations.size)
+            }
+        }
+        binding.tvTvShowRecommendationsSelected.text = recommendations.firstOrNull()?.let(::recommendationLabel).orEmpty()
     }
+
+    private fun recommendationLabel(show: com.streamflixreborn.streamflix.models.Show): String =
+        when (show) {
+            is Movie -> listOfNotNull(show.title.takeIf { it.isNotBlank() }, show.released?.format("yyyy")).joinToString(" • ")
+            is TvShow -> listOfNotNull(show.title.takeIf { it.isNotBlank() }, show.released?.format("yyyy")).joinToString(" • ")
+        }
 }

@@ -40,6 +40,9 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class TmdbProvider(override val language: String) : Provider {
     override val baseUrl: String
@@ -49,12 +52,62 @@ class TmdbProvider(override val language: String) : Provider {
     override val logo =
         "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Tmdb.new.logo.svg/1280px-Tmdb.new.logo.svg.png"
 
+    private fun isReleased(releaseDate: String?): Boolean {
+        return releaseDate.isNullOrBlank() || releaseDate <= SimpleDateFormat(
+            "yyyy-MM-dd",
+            Locale.US,
+        ).format(Date())
+    }
+
+    private fun isReleased(item: TMDb3.MultiItem): Boolean = when (item) {
+        is TMDb3.Movie -> isReleased(item.releaseDate)
+        is TMDb3.Tv -> isReleased(item.firstAirDate)
+        else -> true
+    }
+
     override suspend fun getHome(): List<Category> = coroutineScope {
+        val trending = awaitAll(
+            async { TMDb3.Trending.all(TMDb3.Params.TimeWindow.DAY, page = 1, language = language) },
+            async { TMDb3.Trending.all(TMDb3.Params.TimeWindow.DAY, page = 2, language = language) },
+            async { TMDb3.Trending.all(TMDb3.Params.TimeWindow.DAY, page = 3, language = language) },
+        ).flatMap { it.results }
+
+        val items = trending.mapNotNull { multi ->
+            if (!isReleased(multi)) return@mapNotNull null
+            when (multi) {
+                is TMDb3.Movie -> Movie(
+                    id = multi.id.toString(),
+                    title = multi.title,
+                    overview = multi.overview,
+                    released = multi.releaseDate,
+                    rating = multi.voteAverage.toDouble(),
+                    poster = multi.posterPath?.w500,
+                    banner = multi.backdropPath?.original,
+                )
+                is TMDb3.Tv -> TvShow(
+                    id = multi.id.toString(),
+                    title = multi.name,
+                    overview = multi.overview,
+                    released = multi.firstAirDate,
+                    rating = multi.voteAverage.toDouble(),
+                    poster = multi.posterPath?.w500,
+                    banner = multi.backdropPath?.original,
+                )
+                else -> null
+            }
+        }
+
+        listOf(Category(name = getTranslation("Trending"), list = items))
+    }
+
+    private suspend fun getHomeLegacy(): List<Category> = coroutineScope {
         val categories = mutableListOf<Category>()
         val watchRegion = if (language == "en") "US" else language.uppercase()
 
         val mapMulti: (TMDb3.MultiItem) -> AppAdapter.Item? = { multi ->
-            when (multi) {
+            if (!isReleased(multi)) {
+                null
+            } else when (multi) {
                 is TMDb3.Movie -> Movie(
                     id = multi.id.toString(),
                     title = multi.title,
@@ -379,7 +432,9 @@ class TmdbProvider(override val language: String) : Provider {
         }
 
         val results = TMDb3.Search.multi(query, page = page, language = language).results.mapNotNull { multi ->
-            when (multi) {
+            if (!isReleased(multi)) {
+                null
+            } else when (multi) {
                 is TMDb3.Movie -> Movie(
                     id = multi.id.toString(),
                     title = multi.title,
@@ -408,7 +463,9 @@ class TmdbProvider(override val language: String) : Provider {
     }
 
     override suspend fun getMovies(page: Int): List<Movie> {
-        val movies = TMDb3.MovieLists.popular(page = page, language = language).results.map { movie ->
+        val movies = TMDb3.MovieLists.popular(page = page, language = language).results.filter {
+            isReleased(it.releaseDate)
+        }.map { movie ->
             Movie(
                 id = movie.id.toString(),
                 title = movie.title,
@@ -424,7 +481,9 @@ class TmdbProvider(override val language: String) : Provider {
     }
 
     override suspend fun getTvShows(page: Int): List<TvShow> {
-        val tvShows = TMDb3.TvSeriesLists.popular(page = page, language = language).results.map { tv ->
+        val tvShows = TMDb3.TvSeriesLists.popular(page = page, language = language).results.filter {
+            isReleased(it.firstAirDate)
+        }.map { tv ->
             TvShow(
                 id = tv.id.toString(),
                 title = tv.name,
@@ -447,9 +506,13 @@ class TmdbProvider(override val language: String) : Provider {
                 TMDb3.Params.AppendToResponse.Movie.RECOMMENDATIONS,
                 TMDb3.Params.AppendToResponse.Movie.VIDEOS,
                 TMDb3.Params.AppendToResponse.Movie.EXTERNAL_IDS,
+                TMDb3.Params.AppendToResponse.Movie.IMAGES,
             ),
             language = language
         ).let { movie ->
+            check(isReleased(movie.releaseDate)) {
+                "This movie has not been released yet."
+            }
             Movie(
                 id = movie.id.toString(),
                 title = movie.title,
@@ -463,6 +526,11 @@ class TmdbProvider(override val language: String) : Provider {
                 rating = movie.voteAverage.toDouble(),
                 poster = movie.posterPath?.original,
                 banner = movie.backdropPath?.original,
+                logo = movie.images?.logos
+                    ?.sortedByDescending { it.iso639 == language }
+                    ?.firstOrNull()
+                    ?.filePath
+                    ?.original,
                 imdbId = movie.externalIds?.imdbId,
 
                 genres = movie.genres.map { genre ->
@@ -479,7 +547,9 @@ class TmdbProvider(override val language: String) : Provider {
                     )
                 } ?: listOf(),
                 recommendations = movie.recommendations?.results?.mapNotNull { multi ->
-                    when (multi) {
+                    if (!isReleased(multi)) {
+                        null
+                    } else when (multi) {
                         is TMDb3.Movie -> Movie(
                             id = multi.id.toString(),
                             title = multi.title,
@@ -517,14 +587,19 @@ class TmdbProvider(override val language: String) : Provider {
                 TMDb3.Params.AppendToResponse.Tv.RECOMMENDATIONS,
                 TMDb3.Params.AppendToResponse.Tv.VIDEOS,
                 TMDb3.Params.AppendToResponse.Tv.EXTERNAL_IDS,
+                TMDb3.Params.AppendToResponse.Tv.IMAGES,
             ),
             language = language
         ).let { tv ->
+            check(isReleased(tv.firstAirDate)) {
+                "This series has not been released yet."
+            }
             TvShow(
                 id = tv.id.toString(),
                 title = tv.name,
                 overview = tv.overview,
                 released = tv.firstAirDate,
+                runtime = tv.episodeRuntime.firstOrNull(),
                 trailer = tv.videos?.results
                     ?.sortedBy { it.publishedAt ?: "" }
                     ?.firstOrNull { it.site == TMDb3.Video.VideoSite.YOUTUBE }
@@ -532,6 +607,11 @@ class TmdbProvider(override val language: String) : Provider {
                 rating = tv.voteAverage.toDouble(),
                 poster = tv.posterPath?.original,
                 banner = tv.backdropPath?.original,
+                logo = tv.images?.logos
+                    ?.sortedByDescending { it.iso639 == language }
+                    ?.firstOrNull()
+                    ?.filePath
+                    ?.original,
                 imdbId = tv.externalIds?.imdbId,
 
                 seasons = tv.seasons.map { season ->
@@ -556,7 +636,9 @@ class TmdbProvider(override val language: String) : Provider {
                     )
                 } ?: listOf(),
                 recommendations = tv.recommendations?.results?.mapNotNull { multi ->
-                    when (multi) {
+                    if (!isReleased(multi)) {
+                        null
+                    } else when (multi) {
                         is TMDb3.Movie -> Movie(
                             id = multi.id.toString(),
                             title = multi.title,
@@ -598,6 +680,7 @@ class TmdbProvider(override val language: String) : Provider {
                 id = it.id.toString(),
                 number = it.episodeNumber,
                 title = it.name ?: "",
+                overview = it.overview,
                 released = it.airDate,
                 poster = it.stillPath?.w500,
             )
@@ -629,7 +712,7 @@ class TmdbProvider(override val language: String) : Provider {
                 page = page,
                 withGenres = TMDb3.Params.WithBuilder(id),
                 language = language
-            ).results.map { movie ->
+            ).results.filter { isReleased(it.releaseDate) }.map { movie ->
                 Movie(
                     id = movie.id.toString(),
                     title = movie.title,
@@ -643,7 +726,7 @@ class TmdbProvider(override val language: String) : Provider {
                 page = page,
                 withGenres = TMDb3.Params.WithBuilder(id),
                 language = language
-            ).results.map { tv ->
+            ).results.filter { isReleased(it.firstAirDate) }.map { tv ->
                 TvShow(
                     id = tv.id.toString(),
                     title = tv.name,
@@ -678,7 +761,9 @@ class TmdbProvider(override val language: String) : Provider {
 
                 filmography = person.combinedCredits?.cast
                     ?.mapNotNull { multi ->
-                        when (multi) {
+                        if (!isReleased(multi)) {
+                            null
+                        } else when (multi) {
                             is TMDb3.Movie -> Movie(
                                 id = multi.id.toString(),
                                 title = multi.title,

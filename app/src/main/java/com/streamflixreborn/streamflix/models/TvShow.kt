@@ -28,6 +28,12 @@ class TvShow(
     var banner: String? = null,
 
     @Ignore
+    var logo: String? = null,
+
+    @Ignore
+    var ageRating: String? = null,
+
+    @Ignore
     var imdbId: String? = null,
 
     @Ignore
@@ -118,6 +124,8 @@ class TvShow(
         rating: Double? = this.rating,
         poster: String? = this.poster,
         banner: String? = this.banner,
+        logo: String? = this.logo,
+        ageRating: String? = this.ageRating,
         imdbId: String? = this.imdbId,
         seasons: List<Season> = this.seasons,
         genres: List<Genre> = this.genres,
@@ -126,24 +134,26 @@ class TvShow(
         recommendations: List<Show> = this.recommendations,
         isFavorite: Boolean = this.isFavorite
     ) = TvShow(
-        id,
-        title,
-        overview,
-        released,
-        runtime,
-        trailer,
-        quality,
-        rating,
-        poster,
-        banner,
-        imdbId,
-        providerName,
-        seasons,
-        genres,
-        directors,
-        cast,
-        recommendations,
-        isFavorite,
+        id = id,
+        title = title,
+        overview = overview,
+        released = released,
+        runtime = runtime,
+        trailer = trailer,
+        quality = quality,
+        rating = rating,
+        poster = poster,
+        banner = banner,
+        logo = logo,
+        ageRating = ageRating,
+        imdbId = imdbId,
+        providerName = providerName,
+        seasons = seasons,
+        genres = genres,
+        directors = directors,
+        cast = cast,
+        recommendations = recommendations,
+        isFavorite = isFavorite,
     ).apply {
         lastPlayedAtMillis = this@TvShow.lastPlayedAtMillis
         lastPlayedEpisodeId = this@TvShow.lastPlayedEpisodeId

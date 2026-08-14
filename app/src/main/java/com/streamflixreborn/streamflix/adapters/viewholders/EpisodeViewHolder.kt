@@ -14,12 +14,9 @@ import com.streamflixreborn.streamflix.databinding.ItemEpisodeContinueWatchingTv
 import com.streamflixreborn.streamflix.databinding.ItemEpisodeMobileBinding
 import com.streamflixreborn.streamflix.databinding.ItemEpisodeTvBinding
 import com.streamflixreborn.streamflix.fragments.home.HomeMobileFragmentDirections
-import com.streamflixreborn.streamflix.fragments.home.HomeTvFragment
 import com.streamflixreborn.streamflix.fragments.home.HomeTvFragmentDirections
 import com.streamflixreborn.streamflix.fragments.season.SeasonMobileFragmentDirections
 import com.streamflixreborn.streamflix.fragments.season.SeasonTvFragmentDirections
-import com.streamflixreborn.streamflix.fragments.tv_show.TvShowMobileFragmentDirections
-import com.streamflixreborn.streamflix.fragments.tv_show.TvShowTvFragmentDirections
 import com.streamflixreborn.streamflix.models.Episode
 import com.streamflixreborn.streamflix.models.Video
 import com.streamflixreborn.streamflix.ui.ShowOptionsMobileDialog
@@ -36,6 +33,17 @@ class EpisodeViewHolder(
 ) : RecyclerView.ViewHolder(
     _binding.root
 ) {
+
+    private fun formatRuntime(runtime: Int?): String {
+        if (runtime == null || runtime <= 0) return "--"
+        val hours = runtime / 60
+        val minutes = runtime % 60
+        return if (hours > 0) {
+            context.getString(R.string.tv_show_runtime_hours_minutes, hours, minutes)
+        } else {
+            context.getString(R.string.tv_show_runtime_minutes, minutes)
+        }
+    }
 
     private val context = itemView.context
     private lateinit var episode: Episode
@@ -137,6 +145,8 @@ class EpisodeViewHolder(
             episode.number
         )
 
+        binding.tvEpisodeRuntime.text = formatRuntime(episode.tvShow?.runtime)
+
         binding.tvEpisodeTitle.text = episode.title ?: context.getString(
             R.string.episode_number,
             episode.number
@@ -211,6 +221,9 @@ class EpisodeViewHolder(
                 }
                 binding.root.startAnimation(animation)
                 animation.fillAfter = true
+                binding.ivEpisodePlay.visibility = if (hasFocus) View.VISIBLE else View.GONE
+                binding.tvEpisodeTitle.visibility = if (hasFocus) View.VISIBLE else View.GONE
+                binding.tvEpisodeOverview.visibility = if (hasFocus) View.VISIBLE else View.GONE
             }
         }
 
@@ -224,6 +237,10 @@ class EpisodeViewHolder(
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(this)
         }
+        val isFocused = binding.root.hasFocus()
+        binding.ivEpisodePlay.visibility = if (isFocused) View.VISIBLE else View.GONE
+        binding.tvEpisodeTitle.visibility = if (isFocused) View.VISIBLE else View.GONE
+        binding.tvEpisodeOverview.visibility = if (isFocused) View.VISIBLE else View.GONE
         binding.ivEpisodeWatchedRibbon.visibility = if (episode.isWatched) View.VISIBLE else View.GONE
 
         binding.pbEpisodeProgress.apply {
@@ -246,18 +263,12 @@ class EpisodeViewHolder(
             episode.number
         )
 
+        binding.tvEpisodeRuntime.text = formatRuntime(episode.tvShow?.runtime)
+
         binding.tvEpisodeTitle.text = episode.title ?: context.getString(
             R.string.episode_number,
             episode.number
         )
-
-        binding.tvEpisodeReleased.apply {
-            text = episode.released?.format("EEEE - MMMM dd, yyyy")
-            visibility = when {
-                text.isNullOrEmpty() -> View.GONE
-                else -> View.VISIBLE
-            }
-        }
         binding.tvEpisodeOverview.text = episode.overview ?: ""
     }
 
@@ -265,14 +276,7 @@ class EpisodeViewHolder(
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
-                    HomeMobileFragmentDirections.actionHomeToTvShow(
-                        id = episode.tvShow?.id ?: "",
-                        poster = episode.tvShow?.poster,
-                        banner = episode.tvShow?.banner,
-                    )
-                )
-                findNavController().navigate(
-                    TvShowMobileFragmentDirections.actionTvShowToPlayer(
+                    HomeMobileFragmentDirections.actionHomeToPlayer(
                         id = episode.id,
                         title = episode.tvShow?.title ?: "",
                         subtitle = episode.season?.takeIf { it.number != 0 }?.let { season ->
@@ -366,14 +370,7 @@ class EpisodeViewHolder(
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
-                    HomeTvFragmentDirections.actionHomeToTvShow(
-                        id = episode.tvShow?.id ?: "",
-                        poster = episode.tvShow?.poster,
-                        banner = episode.tvShow?.banner,
-                    )
-                )
-                findNavController().navigate(
-                    TvShowTvFragmentDirections.actionTvShowToPlayer(
+                    HomeTvFragmentDirections.actionHomeToPlayer(
                         id = episode.id,
                         title = episode.tvShow?.title ?: "",
                         subtitle = episode.season?.takeIf { it.number != 0 }?.let { season ->
@@ -429,15 +426,7 @@ class EpisodeViewHolder(
                 binding.root.startAnimation(animation)
                 animation.fillAfter = true
 
-                when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                    is HomeTvFragment -> {
-                        if (hasFocus) {
-                            fragment.pinBackground(episode.tvShow?.banner)
-                        } else {
-                            fragment.releasePinnedBackground()
-                        }
-                    }
-                }
+                // Continue Watching keeps the rotating Home background stable.
             }
         }
 
@@ -480,6 +469,9 @@ class EpisodeViewHolder(
                 R.string.episode_number,
                 episode.number
             )
+        )
+        binding.tvEpisodeInfo.append(
+            "  •  ${formatRuntime(episode.tvShow?.runtime)}"
         )
     }
 

@@ -49,6 +49,7 @@ import com.streamflixreborn.streamflix.databinding.ItemLoadingBinding
 import com.streamflixreborn.streamflix.databinding.ItemMovieGridMobileBinding
 import com.streamflixreborn.streamflix.databinding.ItemMovieGridTvBinding
 import com.streamflixreborn.streamflix.databinding.ItemMovieMobileBinding
+import com.streamflixreborn.streamflix.databinding.ItemMovieContinueWatchingTvBinding
 import com.streamflixreborn.streamflix.databinding.ItemMovieTvBinding
 import com.streamflixreborn.streamflix.databinding.ItemPeopleMobileBinding
 import com.streamflixreborn.streamflix.databinding.ItemPeopleTvBinding
@@ -284,7 +285,13 @@ class AppAdapter(
                     false,
                 )
             )
-            Type.MOVIE_CONTINUE_WATCHING_TV_ITEM,
+            Type.MOVIE_CONTINUE_WATCHING_TV_ITEM -> MovieViewHolder(
+                ItemMovieContinueWatchingTvBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
             Type.MOVIE_TV_ITEM -> MovieViewHolder(
                 ItemMovieTvBinding.inflate(
                     LayoutInflater.from(parent.context),

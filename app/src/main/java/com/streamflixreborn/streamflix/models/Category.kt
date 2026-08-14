@@ -52,5 +52,7 @@ class Category(
         const val RECENTLY_WATCHED = "Recently Watched"
         const val FAVORITE_MOVIES = "Favorite movies"
         const val FAVORITE_TV_SHOWS = "Favorite TV shows"
+        const val TRENDING_MOVIES = "Trending Movies"
+        const val TRENDING_TV_SHOWS = "Trending TV Shows"
     }
 }

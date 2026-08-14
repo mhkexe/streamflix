@@ -82,7 +82,7 @@ class FavoritesTvFragment : Fragment() {
                         val position = itemView?.let(binding.rvFavorites::getChildAdapterPosition)
                             ?: RecyclerView.NO_POSITION
                         if (isInFirstGridRow(position)) {
-                            return binding.btnFavoritesReorderMode
+                            return super.onInterceptFocusSearch(focused, direction)
                         }
                     }
                     return super.onInterceptFocusSearch(focused, direction)
@@ -93,11 +93,8 @@ class FavoritesTvFragment : Fragment() {
             }
             addItemDecoration(SpacingItemDecoration(10.dp(requireContext())))
         }
-        binding.btnFavoritesReorder.setOnClickListener { showSortDialog() }
-        binding.btnFavoritesReorderMode.setOnClickListener { setRearrangeMode(!rearrangeMode) }
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, rearrangeBackCallback)
         setRearrangeMode(false)
-        binding.root.requestFocus()
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.sections.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect(::display)
@@ -110,17 +107,8 @@ class FavoritesTvFragment : Fragment() {
         rearrangeBackCallback.isEnabled = enabled
         moveSelectionMode = false
         if (!enabled) selectedItems.clear()
-        binding.btnFavoritesReorderMode.apply {
-            isSelected = enabled
-            text = getString(if (enabled) R.string.favorites_rearrange_off else R.string.favorites_rearrange_on)
-        }
         configureAdapterInteractions()
         appAdapter.notifyDataSetChanged()
-        if (!enabled) {
-            binding.btnFavoritesReorderMode.post {
-                _binding?.btnFavoritesReorderMode?.requestFocus()
-            }
-        }
     }
 
     private fun configureAdapterInteractions() {
@@ -181,7 +169,6 @@ class FavoritesTvFragment : Fragment() {
                     }
                     moveSelectionMode -> {
                         moveSelectionMode = false
-                        binding.btnFavoritesReorderMode.setText(R.string.favorites_rearrange_off)
                     }
                     else -> {
                         toggleSelection(section, id)
@@ -224,7 +211,6 @@ class FavoritesTvFragment : Fragment() {
         if (key !in selectedItems) toggleSelection(section, id)
         selectLongPressHandled = true
         moveSelectionMode = true
-        binding.btnFavoritesReorderMode.setText(R.string.favorites_moving_selected)
     }
 
     private fun isInFirstGridRow(position: Int): Boolean {
@@ -309,7 +295,6 @@ class FavoritesTvFragment : Fragment() {
         }
         binding.tvFavoritesEmpty.isVisible = gridItems.isEmpty()
         binding.rvFavorites.isVisible = gridItems.isNotEmpty()
-        binding.btnFavoritesReorder.isEnabled = gridItems.isNotEmpty()
         appAdapter.submitList(gridItems)
     }
 

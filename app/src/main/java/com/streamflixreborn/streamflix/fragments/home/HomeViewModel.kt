@@ -40,10 +40,7 @@ import java.util.concurrent.ConcurrentHashMap
 class HomeViewModel(database: AppDatabase) : ViewModel() {
 
     private data class HomeHistory(
-        val continueWatching: List<AppAdapter.Item>,
-        val recentlyWatched: List<AppAdapter.Item>,
-        val favoritesMovies: List<Movie>,
-        val favoriteTvShows: List<TvShow>
+        val continueWatching: List<AppAdapter.Item>
     )
 
     private fun <T> preserveCacheOrder(
@@ -145,43 +142,8 @@ class HomeViewModel(database: AppDatabase) : ViewModel() {
                 } as List<AppAdapter.Item>
             }.flowOn(Dispatchers.IO),
 
-            // RECENTLY WATCHED - Recorded immediately when playback starts.
-            combine(
-                database.movieDao().getRecentlyWatched(),
-                database.tvShowDao().getRecentlyWatched(),
-            ) { movies, tvShows ->
-                val episodeIds = tvShows.mapNotNull { it.lastPlayedEpisodeId }.distinct()
-                val episodesById = if (episodeIds.isEmpty()) {
-                    emptyMap()
-                } else {
-                    database.episodeDao().getByIds(episodeIds).associateBy { it.id }
-                }
-
-                val recentlyWatchedTvShows = tvShows.map { tvShow ->
-                    tvShow.copy().apply {
-                        merge(tvShow)
-                        lastPlayedEpisode = lastPlayedEpisodeId?.let(episodesById::get)
-                    }
-                }
-
-                (movies + recentlyWatchedTvShows)
-                    .sortedByDescending { item ->
-                        when (item) {
-                            is Movie -> item.lastPlayedAtMillis ?: 0L
-                            is TvShow -> item.lastPlayedAtMillis ?: 0L
-                            else -> 0L
-                        }
-                    } as List<AppAdapter.Item>
-            }.flowOn(Dispatchers.IO),
-            
-            // FAVORITE MOVIES
-            database.movieDao().getFavorites().flowOn(Dispatchers.IO),
-            
-            // FAVORITE TV SHOWS
-            database.tvShowDao().getFavorites().flowOn(Dispatchers.IO),
-
-        ) { continueWatching, recentlyWatched, favoritesMovies, favoriteTvShows ->
-            HomeHistory(continueWatching, recentlyWatched, favoritesMovies, favoriteTvShows)
+        ) { continueWatching ->
+            HomeHistory(continueWatching.first())
         }.flowOn(Dispatchers.IO),
 
         // MOVIES DB
@@ -242,18 +204,14 @@ class HomeViewModel(database: AppDatabase) : ViewModel() {
                     }
                 }
 
+                val trendingItems = state.categories
+                    .filter { it.name.contains("trending", ignoreCase = true) }
+                    .flatMap { category -> category.list.map(::mergeItem) }
+
+                val trendingMovies = trendingItems.filterIsInstance<Movie>().take(10)
+                val trendingTvShows = trendingItems.filterIsInstance<TvShow>().take(10)
+
                 val categories = ParentalControlUtils.filterCategories(listOfNotNull(
-
-                    // FEATURED
-                    state.categories
-                        .find { it.name == Category.FEATURED }
-                        ?.let { category ->
-                            category.copy(
-                                list = category.list.map(::mergeItem)
-                            )
-                        },
-
-                    // CONTINUE WATCHING
                     Category(
                         name = Category.CONTINUE_WATCHING,
                         list = history.continueWatching
@@ -278,38 +236,15 @@ class HomeViewModel(database: AppDatabase) : ViewModel() {
                                 }
                             },
                     ),
-
                     Category(
-                        name = Category.RECENTLY_WATCHED,
-                        list = history.recentlyWatched,
-                    ),
-
-                    // FAVORITES
-                    Category(
-                        name = Category.FAVORITE_MOVIES,
-                        list = history.favoritesMovies.sortedByDescending {
-                            when (it) {
-                                is Movie -> it.favoritedAtMillis ?: 0L
-                                else -> 0L
-                            }
-                        },
+                        name = Category.TRENDING_MOVIES,
+                        list = trendingMovies,
                     ),
                     Category(
-                        name = Category.FAVORITE_TV_SHOWS,
-                        list = history.favoriteTvShows.sortedByDescending {
-                            when (it) {
-                                is TvShow -> it.favoritedAtMillis ?: 0L
-                                else -> 0L
-                            }
-                        },
+                        name = Category.TRENDING_TV_SHOWS,
+                        list = trendingTvShows,
                     ),
-                ) + state.categories
-                    .filter { it.name != Category.FEATURED }
-                    .map { category ->
-                        category.copy(
-                            list = category.list.map(::mergeItem)
-                        )
-                    })
+                ))
 
                 State.SuccessLoading(categories)
             }
@@ -326,13 +261,16 @@ class HomeViewModel(database: AppDatabase) : ViewModel() {
 
     init {
         val initialProvider = UserPreferences.currentProvider
+        val initialProviderName = initialProvider?.name
         if (initialProvider != null) {
             currentProvider = initialProvider
             loadUserDataCache(initialProvider)
         }
         viewModelScope.launch {
             ProviderChangeNotifier.providerChangeFlow.collect {
-                getHome()
+                if (UserPreferences.currentProvider?.name == initialProviderName) {
+                    getHome()
+                }
             }
         }
 

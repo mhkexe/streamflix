@@ -2,8 +2,10 @@ package com.streamflixreborn.streamflix.activities.main
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -13,6 +15,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.NavController
 import androidx.navigation.navOptions
 import com.bumptech.glide.Glide
 import com.tanasi.navigation.widget.setupWithNavController
@@ -22,6 +25,11 @@ import com.streamflixreborn.streamflix.database.AppDatabase
 import com.streamflixreborn.streamflix.databinding.ActivityMainTvBinding
 import com.streamflixreborn.streamflix.databinding.ContentHeaderMenuMainTvBinding
 import com.streamflixreborn.streamflix.fragments.player.PlayerTvFragment
+import com.streamflixreborn.streamflix.fragments.home.HomeTvFragment
+import com.streamflixreborn.streamflix.fragments.movies.MoviesTvFragment
+import com.streamflixreborn.streamflix.fragments.search.SearchTvFragment
+import com.streamflixreborn.streamflix.fragments.favorites.FavoritesTvFragment
+import com.streamflixreborn.streamflix.fragments.tv_shows.TvShowsTvFragment
 import com.streamflixreborn.streamflix.ui.UpdateAppTvDialog
 import com.streamflixreborn.streamflix.providers.IptvProvider
 import com.streamflixreborn.streamflix.providers.Provider
@@ -44,6 +52,7 @@ class MainTvActivity : FragmentActivity() {
     private val viewModel by viewModels<MainViewModel>()
 
     private lateinit var updateAppDialog: UpdateAppTvDialog
+    private lateinit var navController: NavController
 
     override fun attachBaseContext(newBase: android.content.Context) {
         super.attachBaseContext(AppLanguageManager.wrap(newBase))
@@ -76,7 +85,7 @@ class MainTvActivity : FragmentActivity() {
 
         val navHostFragment = this.supportFragmentManager
             .findFragmentById(binding.navMainFragment.id) as NavHostFragment
-        val navController = navHostFragment.navController
+        navController = navHostFragment.navController
 
         adjustLayoutDelta(null, null)
 
@@ -93,10 +102,15 @@ class MainTvActivity : FragmentActivity() {
         }
 
         binding.navMain.setupWithNavController(navController)
+        binding.navMain.setContentFocusTarget(binding.navMainFragment.id)
         updateNavigationVisibility()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            binding.navMainFragment.isFocusedByDefault = true
+            binding.navMain.isFocusedByDefault = true
+        }
+
+        binding.navMain.post {
+            binding.navMain.requestHomeFocus(R.id.home)
         }
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -112,7 +126,7 @@ class MainTvActivity : FragmentActivity() {
                 val palette = ThemeManager.palette(UserPreferences.selectedTheme)
                 header.tvNavigationHeaderTitle.setTextColor(palette.tvHeaderPrimary)
                 header.tvNavigationHeaderSubtitle.setTextColor(palette.tvHeaderSecondary)
-                setBackgroundColor(palette.tvNavBackground)
+                setBackgroundColor(Color.BLACK)
 
                 setOnOpenListener {
                     header.tvNavigationHeaderTitle.visibility = View.VISIBLE
@@ -133,6 +147,9 @@ class MainTvActivity : FragmentActivity() {
                 R.id.search, R.id.home, R.id.movies, R.id.tv_shows, R.id.favorites, R.id.settings -> {
                     binding.navMain.visibility = View.VISIBLE
                     updateNavigationVisibility()
+                    binding.navMain.post {
+                        requestCurrentMenuFocus()
+                    }
                 }
                 else -> binding.navMain.visibility = View.GONE
             }
@@ -166,10 +183,14 @@ class MainTvActivity : FragmentActivity() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 when (navController.currentDestination?.id) {
-                    R.id.home -> if (binding.navMain.hasFocus()) finish() else binding.navMain.requestFocus()
+                    R.id.home -> if (binding.navMain.hasFocus()) finish() else requestCurrentMenuFocus()
                     R.id.settings, R.id.search, R.id.movies, R.id.tv_shows, R.id.favorites -> {
-                        navigateToProviderHome(navController)
-                        binding.navMain.requestFocus()
+                        if (binding.navMain.hasFocus()) {
+                            navigateToProviderHome(navController)
+                            binding.navMain.requestHomeFocus(R.id.home)
+                        } else {
+                            requestCurrentMenuFocus()
+                        }
                     }
                     else -> {
                         val handled = (getCurrentFragment() as? PlayerTvFragment)?.onBackPressed() ?: false
@@ -185,13 +206,80 @@ class MainTvActivity : FragmentActivity() {
         viewModel.checkUpdate()
     }
 
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (event.action == KeyEvent.ACTION_DOWN) {
+            if (binding.navMain.hasFocus()) {
+                return when (event.keyCode) {
+                    KeyEvent.KEYCODE_DPAD_LEFT -> if (navController.currentDestination?.id == R.id.home) {
+                        true
+                    } else {
+                        binding.navMain.moveFocusLeft()
+                    }
+                    KeyEvent.KEYCODE_DPAD_RIGHT -> binding.navMain.moveFocusRight()
+                    KeyEvent.KEYCODE_DPAD_UP -> true
+                    KeyEvent.KEYCODE_DPAD_DOWN -> binding.navMainFragment.requestFocus()
+                    else -> super.dispatchKeyEvent(event)
+                }
+            }
+
+            if (event.keyCode == KeyEvent.KEYCODE_DPAD_UP && canOpenNavigationMenu()) {
+                if (isAtTopContentFocus()) {
+                    return requestCurrentMenuFocus()
+                }
+                val currentFocus = currentFocus
+                val upwardTarget = currentFocus?.focusSearch(View.FOCUS_UP)
+                if (upwardTarget == null || upwardTarget === currentFocus || isDescendantOfNav(upwardTarget)) {
+                    return requestCurrentMenuFocus()
+                }
+            }
+        }
+
+        return super.dispatchKeyEvent(event)
+    }
+
+    private fun canOpenNavigationMenu(): Boolean = when (getCurrentFragment()) {
+        is HomeTvFragment, is MoviesTvFragment, is TvShowsTvFragment,
+        is SearchTvFragment, is FavoritesTvFragment -> true
+        else -> false
+    }
+
+    private fun isDescendantOfNav(view: View): Boolean {
+        var current: View? = view
+        while (current != null) {
+            if (current === binding.navMain) return true
+            current = current.parent as? View
+        }
+        return false
+    }
+
+    private fun isAtTopContentFocus(): Boolean {
+        return when (val fragment = getCurrentFragment()) {
+            is HomeTvFragment -> fragment.isAtTopContentFocus()
+            is MoviesTvFragment -> fragment.isAtTopContentFocus()
+            is TvShowsTvFragment -> fragment.isAtTopContentFocus()
+            else -> false
+        }
+    }
+
+    private fun requestCurrentMenuFocus(): Boolean {
+        return when (navController.currentDestination?.id) {
+            R.id.home -> binding.navMain.requestHomeFocus(R.id.home)
+            R.id.movies -> binding.navMain.requestHomeFocus(R.id.movies)
+            R.id.tv_shows -> binding.navMain.requestHomeFocus(R.id.tv_shows)
+            R.id.search -> binding.navMain.requestHomeFocus(R.id.search)
+            R.id.favorites -> binding.navMain.requestHomeFocus(R.id.favorites)
+            R.id.settings -> binding.navMain.requestHomeFocus(R.id.settings)
+            else -> binding.navMain.requestSelectedMenuFocus()
+        }
+    }
+
     private fun applyThemeNavigationChrome() {
         val palette = ThemeManager.palette(UserPreferences.selectedTheme)
         window.statusBarColor = palette.systemBar
         window.navigationBarColor = palette.systemBar
-        binding.navMain.setBackgroundColor(palette.tvNavBackground)
+        binding.navMain.setBackgroundColor(Color.BLACK)
         binding.navMain.headerView?.let { headerView ->
-            headerView.setBackgroundColor(palette.tvNavBackground)
+            headerView.setBackgroundColor(Color.BLACK)
             val header = ContentHeaderMenuMainTvBinding.bind(headerView)
             header.tvNavigationHeaderTitle.setTextColor(palette.tvHeaderPrimary)
             header.tvNavigationHeaderSubtitle.setTextColor(palette.tvHeaderSecondary)

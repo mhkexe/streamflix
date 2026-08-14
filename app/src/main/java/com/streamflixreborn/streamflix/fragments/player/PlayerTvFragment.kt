@@ -494,9 +494,11 @@ class PlayerTvFragment : Fragment() {
                                     (state.subtitle.languageName ?: fileName).substringBefore(" ")
                                 player.seekTo(currentPosition)
                                 player.play()
+                                binding.settings.onPendingSelectionResult(true)
                             }
 
                             is PlayerViewModel.SubtitleState.FailedDownloadingOpenSubtitle -> {
+                                binding.settings.onPendingSelectionResult(false)
                                 Toast.makeText(
                                     requireContext(),
                                     "${state.subtitle.subFileName}: ${state.error.message}",
@@ -551,9 +553,11 @@ class PlayerTvFragment : Fragment() {
                                     ?: fileName).substringBefore(" ")
                                 player.seekTo(currentPosition)
                                 player.play()
+                                binding.settings.onPendingSelectionResult(true)
                             }
 
                             is PlayerViewModel.SubtitleState.FailedDownloadingSubDLSubtitle -> {
+                                binding.settings.onPendingSelectionResult(false)
                                 Toast.makeText(
                                     requireContext(),
                                     "${state.subtitle.name}: ${state.error.message}",
@@ -840,11 +844,6 @@ class PlayerTvFragment : Fragment() {
             binding.pvPlayer.controller.binding.exoSettings.setOnClickListener {
                 binding.pvPlayer.controllerShowTimeoutMs = binding.pvPlayer.controllerShowTimeoutMs
                 binding.settings.show()
-            }
-
-            binding.pvPlayer.controller.binding.btnSkipIntro.setOnClickListener {
-                player.seekTo(player.currentPosition + 85000)
-                it.visibility = View.GONE
             }
 
             binding.btnNextEpisodeAction.setOnClickListener {
@@ -1189,6 +1188,7 @@ class PlayerTvFragment : Fragment() {
                         binding.pvPlayer.controller.binding.exoPlayPause.nextFocusDownId = -1
                         val videoFormat = player.videoFormat
                         updatePlayerScale()
+                        binding.settings.onPendingSelectionResult(true)
                     }
                 }
 
@@ -1314,6 +1314,8 @@ class PlayerTvFragment : Fragment() {
                     if (nextServer != null) {
                         Log.i("PlayerTvFragment", "Playback failed, trying next server: ${nextServer.name}")
                         viewModel.getVideo(nextServer)
+                    } else {
+                        binding.settings.onPendingSelectionResult(false)
                     }
                 }
             })
@@ -1444,17 +1446,21 @@ class PlayerTvFragment : Fragment() {
 
         private fun resolvePlayerSubtitle(videoType: Video.Type = currentVideoTypeForUi()): String {
             return when (videoType) {
-                is Video.Type.Movie -> args.subtitle
+                is Video.Type.Movie -> ""
                 is Video.Type.Episode -> {
-                    val episodeTitle = videoType.title?.takeUnless { it.isBlank() } ?: args.subtitle
-                    "S${videoType.season.number} E${videoType.number}  •  $episodeTitle"
+                    val episodeLabel = "S${videoType.season.number} E${videoType.number}"
+                    val episodeTitle = videoType.title?.takeUnless { it.isBlank() }
+                    if (episodeTitle != null) "$episodeLabel  •  $episodeTitle" else episodeLabel
                 }
             }
         }
 
         private fun updatePlayerHeader(videoType: Video.Type = currentVideoTypeForUi()) {
             binding.pvPlayer.controller.binding.tvExoTitle.text = resolvePlayerTitle(videoType)
-            binding.pvPlayer.controller.binding.tvExoSubtitle.text = resolvePlayerSubtitle(videoType)
+            binding.pvPlayer.controller.binding.tvExoSubtitle.apply {
+                text = resolvePlayerSubtitle(videoType)
+                isGone = text.isNullOrBlank()
+            }
         }
 
         private fun queueNextEpisodeForContinueWatching(provider: com.streamflixreborn.streamflix.providers.Provider) {
@@ -1502,8 +1508,6 @@ class PlayerTvFragment : Fragment() {
             progressHandler = android.os.Handler(android.os.Looper.getMainLooper())
             progressRunnable = Runnable {
                 if (player.isPlaying) {
-                    val show = player.currentPosition in 3000..120000
-                    showSkipIntroButton(show)
                     updateNextEpisodeOverlay()
                 }
                 progressHandler.postDelayed(progressRunnable, 1000)
@@ -1644,48 +1648,15 @@ class PlayerTvFragment : Fragment() {
             controllerBinding.btnCustomNext.nextFocusDownId = R.id.exo_progress
             controllerBinding.exoPlayPause.nextFocusDownId = R.id.exo_progress
 
-            controllerBinding.btnSkipIntro.nextFocusLeftId = if (overlayVisible) overlayActionId else View.NO_ID
-            controllerBinding.btnSkipIntro.nextFocusUpId = if (overlayVisible) overlayActionId else View.NO_ID
-            controllerBinding.btnSkipIntro.nextFocusDownId = if (overlayVisible) overlayActionId else View.NO_ID
-
             binding.btnNextEpisodeAction.nextFocusLeftId = overlayDismissId
             binding.btnNextEpisodeAction.nextFocusRightId = overlayDismissId
             binding.btnNextEpisodeAction.nextFocusUpId = controllerBinding.exoPlayPause.id
-            binding.btnNextEpisodeAction.nextFocusDownId =
-                if (controllerBinding.btnSkipIntro.isVisible) controllerBinding.btnSkipIntro.id
-                else controllerBinding.exoSettings.id
+            binding.btnNextEpisodeAction.nextFocusDownId = controllerBinding.exoSettings.id
 
             binding.btnNextEpisodeDismiss.nextFocusLeftId = overlayActionId
             binding.btnNextEpisodeDismiss.nextFocusRightId = overlayActionId
             binding.btnNextEpisodeDismiss.nextFocusUpId = controllerBinding.exoPlayPause.id
-            binding.btnNextEpisodeDismiss.nextFocusDownId =
-                if (controllerBinding.btnSkipIntro.isVisible) controllerBinding.btnSkipIntro.id
-                else controllerBinding.exoSettings.id
-        }
-
-        private fun showSkipIntroButton(show: Boolean) {
-            val btnSkipIntro = binding.pvPlayer.controller.binding.btnSkipIntro
-            if (show && btnSkipIntro.isGone) {
-                val fadeIn = android.view.animation.AnimationUtils.loadAnimation(
-                    requireContext(),
-                    R.anim.fade_in
-                )
-                btnSkipIntro.startAnimation(fadeIn)
-                btnSkipIntro.isVisible = true
-                if (binding.layoutNextEpisodeOverlay.isVisible) {
-                    updateNextEpisodeOverlayFocusBindings(true)
-                }
-            } else if (!show && btnSkipIntro.isVisible) {
-                val fadeOut = android.view.animation.AnimationUtils.loadAnimation(
-                    requireContext(),
-                    R.anim.fade_out
-                )
-                btnSkipIntro.startAnimation(fadeOut)
-                btnSkipIntro.isGone = true
-                if (binding.layoutNextEpisodeOverlay.isVisible) {
-                    updateNextEpisodeOverlayFocusBindings(true)
-                }
-            }
+            binding.btnNextEpisodeDismiss.nextFocusDownId = controllerBinding.exoSettings.id
         }
 
         private var currentExtraBuffering = false

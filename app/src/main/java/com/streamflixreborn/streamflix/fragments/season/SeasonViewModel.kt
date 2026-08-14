@@ -93,7 +93,16 @@ class SeasonViewModel(
                     }
             }
 
-            val tvShow = TvShow(tvShowId)
+            val storedTvShow = database.tvShowDao().getById(tvShowId)
+            val tvShow = if (storedTvShow?.runtime != null) {
+                storedTvShow
+            } else {
+                runCatching {
+                    UserPreferences.currentProvider!!.getTvShow(tvShowId)
+                }.getOrNull()?.also(database.tvShowDao()::insert)
+                    ?: storedTvShow
+                    ?: TvShow(tvShowId)
+            }
             val season = Season(seasonId)
             episodes.forEach { episode ->
                 episode.tvShow = tvShow

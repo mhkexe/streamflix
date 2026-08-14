@@ -19,6 +19,8 @@ import androidx.navigation.findNavController
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import androidx.leanback.widget.BaseGridView
+import androidx.leanback.widget.OnChildViewHolderSelectedListener
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.streamflixreborn.streamflix.R
@@ -35,6 +37,7 @@ import com.streamflixreborn.streamflix.databinding.ItemMovieGridMobileBinding
 import com.streamflixreborn.streamflix.databinding.ItemMovieGridTvBinding
 import com.streamflixreborn.streamflix.databinding.ItemMovieMobileBinding
 import com.streamflixreborn.streamflix.databinding.ItemMovieTvBinding
+import com.streamflixreborn.streamflix.databinding.ItemMovieContinueWatchingTvBinding
 import com.streamflixreborn.streamflix.fragments.favorites.FavoritesMobileFragment
 import com.streamflixreborn.streamflix.fragments.favorites.FavoritesMobileFragmentDirections
 import com.streamflixreborn.streamflix.fragments.favorites.FavoritesTvFragment
@@ -152,6 +155,7 @@ class MovieViewHolder(
         when (_binding) {
             is ItemMovieMobileBinding -> displayMobileItem(_binding)
             is ItemMovieTvBinding -> displayTvItem(_binding)
+            is ItemMovieContinueWatchingTvBinding -> displayContinueWatchingTvItem(_binding)
             is ItemMovieGridMobileBinding -> displayGridMobileItem(_binding)
             is ItemMovieGridTvBinding -> displayGridTvItem(_binding)
             is ItemCategorySwiperMobileBinding -> displaySwiperMobileItem(_binding)
@@ -461,9 +465,9 @@ class MovieViewHolder(
 
                 when (val fragment = context.toActivity()?.getCurrentFragment()) {
                     is HomeTvFragment -> {
-                        if (hasFocus) {
+                        if (hasFocus && movie.itemType != AppAdapter.Type.MOVIE_CONTINUE_WATCHING_TV_ITEM) {
                             fragment.pinBackground(movie.banner)
-                        } else {
+                        } else if (movie.itemType != AppAdapter.Type.MOVIE_CONTINUE_WATCHING_TV_ITEM) {
                             fragment.releasePinnedBackground()
                         }
                     }
@@ -488,16 +492,50 @@ class MovieViewHolder(
                 else -> View.GONE
             }
         }
-        binding.tvMovieQuality.apply {
-            text = movie.quality ?: ""
-            visibility = when {
-                text.isNullOrEmpty() -> View.GONE
-                else -> View.VISIBLE
-            }
+    }
+
+    private fun displayContinueWatchingTvItem(binding: ItemMovieContinueWatchingTvBinding) {
+        binding.root.setOnClickListener {
+            binding.root.findNavController().navigate(
+                HomeTvFragmentDirections.actionHomeToMovie(id = movie.id)
+            )
         }
-        binding.tvMovieReleasedYear.text = movie.released?.format("yyyy")
-            ?: context.getString(R.string.movie_item_type)
+        binding.root.setOnLongClickListener {
+            ShowOptionsTvDialog(context, movie).show()
+            true
+        }
+        binding.root.setOnFocusChangeListener { _, hasFocus ->
+            val animation = AnimationUtils.loadAnimation(
+                context,
+                if (hasFocus) R.anim.zoom_in else R.anim.zoom_out,
+            )
+            binding.root.startAnimation(animation)
+            animation.fillAfter = true
+        }
+        binding.ivMoviePoster.loadMoviePoster(movie) {
+            fallback(R.drawable.glide_fallback_cover)
+            centerCrop()
+            transition(DrawableTransitionOptions.withCrossFade())
+        }
         binding.tvMovieTitle.text = movie.title
+        binding.tvMovieInfo.text = listOfNotNull(
+            movie.released?.format("yyyy"),
+            movie.runtime?.let { runtime ->
+                val hours = runtime / 60
+                val minutes = runtime % 60
+                if (hours > 0) context.getString(R.string.movie_runtime_hours_minutes, hours, minutes)
+                else context.getString(R.string.movie_runtime_minutes, minutes)
+            },
+        ).joinToString("  •  ")
+        binding.pbMovieProgress.apply {
+            val watchHistory = movie.watchHistory
+            progress = when {
+                watchHistory != null && watchHistory.durationMillis > 0 ->
+                    (watchHistory.lastPlaybackPositionMillis * 100 / watchHistory.durationMillis.toDouble()).toInt()
+                else -> 0
+            }
+            visibility = if (watchHistory != null) View.VISIBLE else View.GONE
+        }
     }
 
     private fun displayGridMobileItem(binding: ItemMovieGridMobileBinding) {
@@ -609,6 +647,14 @@ class MovieViewHolder(
             centerCrop()
             transition(DrawableTransitionOptions.withCrossFade())
         }
+        binding.tvMovieYearOverlay.apply {
+            text = movie.released?.format("yyyy") ?: ""
+            visibility = if (text.isNullOrEmpty()) View.GONE else View.VISIBLE
+        }
+        binding.tvMovieRatingOverlay.apply {
+            text = movie.rating?.let { "★ ${String.format(Locale.ROOT, "%.1f", it)}" } ?: ""
+            visibility = if (text.isNullOrEmpty()) View.GONE else View.VISIBLE
+        }
         bindRibbons(binding.ivMovieFavoriteRibbon, binding.ivMovieWatchedRibbon)
         binding.pbMovieProgress.apply {
             val watchHistory = movie.watchHistory
@@ -621,16 +667,6 @@ class MovieViewHolder(
                 else -> View.GONE
             }
         }
-        binding.tvMovieQuality.apply {
-            text = movie.quality ?: ""
-            visibility = when {
-                text.isNullOrEmpty() -> View.GONE
-                else -> View.VISIBLE
-            }
-        }
-        binding.tvMovieReleasedYear.text = movie.released?.format("yyyy")
-            ?: context.getString(R.string.movie_item_type)
-        binding.tvMovieTitle.text = movie.title
     }
 
     private fun applyMobileSelection(view: View) {
@@ -796,6 +832,7 @@ class MovieViewHolder(
         }
 
         binding.tvMovieOverview.text = movie.overview
+        binding.tvMovieOverview.setTextColor(ContextCompat.getColor(context, R.color.detail_description))
 
         binding.btnMovieWatchNow.apply {
             setOnClickListener {
@@ -854,6 +891,7 @@ class MovieViewHolder(
                             movie.poster = resolvedMovie.poster
                             movie.banner = resolvedMovie.banner
                             movie.isFavorite = newValue
+                            isSelected = newValue
                             setImageDrawable(
                                 ContextCompat.getDrawable(context, newValue.drawable())
                             )
@@ -862,6 +900,7 @@ class MovieViewHolder(
                 }
             }
 
+            isSelected = movie.isFavorite
             setImageDrawable(
                 ContextCompat.getDrawable(context, movie.isFavorite.drawable())
             )
@@ -879,28 +918,20 @@ class MovieViewHolder(
             }
         }
 
-        binding.tvMovieTitle.text = movie.title
-
-        binding.tvMovieRating.text = movie.rating?.let { String.format(Locale.ROOT, "%.1f", it) } ?: "N/A"
-
-        binding.tvMovieQuality.apply {
-            text = movie.quality
-            visibility = when {
-                text.isNullOrEmpty() -> View.GONE
-                else -> View.VISIBLE
+        binding.tvMovieLogo.apply {
+            visibility = if (movie.logo.isNullOrEmpty()) View.GONE else View.VISIBLE
+            if (visibility == View.VISIBLE) {
+                Glide.with(context)
+                    .load(movie.logo)
+                    .into(this)
             }
         }
-
-        binding.tvMovieReleased.apply {
-            text = movie.released?.format("yyyy")
-            visibility = when {
-                text.isNullOrEmpty() -> View.GONE
-                else -> View.VISIBLE
-            }
+        binding.tvMovieTitle.apply {
+            text = movie.title
+            visibility = if (movie.logo.isNullOrEmpty()) View.VISIBLE else View.GONE
         }
 
-        binding.tvMovieRuntime.apply {
-            text = movie.runtime?.let {
+        val runtime = movie.runtime?.let {
                 val hours = it / 60
                 val minutes = it % 60
                 when {
@@ -912,21 +943,27 @@ class MovieViewHolder(
                     else -> context.getString(R.string.movie_runtime_minutes, minutes)
                 }
             }
-            visibility = when {
-                text.isNullOrEmpty() -> View.GONE
-                else -> View.VISIBLE
-            }
-        }
 
-        binding.tvMovieGenres.apply {
-            text = movie.genres.joinToString(", ") { it.name }
-            visibility = when {
-                movie.genres.isEmpty() -> View.GONE
-                else -> View.VISIBLE
-            }
+        binding.tvMovieMetadata.apply {
+            text = listOfNotNull(
+                movie.rating?.let { String.format(Locale.ROOT, "%.1f", it) },
+                movie.released?.format("yyyy"),
+                movie.genres.takeIf { it.isNotEmpty() }?.joinToString(", ") { it.name },
+                runtime,
+                movie.ageRating,
+            ).joinToString("  •  ")
+            visibility = if (text.isEmpty()) View.GONE else View.VISIBLE
         }
+        binding.ivMovieRatingIcon.visibility = View.GONE
+        binding.tvMovieRating.visibility = View.GONE
+        binding.tvMovieQuality.visibility = View.GONE
+        binding.tvMovieReleased.visibility = View.GONE
+        binding.tvMovieRuntime.visibility = View.GONE
+        binding.tvMovieAgeRating.visibility = View.GONE
+        binding.tvMovieGenres.visibility = View.GONE
 
         binding.tvMovieOverview.text = movie.overview
+        binding.tvMovieOverview.setTextColor(ContextCompat.getColor(context, R.color.detail_description))
 
         binding.btnMovieWatchNow.apply {
             setOnClickListener {
@@ -983,6 +1020,7 @@ class MovieViewHolder(
                             movie.poster = resolvedMovie.poster
                             movie.banner = resolvedMovie.banner
                             movie.isFavorite = newValue
+                            isSelected = newValue
                             setImageDrawable(
                                 ContextCompat.getDrawable(context, newValue.drawable())
                             )
@@ -991,6 +1029,7 @@ class MovieViewHolder(
                 }
             }
 
+            isSelected = movie.isFavorite
             setImageDrawable(
                 ContextCompat.getDrawable(context, movie.isFavorite.drawable())
             )
@@ -1046,17 +1085,67 @@ class MovieViewHolder(
     }
 
     private fun displayRecommendationsTv(binding: ContentMovieRecommendationsTvBinding) {
+        val recommendations = movie.recommendations.take(10).onEach {
+            when (it) {
+                is Movie -> it.itemType = AppAdapter.Type.MOVIE_TV_ITEM
+                is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_TV_ITEM
+            }
+        }
+        val loopedRecommendations = if (recommendations.size > 1) {
+            buildList {
+                repeat(3) { addAll(recommendations) }
+            }
+        } else {
+            recommendations
+        }
         binding.hgvMovieRecommendations.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
+            windowAlignment = BaseGridView.WINDOW_ALIGN_NO_EDGE
+            windowAlignmentOffsetPercent = 50f
+            itemAlignmentOffsetPercent = 50f
             adapter = AppAdapter().apply {
-                submitList(movie.recommendations.onEach {
-                    when (it) {
-                        is Movie -> it.itemType = AppAdapter.Type.MOVIE_TV_ITEM
-                        is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_TV_ITEM
-                    }
-                })
+                setHasStableIds(false)
+                submitList(loopedRecommendations)
             }
             setItemSpacing(20)
+            addOnChildAttachStateChangeListener(object : RecyclerView.OnChildAttachStateChangeListener {
+                override fun onChildViewAttachedToWindow(view: View) {
+                    view.findViewById<View>(R.id.tv_movie_quality)?.visibility = View.GONE
+                    view.findViewById<View>(R.id.tv_movie_released_year)?.visibility = View.GONE
+                    view.findViewById<View>(R.id.tv_movie_title)?.visibility = View.GONE
+                    view.findViewById<View>(R.id.tv_tv_show_quality)?.visibility = View.GONE
+                    view.findViewById<View>(R.id.tv_tv_show_last_episode)?.visibility = View.GONE
+                    view.findViewById<View>(R.id.tv_tv_show_title)?.visibility = View.GONE
+                }
+
+                override fun onChildViewDetachedFromWindow(view: View) = Unit
+            })
+            addOnChildViewHolderSelectedListener(object : OnChildViewHolderSelectedListener() {
+                override fun onChildViewHolderSelected(
+                    parent: RecyclerView,
+                    child: RecyclerView.ViewHolder?,
+                    position: Int,
+                    subposition: Int,
+                ) {
+                    val selected = recommendations.getOrNull(position % recommendations.size) ?: return
+                    binding.tvMovieRecommendationsSelected.text = recommendationLabel(selected)
+                    if (recommendations.size > 1 && (position < recommendations.size || position >= recommendations.size * 2)) {
+                        post { setSelectedPosition(position + if (position < recommendations.size) recommendations.size else -recommendations.size) }
+                    }
+                }
+            })
         }
+        if (recommendations.size > 1) {
+            binding.hgvMovieRecommendations.post {
+                binding.hgvMovieRecommendations.setSelectedPosition(recommendations.size)
+            }
+        }
+        binding.tvMovieRecommendationsSelected.text = recommendations.firstOrNull()?.let(::recommendationLabel).orEmpty()
     }
+
+    private fun recommendationLabel(show: com.streamflixreborn.streamflix.models.Show): String =
+        when (show) {
+            is Movie -> listOfNotNull(show.title.takeIf { it.isNotBlank() }, show.released?.format("yyyy")).joinToString(" • ")
+            is TvShow -> listOfNotNull(show.title.takeIf { it.isNotBlank() }, show.released?.format("yyyy")).joinToString(" • ")
+        }
 }

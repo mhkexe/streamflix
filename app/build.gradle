@@ -92,6 +92,39 @@ android {
     }
 }
 
+tasks.register("generateNativeKeys") {
+    def templateFile = file("src/main/cpp/native-lib.cpp.template")
+    def outputFile = file("src/main/cpp/native-lib.cpp")
+    def localPropsFile = rootProject.file("local.properties")
+
+    inputs.file templateFile
+    inputs.file(localPropsFile).optional()
+    outputs.file outputFile
+
+    doLast {
+        def props = new Properties()
+        if (localPropsFile.exists()) {
+            localPropsFile.withInputStream { props.load(it) }
+        }
+
+        def content = templateFile.text
+        content = content.replace("{{UPROT_MSFI_API_BASE}}", props.getProperty("UPROT_MSFI_API_BASE", ""))
+        content = content.replace("{{UPROT_MSE_API_BASE}}", props.getProperty("UPROT_MSE_API_BASE", ""))
+        content = content.replace("{{UPROT_API_KEY}}", props.getProperty("UPROT_API_KEY", ""))
+
+        outputFile.text = content
+    }
+}
+
+afterEvaluate {
+    tasks.named("preBuild").configure {
+        dependsOn("generateNativeKeys")
+    }
+    tasks.matching { it.name.contains("configureCMake") }.configureEach {
+        dependsOn("generateNativeKeys")
+    }
+}
+
 dependencies {
     implementation 'androidx.media3:media3-datasource-okhttp:1.8.0'
     implementation 'androidx.appcompat:appcompat:1.7.1'

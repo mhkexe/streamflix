@@ -3,7 +3,9 @@
     <style name="AppTheme.Mobile" parent="Theme.AppCompat">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="app_background_color">#181818</item>
+        <item name="fontFamily">@font/sf_pro_display_regular</item>
+        <item name="android:fontFamily">@font/sf_pro_display_regular</item>
+        <item name="app_background_color">#000000</item>
         <item name="home_gradient_drawable">@drawable/bg_home_gradient_default</item>
         <item name="movie_banner_gradient_drawable">@drawable/bg_movie_banner_gradient_default</item>
         <item name="tv_show_banner_gradient_drawable">@drawable/bg_tv_show_banner_gradient_default</item>
@@ -134,8 +136,13 @@
     </style>
 
     <!-- Tema di Default per TV -->
-    <style name="AppTheme.Tv" parent="Theme.Leanback">
-        <item name="app_background_color">#181818</item>
+    <style name="AppTheme.Tv.Base" parent="Theme.Leanback">
+        <item name="fontFamily">@font/sf_pro_display_regular</item>
+        <item name="android:fontFamily">@font/sf_pro_display_regular</item>
+    </style>
+
+    <style name="AppTheme.Tv" parent="AppTheme.Tv.Base">
+        <item name="app_background_color">#000000</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlayLeanback</item>
         <item name="alertDialogTheme">@style/Theme.AppCompat.Dialog.Alert</item>
         <item name="colorAccent">#FFFFFF</item>
@@ -149,7 +156,7 @@
     </style>
 
     <!-- Tema Nero Amoled/Oled per TV (Nero Puro #000000) -->
-    <style name="AppTheme.NeroAmoledOled" parent="Theme.Leanback">
+    <style name="AppTheme.NeroAmoledOled" parent="AppTheme.Tv.Base">
         <item name="app_background_color">#000000</item>
         <item name="android:windowBackground">@drawable/bg_splash_screen_amoled</item>
         <item name="android:colorBackground">#000000</item>
@@ -172,7 +179,7 @@
         <item name="category_swiper_gradient_drawable">@drawable/fg_category_swiper_amoled</item>
     </style>
 
-    <style name="AppTheme.SunsetCinema" parent="Theme.Leanback">
+    <style name="AppTheme.SunsetCinema" parent="AppTheme.Tv.Base">
         <item name="app_background_color">#201410</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlayLeanback</item>
         <item name="alertDialogTheme">@style/Theme.AppCompat.Dialog.Alert</item>
@@ -192,7 +199,7 @@
         <item name="category_swiper_gradient_drawable">@drawable/fg_category_swiper_sunset</item>
     </style>
 
-    <style name="AppTheme.SteelBlue" parent="Theme.Leanback">
+    <style name="AppTheme.SteelBlue" parent="AppTheme.Tv.Base">
         <item name="app_background_color">#141C25</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlayLeanback</item>
         <item name="alertDialogTheme">@style/Theme.AppCompat.Dialog.Alert</item>
@@ -212,7 +219,7 @@
         <item name="category_swiper_gradient_drawable">@drawable/fg_category_swiper_steel</item>
     </style>
 
-    <style name="AppTheme.ForestNight" parent="Theme.Leanback">
+    <style name="AppTheme.ForestNight" parent="AppTheme.Tv.Base">
         <item name="app_background_color">#101816</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlayLeanback</item>
         <item name="alertDialogTheme">@style/Theme.AppCompat.Dialog.Alert</item>
@@ -232,7 +239,7 @@
         <item name="category_swiper_gradient_drawable">@drawable/fg_category_swiper_forest</item>
     </style>
 
-    <style name="AppTheme.CrimsonNoir" parent="Theme.Leanback">
+    <style name="AppTheme.CrimsonNoir" parent="AppTheme.Tv.Base">
         <item name="app_background_color">#1C1014</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlayLeanback</item>
         <item name="alertDialogTheme">@style/Theme.AppCompat.Dialog.Alert</item>
@@ -252,7 +259,7 @@
         <item name="category_swiper_gradient_drawable">@drawable/fg_category_swiper_crimson</item>
     </style>
 
-    <style name="AppTheme.MidnightViolet" parent="Theme.Leanback">
+    <style name="AppTheme.MidnightViolet" parent="AppTheme.Tv.Base">
         <item name="app_background_color">#151523</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlayLeanback</item>
         <item name="alertDialogTheme">@style/Theme.AppCompat.Dialog.Alert</item>
@@ -272,7 +279,7 @@
         <item name="category_swiper_gradient_drawable">@drawable/fg_category_swiper_violet</item>
     </style>
 
-    <style name="AppTheme.NordFrost" parent="Theme.Leanback">
+    <style name="AppTheme.NordFrost" parent="AppTheme.Tv.Base">
         <item name="app_background_color">#182029</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlayLeanback</item>
         <item name="alertDialogTheme">@style/Theme.AppCompat.Dialog.Alert</item>
@@ -292,7 +299,7 @@
         <item name="category_swiper_gradient_drawable">@drawable/fg_category_swiper_nord</item>
     </style>
 
-    <style name="AppTheme.EmeraldLuxe" parent="Theme.Leanback">
+    <style name="AppTheme.EmeraldLuxe" parent="AppTheme.Tv.Base">
         <item name="app_background_color">#11201B</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlayLeanback</item>
         <item name="alertDialogTheme">@style/Theme.AppCompat.Dialog.Alert</item>
@@ -312,7 +319,7 @@
         <item name="category_swiper_gradient_drawable">@drawable/fg_category_swiper_emerald</item>
     </style>
 
-    <style name="AppTheme.RetroNeon" parent="Theme.Leanback">
+    <style name="AppTheme.RetroNeon" parent="AppTheme.Tv.Base">
         <item name="app_background_color">#16161D</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlayLeanback</item>
         <item name="alertDialogTheme">@style/Theme.AppCompat.Dialog.Alert</item>

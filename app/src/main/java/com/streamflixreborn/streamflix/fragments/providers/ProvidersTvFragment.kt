@@ -4,10 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -17,9 +18,7 @@ import com.streamflixreborn.streamflix.R
 import com.streamflixreborn.streamflix.adapters.AppAdapter
 import com.streamflixreborn.streamflix.databinding.FragmentProvidersTvBinding
 import com.streamflixreborn.streamflix.models.Provider as ModelProvider
-import com.streamflixreborn.streamflix.providers.Provider
 import com.streamflixreborn.streamflix.ui.SpacingItemDecoration
-import com.streamflixreborn.streamflix.utils.UserPreferences
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -45,6 +44,14 @@ class ProvidersTvFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initializeProviders()
+        Glide.with(this)
+            .load("file:///android_asset/bg.webp")
+            .into(binding.ivProvidersBackground)
+        binding.ivProvidersBackground.startAnimation(AlphaAnimation(0.16f, 0.28f).apply {
+            duration = 9000L
+            repeatMode = Animation.REVERSE
+            repeatCount = Animation.INFINITE
+        })
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { state ->
@@ -86,79 +93,10 @@ class ProvidersTvFragment : Fragment() {
 
 
     private fun initializeProviders() {
-        binding.sProvidersLanguage.apply {
-            class Language(
-                val code: String,
-                val name: String,
-            )
-
-            val languages = Provider.providers.keys
-                .distinctBy { it.language }
-                .map {
-                    val locale = Locale.forLanguageTag(it.language)
-
-                    Language(
-                        code = it.language,
-                        name = locale.getDisplayLanguage(locale)
-                            .replaceFirstChar { char -> char.titlecase() },
-                    )
-                }
-                .sortedBy { it.name.lowercase() }
-
-            val spinnerAdapter = ArrayAdapter(
-                requireContext(),
-                android.R.layout.simple_spinner_item,
-                mutableListOf(
-                    context.getString(R.string.providers_all_languages),
-                    context.getString(R.string.providers_favorites)
-                ).apply {
-                    addAll(languages.map { it.name })
-                }.toTypedArray()
-            ).also {
-                it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            }
-            setAdapter(spinnerAdapter)
-
-            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    when (position) {
-                        0 -> {
-                            viewModel.getProviders()
-                            UserPreferences.providerLanguage = null
-                        }
-                        1 -> {
-                            viewModel.getProviders("favorites")
-                            UserPreferences.providerLanguage = "favorites"
-                        }
-                        else -> {
-                            val langCode = languages[position - 2].code
-                            viewModel.getProviders(langCode)
-                            UserPreferences.providerLanguage = langCode
-                        }
-                    }
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {}
-            }
-
-            setSelection(
-                when (val lang = UserPreferences.providerLanguage) {
-                    null -> 0
-                    "favorites" -> 1
-                    else -> {
-                        val index = languages.indexOfFirst { it.code == lang }
-                        if (index != -1) index + 2 else 0
-                    }
-                }
-            )
-        }
-
         binding.rvProviders.apply {
+            setHasFixedSize(true)
+            itemAnimator = null
+            setItemViewCacheSize(8)
             adapter = appAdapter.apply {
                 stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             }
@@ -174,7 +112,9 @@ class ProvidersTvFragment : Fragment() {
         appAdapter.submitList(providers.onEach {
             it.itemType = AppAdapter.Type.PROVIDER_TV_ITEM
         })
+        binding.rvProviders.post {
+            binding.rvProviders.getChildAt(0)?.requestFocus()
+        }
 
-        binding.rvProviders.requestFocus()
     }
 }

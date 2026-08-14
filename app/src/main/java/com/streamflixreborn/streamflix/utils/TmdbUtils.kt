@@ -32,6 +32,8 @@ object TmdbUtils {
                     TMDb3.Params.AppendToResponse.Movie.RECOMMENDATIONS,
                     TMDb3.Params.AppendToResponse.Movie.VIDEOS,
                     TMDb3.Params.AppendToResponse.Movie.EXTERNAL_IDS,
+                    TMDb3.Params.AppendToResponse.Movie.IMAGES,
+                    TMDb3.Params.AppendToResponse.Movie.RELEASES_DATES,
                 ),
                 language = language
             )
@@ -49,6 +51,12 @@ object TmdbUtils {
                 rating = details.voteAverage.toDouble(),
                 poster = details.posterPath?.original,
                 banner = details.backdropPath?.original,
+                logo = details.images?.logos?.firstOrNull()?.filePath?.original,
+                ageRating = details.releaseDates?.results
+                    ?.firstOrNull { it.iso3166 == "US" }
+                    ?.releaseDates
+                    ?.firstOrNull { it.certification?.isNotBlank() == true }
+                    ?.certification,
                 imdbId = details.externalIds?.imdbId,
                 genres = details.genres.map { Genre(it.id.toString(), it.name) },
                 cast = details.credits?.cast?.map { People(it.id.toString(), it.name, it.profilePath?.w500) } ?: listOf(),
@@ -69,6 +77,8 @@ object TmdbUtils {
                     TMDb3.Params.AppendToResponse.Tv.RECOMMENDATIONS,
                     TMDb3.Params.AppendToResponse.Tv.VIDEOS,
                     TMDb3.Params.AppendToResponse.Tv.EXTERNAL_IDS,
+                    TMDb3.Params.AppendToResponse.Tv.IMAGES,
+                    TMDb3.Params.AppendToResponse.Tv.CONTENT_RATING,
                 ),
                 language = language
             )
@@ -85,6 +95,11 @@ object TmdbUtils {
                 rating = details.voteAverage.toDouble(),
                 poster = details.posterPath?.original,
                 banner = details.backdropPath?.original,
+                logo = details.images?.logos?.firstOrNull()?.filePath?.original,
+                ageRating = details.contentRatings?.results
+                    ?.firstOrNull { it.iso3166 == "US" }
+                    ?.rating
+                    ?.takeIf { it.isNotBlank() },
                 imdbId = details.externalIds?.imdbId,
                 seasons = details.seasons.map {
                     Season(

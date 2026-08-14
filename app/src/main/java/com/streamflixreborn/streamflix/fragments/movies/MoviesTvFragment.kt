@@ -112,7 +112,6 @@ class MoviesTvFragment : Fragment() {
             setItemSpacing(requireContext().resources.getDimension(R.dimen.movies_spacing).toInt())
         }
 
-        binding.root.requestFocus()
     }
 
     private fun displayMovies(movies: List<Movie>, hasMore: Boolean) {
@@ -125,5 +124,15 @@ class MoviesTvFragment : Fragment() {
         } else {
             appAdapter.setOnLoadMoreListener(null)
         }
+    }
+
+    fun isAtTopContentFocus(): Boolean {
+        val focused = activity?.currentFocus ?: return false
+        val itemView = binding.vgvMovies.findContainingItemView(focused) ?: return false
+        return binding.vgvMovies.getChildAdapterPosition(itemView) < TV_GRID_COLUMNS
+    }
+
+    private companion object {
+        const val TV_GRID_COLUMNS = 6
     }
 }

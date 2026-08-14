@@ -1,58 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="62dp"
+    android:background="@drawable/bg_language_item_mobile"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="12dp"
+    android:paddingEnd="16dp"
+    android:stateListAnimator="@animator/scale_press_mobile">
 
-    <ImageView
-        android:id="@+id/iv_provider_logo"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="#000000"
-        android:duplicateParentState="true"
-        android:padding="8dp"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="ContentDescription" />
+    <FrameLayout
+        android:layout_width="40dp"
+        android:layout_height="40dp">
 
-    <ImageView
-        android:id="@+id/iv_provider_favorite"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_margin="4dp"
-        android:src="@drawable/ic_favorite_badge"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@id/iv_provider_logo"
-        app:layout_constraintTop_toTopOf="@id/iv_provider_logo"
-        tools:ignore="ContentDescription"
-        tools:visibility="visible" />
+        <ImageView
+            android:id="@+id/iv_provider_logo"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:scaleType="centerInside"
+            tools:ignore="ContentDescription"
+            tools:src="@drawable/ic_flag_us" />
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/tv_provider_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:gravity="center"
+        android:layout_marginStart="14dp"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textColor="#FFFFFF"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/iv_provider_logo"
-        tools:text="Provider name" />
+        android:textSize="16sp"
+        android:textStyle="bold"
+        tools:text="English" />
 
-    <TextView
-        android:id="@+id/tv_provider_language"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:gravity="center"
-        android:textColor="#808080"
-        android:textSize="12sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_provider_name"
-        tools:text="Provider language" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

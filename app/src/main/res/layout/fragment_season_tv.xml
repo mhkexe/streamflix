@@ -4,7 +4,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#000000"
     tools:context=".fragments.season.SeasonTvFragment">
+
+    <ImageButton
+        android:id="@+id/btn_previous_season"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/bg_season_navigation_tv"
+        android:contentDescription="Previous season"
+        android:padding="12dp"
+        android:src="@drawable/ic_arrow_left"
+        android:tint="#FFFFFF"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/tv_season_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_season_title"
+        tools:ignore="UseAppTint" />
 
     <TextView
         android:id="@+id/tv_season_title"
@@ -18,6 +35,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Season #" />
+
+    <ImageButton
+        android:id="@+id/btn_next_season"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="20dp"
+        android:background="@drawable/bg_season_navigation_tv"
+        android:contentDescription="Next season"
+        android:padding="12dp"
+        android:src="@drawable/ic_arrow_right"
+        android:tint="#FFFFFF"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/tv_season_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_season_title"
+        tools:ignore="UseAppTint" />
 
     <androidx.leanback.widget.HorizontalGridView
         android:id="@+id/hgv_episodes"

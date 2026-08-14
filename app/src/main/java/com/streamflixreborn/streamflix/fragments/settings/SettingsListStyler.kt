@@ -11,12 +11,19 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.streamflixreborn.streamflix.R
 import com.streamflixreborn.streamflix.utils.ThemeManager
 import com.streamflixreborn.streamflix.utils.UserPreferences
 
 internal object SettingsListStyler {
+    private fun regularTypeface(view: View): Typeface =
+        ResourcesCompat.getFont(view.context, R.font.sf_pro_display_regular) ?: Typeface.DEFAULT
+
+    private fun semiboldTypeface(view: View): Typeface =
+        ResourcesCompat.getFont(view.context, R.font.sf_pro_display_semibold) ?: Typeface.DEFAULT
+
     private data class DefaultRowStyle(
         val background: Drawable?,
         val minHeight: Int,
@@ -129,7 +136,7 @@ internal object SettingsListStyler {
 
             title.setTextColor(defaults.titleColor)
             title.setTextSize(TypedValue.COMPLEX_UNIT_PX, defaults.titleSizePx)
-            title.typeface = Typeface.DEFAULT
+            title.typeface = regularTypeface(view)
             title.letterSpacing = 0f
 
             summary?.apply {
@@ -176,7 +183,7 @@ internal object SettingsListStyler {
 
         title.setTextColor(titleColor)
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, if (isTv) 20f else 16f)
-        title.typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+        title.typeface = semiboldTypeface(view)
         title.letterSpacing = 0f
 
         summary?.apply {

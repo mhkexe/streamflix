@@ -6,9 +6,10 @@
     android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_settings_panel"
         android:layout_width="350dp"
         android:layout_height="0dp"
-        android:background="#202020"
+        android:background="#0D0D0D"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">

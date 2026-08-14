@@ -30,7 +30,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.streamflixreborn.streamflix.utils.LoggingUtils
 import com.streamflixreborn.streamflix.utils.UserPreferences
-import com.streamflixreborn.streamflix.utils.ProviderChangeNotifier
 
 class HomeTvFragment : Fragment() {
 
@@ -68,16 +67,6 @@ class HomeTvFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initializeHome()
-
-        // Lightweight refresh when provider changes
-        viewLifecycleOwner.lifecycleScope.launch {
-            ProviderChangeNotifier.providerChangeFlow.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect {
-                viewModel.getHome()
-            }
-        }
-
-        // Initial load
-        viewModel.getHome()
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { state ->
@@ -183,7 +172,6 @@ class HomeTvFragment : Fragment() {
             setItemSpacing(resources.getDimension(R.dimen.home_spacing).toInt() * 2)
         }
 
-        binding.root.requestFocus()
     }
 
     private fun displayHome(categories: List<Category>) {
@@ -300,6 +288,12 @@ class HomeTvFragment : Fragment() {
                 swiperHandler.postDelayed(this, 8_000)
             }
         }, 8_000)
+    }
+
+    fun isAtTopContentFocus(): Boolean {
+        val focused = activity?.currentFocus ?: return false
+        val itemView = binding.vgvHome.findContainingItemView(focused) ?: return false
+        return binding.vgvHome.getChildAdapterPosition(itemView) == 0
     }
 
     private fun syncFeaturedBackground() {

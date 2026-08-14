@@ -20,6 +20,8 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.CancellationException
 
 // DEFINICIONES DE ESTADO Y RESULTADOS (Fuera de la clase para mejor acceso)
 sealed class State {
@@ -45,7 +47,7 @@ data class ProviderResult(
 
 class SearchViewModel(database: AppDatabase) : ViewModel() {
 
-    private val _state = MutableStateFlow<State>(State.Searching)
+    private val _state = MutableStateFlow<State>(State.SuccessSearching(emptyList(), false))
     @OptIn(ExperimentalCoroutinesApi::class)
     val state: Flow<State> = combine(
         _state,
@@ -106,12 +108,12 @@ class SearchViewModel(database: AppDatabase) : ViewModel() {
 
     var query = ""
     private var page = 1
+    private var activeSearchJob: Job? = null
 
-    init {
-        search(query)
-    }
-
-    fun search(query: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun search(query: String): Job {
+        activeSearchJob?.cancel()
+        return viewModelScope.launch(Dispatchers.IO) {
+            activeSearchJob = coroutineContext[Job]
         _state.emit(State.Searching)
 
         try {
@@ -119,9 +121,12 @@ class SearchViewModel(database: AppDatabase) : ViewModel() {
             this@SearchViewModel.query = query
             page = 1
             _state.emit(State.SuccessSearching(results, results.isNotEmpty()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Log.e("SearchViewModel", "search: ", e)
             _state.emit(State.FailedSearching(e))
+        }
         }
     }
 

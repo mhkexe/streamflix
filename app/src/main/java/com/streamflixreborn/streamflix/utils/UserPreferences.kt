@@ -72,11 +72,11 @@ object UserPreferences {
             return Provider.providers.keys.find { it.name == providerName }
         }
         set(value) {
-            // CRITICO: Resetta l'istanza del database prima di cambiare provider
-            // per forzare la creazione di un nuovo database file corretto.
+            Key.CURRENT_PROVIDER.setString(value?.name)
+
+            // Persist the new provider before recreating the provider-scoped database.
             AppDatabase.resetInstance()
 
-            Key.CURRENT_PROVIDER.setString(value?.name)
             runCatching {
                 ArtworkRepairScheduler.schedule(StreamFlixApp.instance, value)
             }

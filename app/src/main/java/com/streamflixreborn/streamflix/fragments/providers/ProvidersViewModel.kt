@@ -4,9 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.streamflixreborn.streamflix.models.Provider as ModelProvider
-import com.streamflixreborn.streamflix.providers.Provider
 import com.streamflixreborn.streamflix.providers.TmdbProvider
-import com.streamflixreborn.streamflix.utils.UserPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,69 +23,51 @@ class ProvidersViewModel : ViewModel() {
     }
 
     init {
-        getProviders(UserPreferences.providerLanguage)
+        getProviders()
     }
 
-    fun getProviders(language: String? = null) = viewModelScope.launch(Dispatchers.IO) {
+    fun getProviders() = viewModelScope.launch(Dispatchers.IO) {
         _state.emit(State.Loading)
 
         try {
-            val isFavoritesFilter = language == "favorites"
-            val favorites = UserPreferences.favoriteProviders
+            // Keep only TMDb Providers as requested, mapped to specific languages
+            val languages = listOf("en", "es", "it", "fr", "de", "pl")
+            
+            val modelProviders = languages.map { lang ->
+                val tmdbProvider = TmdbProvider(lang)
+                val displayName = when (lang) {
+                    "en" -> "English"
+                    "es" -> "Spanish"
+                    "it" -> "Italian"
+                    "fr" -> "French"
+                    "de" -> "German"
+                    "pl" -> "Polish"
+                    else -> Locale.forLanguageTag(lang).displayLanguage.replaceFirstChar { it.titlecase() }
+                }
+                
+                val flagRes = when (lang) {
+                    "en" -> "res://drawable/ic_flag_us"
+                    "es" -> "res://drawable/ic_flag_es"
+                    "it" -> "res://drawable/ic_flag_it"
+                    "fr" -> "res://drawable/ic_flag_fr"
+                    "de" -> "res://drawable/ic_flag_de"
+                    "pl" -> "res://drawable/ic_flag_pl"
+                    else -> "" 
+                }
 
-            val providers = Provider.providers.keys
-                .filter { 
-                    if (isFavoritesFilter) {
-                        favorites.contains(it.name)
-                    } else {
-                        language == null || it.language == language 
-                    }
-                }
-                .sortedBy { it.name }
-                .toMutableList()
-
-            if (language == null || isFavoritesFilter) {
-                val availableLanguages = Provider.providers.keys.map { it.language }.distinct()
-                availableLanguages.forEach { lang ->
-                    if (lang != "pl") {
-                        val tmdbName = "TMDb (${getLanguageDisplayName(lang)})"
-                        if (!isFavoritesFilter || favorites.contains(tmdbName)) {
-                            providers.add(TmdbProvider(lang))
-                        }
-                    }
-                }
-            } else {
-                if (language != "pl") {
-                    providers.add(TmdbProvider(language))
-                }
-            }
-
-            val modelProviders = providers.map {
-                val name = if (it is TmdbProvider) {
-                    "TMDb (${getLanguageDisplayName(it.language)})"
-                } else {
-                    it.name
-                }
                 ModelProvider(
-                    name = name,
-                    logo = it.logo,
-                    language = it.language,
-                    provider = it,
-                    isFavorite = favorites.contains(name)
+                    name = displayName,
+                    logo = flagRes,
+                    language = lang,
+                    provider = tmdbProvider,
+                    isFavorite = false 
                 )
-            }.sortedWith(
-                compareBy<ModelProvider> { it.provider is TmdbProvider }
-                    .thenBy { it.name.lowercase(Locale.ROOT) }
-            )
+            }
 
             _state.emit(State.SuccessLoading(modelProviders))
         } catch (e: Exception) {
             Log.e("ProvidersViewModel", "getProviders: ", e)
             _state.emit(State.FailedLoading(e))
         }
-    }
-
-    private fun getLanguageDisplayName(languageCode: String): String {
-        return Locale.forLanguageTag(languageCode).displayLanguage
     }
 }

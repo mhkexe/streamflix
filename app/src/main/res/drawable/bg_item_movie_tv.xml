@@ -5,6 +5,7 @@
         <layer-list>
             <item android:bottom="-5dp" android:left="-5dp" android:right="-5dp" android:top="-5dp">
                 <shape android:shape="rectangle">
+                    <corners android:radius="10dp" />
                     <solid android:color="#2200E5FF" />
                     <stroke android:width="5dp" android:color="@color/favorite_selected" />
                 </shape>
@@ -16,6 +17,7 @@
         <layer-list>
             <item android:bottom="-3dp" android:left="-3dp" android:right="-3dp" android:top="-3dp">
                 <shape android:shape="rectangle">
+                    <corners android:radius="10dp" />
                     <stroke android:width="3dp" android:color="#FFFFFF" />
                 </shape>
             </item>
@@ -23,7 +25,9 @@
     </item>
 
     <item>
-        <shape android:shape="rectangle"></shape>
+        <shape android:shape="rectangle">
+            <corners android:radius="10dp" />
+        </shape>
     </item>
 
 </selector>

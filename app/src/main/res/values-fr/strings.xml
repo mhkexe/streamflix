@@ -23,7 +23,7 @@
 
     <string name="providers_all_languages">Toutes les langues</string>
     <string name="providers_favorites">Favoris</string>
-    <string name="providers_choose_title">Choisir un fournisseur</string>
+    <string name="providers_choose_title">Choisissez votre langue</string>
 
     <string name="main_menu_change_provider">Changer de fournisseur</string>
     <string name="main_menu_search">Rechercher</string>

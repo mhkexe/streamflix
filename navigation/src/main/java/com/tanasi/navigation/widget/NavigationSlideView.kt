@@ -3,10 +3,12 @@ package com.tanasi.navigation.widget
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.MenuInflater
 import android.view.MenuItem
-import android.widget.FrameLayout
+import android.view.View
+import android.widget.LinearLayout
 import androidx.annotation.LayoutRes
 import androidx.appcompat.view.SupportMenuInflater
 import androidx.appcompat.view.menu.MenuBuilder
@@ -17,7 +19,7 @@ class NavigationSlideView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : FrameLayout(context, attrs, defStyle) {
+) : LinearLayout(context, attrs, defStyle) {
 
     val menu = NavigationSlideMenu(context)
     var headerView: NavigationSlideHeaderView? = null
@@ -31,6 +33,7 @@ class NavigationSlideView @JvmOverloads constructor(
 
     private var selectedListener: ((item: MenuItem) -> Boolean)? = null
     private var reselectedListener: ((item: MenuItem) -> Boolean)? = null
+    private var contentFocusTargetId: Int = View.NO_ID
 
     /**
      * Currently selected menu item ID, or zero if there is no menu.
@@ -96,11 +99,29 @@ class NavigationSlideView @JvmOverloads constructor(
             DEFAULT_MENU_SPACING
         )
 
+        val horizontalMenu = attributes.getInt(
+            R.styleable.NavigationSlideView_menuOrientation,
+            DEFAULT_MENU_ORIENTATION
+        ) == HORIZONTAL_MENU
+        orientation = if (horizontalMenu) HORIZONTAL else VERTICAL
+        menuView.setHorizontal(horizontalMenu)
+        if (horizontalMenu) {
+            menuView.layoutParams = LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f)
+            headerView?.layoutParams = LinearLayout.LayoutParams(
+                LayoutParams.WRAP_CONTENT,
+                LayoutParams.WRAP_CONTENT
+            )
+        }
+
         inflateMenu(attributes.getResourceIdOrThrow(R.styleable.NavigationSlideView_menu))
 
         attributes.recycle()
 
         addView(menuView)
+        if (orientation == HORIZONTAL && headerView != null) {
+            removeView(headerView)
+            addView(headerView)
+        }
 
         menu.setCallback(object : MenuBuilder.Callback {
             override fun onMenuItemSelected(menu: MenuBuilder, item: MenuItem): Boolean {
@@ -122,6 +143,33 @@ class NavigationSlideView @JvmOverloads constructor(
 
     fun setOnItemReselectedListener(onNavigationItemReselected: (item: MenuItem) -> Boolean) {
         reselectedListener = onNavigationItemReselected
+    }
+
+    fun setContentFocusTarget(viewId: Int) {
+        contentFocusTargetId = viewId
+    }
+
+    fun requestMenuFocus(): Boolean = menuView.requestFirstItemFocus()
+
+    fun requestSelectedMenuFocus(): Boolean = menuView.requestSelectedItemFocus()
+
+    fun requestHomeFocus(homeId: Int): Boolean = menuView.requestItemFocus(homeId)
+
+    fun moveFocusLeft(): Boolean {
+        if (headerView?.hasFocus() == true) {
+            menuView.requestLastItemFocus()
+            return true
+        }
+        menuView.focusPreviousFocusedItem()
+        return true
+    }
+
+    fun moveFocusRight(): Boolean {
+        if (headerView?.hasFocus() == true) return true
+        if (!menuView.focusNextFocusedItem()) {
+            headerView?.requestFocus()
+        }
+        return true
     }
 
     /**
@@ -152,6 +200,15 @@ class NavigationSlideView @JvmOverloads constructor(
                     headerView?.hasFocus() == true || menuView.hasFocus() -> open()
                     else -> close()
                 }
+
+                if (child.hasFocus() && item.isEnabled) {
+                    if (!menu.performItemAction(item, presenter, 0)) {
+                        item.isChecked = true
+                    }
+                    child.animate().scaleX(1.04f).scaleY(1.04f).setDuration(140L).start()
+                } else {
+                    child.animate().scaleX(1f).scaleY(1f).setDuration(140L).start()
+                }
             }
 
             child.setOnClickListener {
@@ -177,6 +234,12 @@ class NavigationSlideView @JvmOverloads constructor(
     fun addHeaderView(headerView: NavigationSlideHeaderView) {
         removeHeaderView()
         this.headerView = headerView
+        if (orientation == HORIZONTAL) {
+            headerView.layoutParams = LinearLayout.LayoutParams(
+                LayoutParams.WRAP_CONTENT,
+                LayoutParams.WRAP_CONTENT
+            )
+        }
         addView(headerView, 0)
     }
 
@@ -195,6 +258,10 @@ class NavigationSlideView @JvmOverloads constructor(
     }
 
     fun close() {
+        if (orientation == HORIZONTAL) {
+            return
+        }
+
         isOpen = false
 
         headerView?.close()
@@ -205,5 +272,7 @@ class NavigationSlideView @JvmOverloads constructor(
     companion object {
         const val DEFAULT_MENU_GRAVITY = Gravity.TOP or Gravity.START
         const val DEFAULT_MENU_SPACING = 0
+        private const val HORIZONTAL_MENU = 0
+        private const val DEFAULT_MENU_ORIENTATION = 1
     }
 }

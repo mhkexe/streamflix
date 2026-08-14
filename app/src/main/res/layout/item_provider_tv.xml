@@ -1,64 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:focusable="true"
-    android:focusableInTouchMode="true">
+    android:layout_width="132dp"
+    android:layout_height="172dp"
+    android:clickable="true"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:focusable="true">
 
-    <ImageView
-        android:id="@+id/iv_provider_logo"
-        android:layout_width="130dp"
-        android:layout_height="0dp"
-        android:background="#000000"
-        android:duplicateParentState="true"
-        android:foreground="@drawable/fg_item_provider_image_tv"
-        android:padding="8dp"
-        android:scaleType="fitCenter"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="ContentDescription" />
+    <FrameLayout
+        android:id="@+id/fl_provider_tile"
+        android:layout_width="132dp"
+        android:layout_height="116dp"
+        android:layout_gravity="top|start"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_language_tile_tv"
+        android:clipChildren="true"
+        android:clipToPadding="true"
+        android:duplicateParentState="true">
 
-    <ImageView
-        android:id="@+id/iv_provider_favorite"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_margin="8dp"
-        android:src="@drawable/ic_favorite_badge"
-        android:visibility="gone"
-        android:elevation="2dp"
-        app:layout_constraintEnd_toEndOf="@id/iv_provider_logo"
-        app:layout_constraintTop_toTopOf="@id/iv_provider_logo"
-        tools:ignore="ContentDescription"
-        tools:visibility="visible" />
+        <ImageView
+            android:id="@+id/iv_provider_logo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            tools:ignore="ContentDescription"
+            tools:src="@drawable/ic_flag_us" />
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/tv_provider_name"
-        android:layout_width="0dp"
+        android:layout_width="132dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_gravity="top|start"
+        android:layout_marginTop="140dp"
         android:gravity="center"
+        android:alpha="0"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textColor="#FFFFFF"
         android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/iv_provider_logo"
-        tools:text="Provider name" />
+        android:textStyle="bold"
+        tools:alpha="1"
+        tools:text="English" />
 
-    <TextView
-        android:id="@+id/tv_provider_language"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:gravity="center"
-        android:textColor="#808080"
-        android:textSize="12sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_provider_name"
-        tools:text="Provider language" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

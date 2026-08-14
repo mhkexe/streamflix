@@ -62,8 +62,6 @@ class FavoritesMobileFragment : Fragment() {
             addItemDecoration(SpacingItemDecoration(8.dp(requireContext())))
         }
         createDragHelper().attachToRecyclerView(binding.rvFavorites)
-        binding.btnFavoritesReorder.setOnClickListener { showSortDialog() }
-        binding.btnFavoritesReorderMode.setOnClickListener { setRearrangeMode(!rearrangeMode) }
         setRearrangeMode(false)
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -115,13 +113,6 @@ class FavoritesMobileFragment : Fragment() {
     private fun setRearrangeMode(enabled: Boolean) {
         rearrangeMode = enabled
         if (!enabled) selectedItems.clear()
-        binding.btnFavoritesReorderMode.apply {
-            isSelected = enabled
-            alpha = if (enabled) 1f else 0.65f
-            contentDescription = getString(
-                if (enabled) R.string.favorites_rearrange_off else R.string.favorites_rearrange_on
-            )
-        }
         configureAdapterInteractions()
         appAdapter.notifyDataSetChanged()
     }
@@ -245,7 +236,6 @@ class FavoritesMobileFragment : Fragment() {
         }
         binding.tvFavoritesEmpty.isVisible = gridItems.isEmpty()
         binding.rvFavorites.isVisible = gridItems.isNotEmpty()
-        binding.btnFavoritesReorder.isEnabled = gridItems.isNotEmpty()
         appAdapter.submitList(gridItems)
     }
 

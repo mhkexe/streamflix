@@ -113,7 +113,6 @@ class TvShowsTvFragment : Fragment() {
             }
         }
 
-        binding.root.requestFocus()
     }
 
     private fun displayTvShows(tvShows: List<TvShow>, hasMore: Boolean) {
@@ -126,5 +125,15 @@ class TvShowsTvFragment : Fragment() {
         } else {
             appAdapter.setOnLoadMoreListener(null)
         }
+    }
+
+    fun isAtTopContentFocus(): Boolean {
+        val focused = activity?.currentFocus ?: return false
+        val itemView = binding.vgvTvShows.findContainingItemView(focused) ?: return false
+        return binding.vgvTvShows.getChildAdapterPosition(itemView) < TV_GRID_COLUMNS
+    }
+
+    private companion object {
+        const val TV_GRID_COLUMNS = 6
     }
 }

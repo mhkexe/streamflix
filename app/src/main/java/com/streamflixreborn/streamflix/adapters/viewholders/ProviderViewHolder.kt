@@ -1,9 +1,10 @@
 package com.streamflixreborn.streamflix.adapters.viewholders
 
 import android.content.Intent
-import android.graphics.drawable.PictureDrawable
+import android.net.Uri
 import android.view.View
 import android.widget.ImageView
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
@@ -14,7 +15,6 @@ import com.streamflixreborn.streamflix.databinding.ItemProviderTvBinding
 import com.streamflixreborn.streamflix.models.Provider
 import com.streamflixreborn.streamflix.utils.UserPreferences
 import com.streamflixreborn.streamflix.utils.toActivity
-import java.util.Locale
 
 class ProviderViewHolder(
     private val _binding: ViewBinding
@@ -36,97 +36,78 @@ class ProviderViewHolder(
 
 
     private fun displayMobileItem(binding: ItemProviderMobileBinding) {
-        binding.root.apply {
-            setOnClickListener {
-                UserPreferences.currentProvider = provider.provider
-                context.toActivity()?.apply {
-                    startActivity(
-                        Intent(this, this::class.java).apply {
-                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                        }
-                    )
-                    finish()
-                }
-            }
-            setOnLongClickListener {
-                toggleFavorite(provider)
-                binding.ivProviderFavorite.visibility = if (provider.isFavorite) android.view.View.VISIBLE else android.view.View.GONE
-                true
-            }
-        }
-        
-        binding.ivProviderFavorite.visibility = if (provider.isFavorite) android.view.View.VISIBLE else android.view.View.GONE
-
-        loadProviderLogo(binding.ivProviderLogo)
-
+        binding.root.setOnClickListener { selectProvider() }
         binding.tvProviderName.text = provider.name
-
-        binding.tvProviderLanguage.text = Locale.forLanguageTag(provider.language)
-            .let { it.getDisplayLanguage(it) }
-            .replaceFirstChar { it.titlecase() }
+        loadFlag(binding.ivProviderLogo)
     }
 
     private fun displayTvItem(binding: ItemProviderTvBinding) {
-        binding.root.apply {
-            setOnClickListener {
-                UserPreferences.currentProvider = provider.provider
-                context.toActivity()?.apply {
-                    startActivity(
-                        Intent(this, this::class.java).apply {
-                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                        }
-                    )
-                    finish()
-                }
-            }
-            setOnLongClickListener {
-                toggleFavorite(provider)
-                binding.ivProviderFavorite.visibility = if (provider.isFavorite) android.view.View.VISIBLE else android.view.View.GONE
-                true
-            }
-        }
-        
-        binding.ivProviderFavorite.visibility = if (provider.isFavorite) android.view.View.VISIBLE else android.view.View.GONE
-
-        loadProviderLogo(binding.ivProviderLogo)
-
+        binding.root.setOnClickListener { selectProvider() }
         binding.tvProviderName.text = provider.name
+        loadFlag(binding.ivProviderLogo)
 
-        binding.tvProviderLanguage.text = Locale.forLanguageTag(provider.language)
-            .let { it.getDisplayLanguage(it) }
-            .replaceFirstChar { it.titlecase() }
+        val tile = binding.flProviderTile
+        val name = binding.tvProviderName
+        val focused = binding.root.hasFocus()
+
+        tile.scaleX = if (focused) FOCUSED_SCALE else 1f
+        tile.scaleY = tile.scaleX
+        name.alpha = if (focused) 1f else 0f
+        name.translationY = if (focused) 0f else NAME_OFFSET_PX * name.resources.displayMetrics.density
+
+        binding.root.setOnFocusChangeListener { view, hasFocus ->
+            // keep the enlarged tile above its neighbours while focused
+            view.z = if (hasFocus) 1f else 0f
+
+            tile.animate()
+                .scaleX(if (hasFocus) FOCUSED_SCALE else 1f)
+                .scaleY(if (hasFocus) FOCUSED_SCALE else 1f)
+                .setDuration(ANIMATION_DURATION)
+                .setInterpolator(INTERPOLATOR)
+                .start()
+
+            name.animate()
+                .alpha(if (hasFocus) 1f else 0f)
+                .translationY(if (hasFocus) 0f else NAME_OFFSET_PX * name.resources.displayMetrics.density)
+                .setDuration(ANIMATION_DURATION)
+                .setInterpolator(INTERPOLATOR)
+                .start()
+        }
     }
 
-    private fun loadProviderLogo(imageView: ImageView) {
-        val logo = provider.logo.takeIf { it.isNotEmpty() }
-        val isSvg = logo?.substringBefore("?")?.endsWith(".svg", ignoreCase = true) == true
+    private fun selectProvider() {
+        UserPreferences.currentProvider = provider.provider
+        context.toActivity()?.apply {
+            startActivity(
+                Intent(this, this::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                }
+            )
+            finish()
+        }
+    }
 
-        if (isSvg) {
-            imageView.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
-            Glide.with(context)
-                .`as`(PictureDrawable::class.java)
-                .load(logo)
-                .error(R.drawable.ic_provider_default_logo)
-                .into(imageView)
+    private fun loadFlag(imageView: ImageView) {
+        if (provider.logo.startsWith("res://")) {
+            val resName = provider.logo.substringAfter("res://drawable/")
+            val resId = context.resources.getIdentifier(resName, "drawable", context.packageName)
+            if (resId != 0) {
+                imageView.setImageResource(resId)
+            } else {
+                imageView.setImageResource(R.drawable.ic_provider_default_logo)
+            }
         } else {
-            imageView.setLayerType(View.LAYER_TYPE_NONE, null)
             Glide.with(context)
-                .load(logo ?: R.drawable.ic_provider_default_logo)
-                .error(R.drawable.ic_provider_default_logo)
-                .fitCenter()
+                .load(provider.logo.takeIf { it.isNotEmpty() } ?: R.drawable.ic_provider_default_logo)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(imageView)
         }
     }
-    
-    private fun toggleFavorite(provider: Provider) {
-        provider.isFavorite = !provider.isFavorite
-        val favorites = UserPreferences.favoriteProviders.toMutableSet()
-        if (provider.isFavorite) {
-            favorites.add(provider.name)
-        } else {
-            favorites.remove(provider.name)
-        }
-        UserPreferences.favoriteProviders = favorites
+
+    private companion object {
+        const val FOCUSED_SCALE = 1.12f
+        const val ANIMATION_DURATION = 180L
+        const val NAME_OFFSET_PX = 6f
+        val INTERPOLATOR = FastOutSlowInInterpolator()
     }
 }

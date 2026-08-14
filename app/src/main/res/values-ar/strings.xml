@@ -23,7 +23,7 @@
 
 	<string name="providers_all_languages">كل اللغات</string>
 	<string name="providers_favorites">المفضلة</string>
-	<string name="providers_choose_title">اختر مزود الخدمة</string>
+	<string name="providers_choose_title">اختر لغتك</string>
 
 	<string name="main_menu_change_provider">تغيير المزود</string>
 	<string name="main_menu_search">بحث</string>

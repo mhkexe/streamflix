@@ -9,8 +9,11 @@ import android.view.ViewGroup
 import android.view.KeyEvent
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
-import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import android.widget.GridLayout
+import android.widget.TextView
+import android.graphics.Color
+import android.view.Gravity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -21,17 +24,16 @@ import com.streamflixreborn.streamflix.R
 import com.streamflixreborn.streamflix.adapters.AppAdapter
 import com.streamflixreborn.streamflix.database.AppDatabase
 import com.streamflixreborn.streamflix.databinding.FragmentSearchTvBinding
-import com.streamflixreborn.streamflix.models.Category
-import com.streamflixreborn.streamflix.models.Genre
 import com.streamflixreborn.streamflix.models.Movie
 import com.streamflixreborn.streamflix.models.TvShow
 import com.streamflixreborn.streamflix.utils.CacheUtils
 import com.streamflixreborn.streamflix.utils.LoggingUtils
 import com.streamflixreborn.streamflix.utils.UserPreferences
 import com.streamflixreborn.streamflix.utils.VoiceRecognitionHelper
-import com.streamflixreborn.streamflix.utils.hideKeyboard
 import com.streamflixreborn.streamflix.utils.viewModelsFactory
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import androidx.navigation.fragment.findNavController
 import com.streamflixreborn.streamflix.providers.Provider
 import com.streamflixreborn.streamflix.providers.IptvProvider
@@ -44,8 +46,8 @@ class SearchTvFragment : Fragment() {
 
     private val database by lazy { AppDatabase.getInstance(requireContext()) }
     private val viewModel by viewModelsFactory { SearchViewModel(database) }
-    private var isGlobalSearchChecked: Boolean = false
     private var currentGridColumns: Int = 1
+    private var searchJob: Job? = null
 
     private val appAdapter by lazy {
         AppAdapter().apply {
@@ -94,7 +96,7 @@ class SearchTvFragment : Fragment() {
             viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { state ->
 
                 when (state) {
-                    is State.Searching, is State.GlobalSearching -> {
+                    is State.Searching -> {
                         binding.isLoading.apply {
                             root.visibility = View.VISIBLE
                             pbIsLoading.visibility = View.VISIBLE
@@ -104,14 +106,10 @@ class SearchTvFragment : Fragment() {
                         appAdapter.setOnLoadMoreListener(null)
                     }
                     is State.SearchingMore -> appAdapter.isLoading = true
+                    State.GlobalSearching -> Unit
+                    is State.SuccessGlobalSearching -> Unit
                     is State.SuccessSearching -> {
                         displaySearch(state.results, state.hasMore)
-                        appAdapter.isLoading = false
-                        binding.vgvSearch.visibility = View.VISIBLE
-                        binding.isLoading.root.visibility = View.GONE
-                    }
-                    is State.SuccessGlobalSearching -> {
-                        displayGlobalSearch(state.providerResults)
                         appAdapter.isLoading = false
                         binding.vgvSearch.visibility = View.VISIBLE
                         binding.isLoading.root.visibility = View.GONE
@@ -154,6 +152,7 @@ class SearchTvFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        searchJob?.cancel()
         super.onDestroyView()
         voiceHelper.stopRecognition()
         _binding = null
@@ -161,18 +160,7 @@ class SearchTvFragment : Fragment() {
 
     private fun submitSearch(): Boolean {
         val query = binding.etSearch.text?.toString().orEmpty()
-        hideKeyboard()
-
-        if (isGlobalSearchChecked) {
-            if (query.isBlank()) {
-                Toast.makeText(requireContext(), getString(R.string.search_empty_query), Toast.LENGTH_SHORT).show()
-                return true
-            }
-            val currentLanguage = UserPreferences.currentProvider?.language ?: "es"
-            viewModel.searchGlobal(query, currentLanguage)
-        } else {
-            viewModel.search(query)
-        }
+        if (query.isNotBlank()) viewModel.search(query)
         return true
     }
 
@@ -180,34 +168,16 @@ class SearchTvFragment : Fragment() {
         val isIptv = UserPreferences.currentProvider is IptvProvider
         val hintStringRes = if (isIptv) R.string.search_input_hint_iptv else R.string.search_input_hint
         binding.etSearch.hint = getString(hintStringRes)
+        binding.etSearch.showSoftInputOnFocus = false
+        binding.etSearch.isFocusable = true
+        binding.etSearch.isFocusableInTouchMode = true
+        binding.etSearch.post { binding.etSearch.requestFocus() }
 
-        binding.llGlobalSearch.nextFocusUpId = binding.etSearch.id
-        binding.vgvSearch.nextFocusUpId = binding.llGlobalSearch.id
-
-        binding.llGlobalSearch.setOnClickListener {
-            isGlobalSearchChecked = !isGlobalSearchChecked
-            binding.ivGlobalSearchSwitch.setImageResource(
-                if (isGlobalSearchChecked) R.drawable.ic_switch_on else R.drawable.ic_switch_off
-            )
-        }
+        binding.keyboardSpace.setOnClickListener { appendSearchText(" ") }
+        binding.keyboardDelete.setOnClickListener { deleteSearchText() }
+        buildKeyboard()
 
         binding.etSearch.apply {
-            setOnEditorActionListener { _, actionId, event ->
-                val isSubmitAction =
-                    actionId == EditorInfo.IME_ACTION_SEARCH ||
-                        actionId == EditorInfo.IME_ACTION_DONE ||
-                        actionId == EditorInfo.IME_NULL
-                val isSubmitKey =
-                    event?.action == KeyEvent.ACTION_DOWN &&
-                        (event.keyCode == KeyEvent.KEYCODE_ENTER ||
-                            event.keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER)
-
-                if (isSubmitAction || isSubmitKey) {
-                    return@setOnEditorActionListener submitSearch()
-                }
-                return@setOnEditorActionListener false
-            }
-
             setOnKeyListener { _, keyCode, event ->
                 if (event.action != KeyEvent.ACTION_DOWN) {
                     return@setOnKeyListener false
@@ -225,15 +195,23 @@ class SearchTvFragment : Fragment() {
                     return@setOnKeyListener submitSearch()
                 }
 
-                false
+                true
             }
 
             addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {
-                    if (s.isNullOrBlank()) {
-                                val isIptv = UserPreferences.currentProvider is IptvProvider
-        val hintStringRes = if (isIptv) R.string.search_input_hint_iptv else R.string.search_input_hint
-        binding.etSearch.hint = getString(hintStringRes)
+                    searchJob?.cancel()
+                    val query = s?.toString()?.trim().orEmpty()
+                    updateSearchRail(query.isNotEmpty())
+                    if (query.isEmpty()) {
+                        appAdapter.submitList(emptyList())
+                        binding.vgvSearch.visibility = View.VISIBLE
+                        binding.isLoading.root.visibility = View.GONE
+                    } else {
+                        searchJob = viewLifecycleOwner.lifecycleScope.launch {
+                            delay(220)
+                            viewModel.search(query)
+                        }
                     }
                 }
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -252,7 +230,6 @@ class SearchTvFragment : Fragment() {
             onResult = { query ->
                 binding.btnSearchVoice.clearAnimation()
                 binding.etSearch.setText(query)
-                viewModel.search(query)
             },
             onError = { msg ->
                 Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
@@ -268,27 +245,14 @@ class SearchTvFragment : Fragment() {
         )
 
         binding.btnSearchVoice.apply {
-            requestFocus()
             visibility = if (voiceHelper.isAvailable()) View.VISIBLE else View.GONE
             setOnClickListener { if (!voiceHelper.isListening) voiceHelper.startWithPermissionCheck() }
         }
 
-        listOf(binding.btnSearchClear, binding.btnSearchVoice, binding.llGlobalSearch).forEach { view ->
-            view.setOnKeyListener { _, keyCode, event ->
-                if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
-                    focusSearchContent()
-                } else {
-                    false
-                }
-            }
-        }
-
-        binding.btnSearchClear.setOnClickListener {
-            binding.etSearch.setText("")
-                    val isIptv = UserPreferences.currentProvider is IptvProvider
-        val hintStringRes = if (isIptv) R.string.search_input_hint_iptv else R.string.search_input_hint
-        binding.etSearch.hint = getString(hintStringRes)
-            viewModel.search("")
+        binding.btnSearchVoice.setOnKeyListener { _, keyCode, event ->
+            if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+                focusSearchContent()
+            } else false
         }
 
         binding.vgvSearch.apply {
@@ -304,13 +268,51 @@ class SearchTvFragment : Fragment() {
                     subposition: Int,
                 ) {
                     child?.itemView?.nextFocusUpId =
-                        if (position in 0 until currentGridColumns) binding.llGlobalSearch.id
+                        if (position in 0 until currentGridColumns) binding.etSearch.id
                         else View.NO_ID
                 }
             })
         }
 
-        binding.root.requestFocus()
+    }
+
+    private fun buildKeyboard() {
+        val keys = "abcdefghijklmnopqrstuvwxyz1234567890"
+        binding.keyboardGrid.removeAllViews()
+        keys.forEach { key ->
+            val button = TextView(requireContext()).apply {
+                text = key.toString()
+                gravity = Gravity.CENTER
+                setTextColor(Color.WHITE)
+                textSize = 20f
+                isFocusable = true
+                isClickable = true
+                background = requireContext().getDrawable(R.drawable.bg_search_key_tv)
+                setOnClickListener { appendSearchText(key.toString()) }
+                if (binding.keyboardGrid.childCount >= 30) {
+                    nextFocusDownId = binding.vgvSearch.id
+                }
+            }
+            val params = GridLayout.LayoutParams().apply {
+                width = 0
+                height = 0
+                columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
+                rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
+                setMargins(2, 2, 2, 2)
+            }
+            binding.keyboardGrid.addView(button, params)
+        }
+    }
+
+    private fun appendSearchText(value: String) {
+        binding.etSearch.append(value)
+    }
+
+    private fun deleteSearchText() {
+        val text = binding.etSearch.text ?: return
+        if (text.isNotEmpty()) {
+            text.delete(text.length - 1, text.length)
+        }
     }
 
     private fun focusSearchContent(): Boolean {
@@ -319,20 +321,16 @@ class SearchTvFragment : Fragment() {
             hasResults -> {
                 binding.vgvSearch.requestFocus()
             }
-            binding.llGlobalSearch.visibility == View.VISIBLE -> {
-                binding.llGlobalSearch.requestFocus()
-            }
-            else -> false
+            else -> binding.etSearch.requestFocus()
         }
     }
 
     private fun displaySearch(list: List<AppAdapter.Item>, hasMore: Boolean) {
-        currentGridColumns = if (viewModel.query == "") 5 else 6
+        currentGridColumns = 3
         binding.vgvSearch.setNumColumns(currentGridColumns)
 
         appAdapter.submitList(list.onEach {
             when (it) {
-                is Genre -> it.itemType = AppAdapter.Type.GENRE_GRID_TV_ITEM
                 is Movie -> it.itemType = AppAdapter.Type.MOVIE_GRID_TV_ITEM
                 is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_GRID_TV_ITEM
             }
@@ -345,33 +343,12 @@ class SearchTvFragment : Fragment() {
         }
     }
 
-    private fun displayGlobalSearch(providerResults: List<ProviderResult>) {
-        val categories = providerResults.map { providerResult ->
-            val headerTitle = when (val state = providerResult.state) {
-                is ProviderResult.State.Loading -> "${providerResult.provider.name} - ${getString(R.string.searching)}"
-                is ProviderResult.State.Error -> "${providerResult.provider.name} - ${getString(R.string.search_error)}"
-                is ProviderResult.State.Success -> {
-                    val count = state.results.size
-                    val resultText = if (count == 1) getString(R.string.result) else getString(R.string.results)
-                    "${providerResult.provider.name} - $count $resultText"
-                }
-            }
-
-            val items = (providerResult.state as? ProviderResult.State.Success)?.results?.onEach {
-                when (it) {
-                    is Movie -> it.itemType = AppAdapter.Type.MOVIE_TV_ITEM
-                    is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_TV_ITEM
-                }
-            } ?: emptyList()
-
-            Category(name = headerTitle, list = items).apply {
-                itemType = AppAdapter.Type.CATEGORY_TV_ITEM
-            }
+    private fun updateSearchRail(hasQuery: Boolean) {
+        val width = if (hasQuery) 248 else 300
+        binding.searchRail.layoutParams = binding.searchRail.layoutParams.apply {
+            this.width = (width * resources.displayMetrics.density).toInt()
         }
-
-        currentGridColumns = 1
-        binding.vgvSearch.setNumColumns(currentGridColumns) // La lista de categorías es una sola columna vertical
-        appAdapter.submitList(categories)
-        appAdapter.setOnLoadMoreListener(null)
+        binding.searchRail.requestLayout()
     }
+
 }

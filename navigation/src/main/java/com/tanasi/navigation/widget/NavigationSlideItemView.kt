@@ -63,6 +63,7 @@ class NavigationSlideItemView(
 
     override fun setTitle(title: CharSequence?) {
         label.text = title
+        label.visibility = if (title.isNullOrEmpty()) GONE else VISIBLE
     }
 
     override fun setCheckable(checkable: Boolean) {
@@ -102,11 +103,8 @@ class NavigationSlideItemView(
     }
 
     override fun setIcon(drawable: Drawable?) {
-        if (drawable === icon.drawable) {
-            return
-        }
-
         icon.setImageDrawable(drawable)
+        icon.visibility = if (drawable == null) GONE else VISIBLE
     }
 
     override fun prefersCondensedTitle(): Boolean = false
