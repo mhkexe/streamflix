@@ -8,6 +8,7 @@ import com.nextservices.nextvision.models.Movie
 import com.nextservices.nextvision.utils.ParentalControlUtils
 import com.nextservices.nextvision.utils.UserPreferences
 import com.nextservices.nextvision.utils.ProviderChangeNotifier
+import com.nextservices.nextvision.utils.StartupPreloadStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -81,13 +82,14 @@ class MoviesViewModel(database: AppDatabase) : ViewModel() {
         _state.emit(State.Loading)
 
         try {
-            val movies = ParentalControlUtils.filterItems(
-                UserPreferences.currentProvider!!.getMovies()
-            ).filterIsInstance<Movie>()
+            val provider = UserPreferences.currentProvider!!
+            val movies = StartupPreloadStore.get(provider)?.movies
+                ?: provider.getMovies()
+            val filteredMovies = ParentalControlUtils.filterItems(movies).filterIsInstance<Movie>()
 
             page = 1
 
-            _state.emit(State.SuccessLoading(movies, movies.isNotEmpty()))
+            _state.emit(State.SuccessLoading(filteredMovies, filteredMovies.isNotEmpty()))
         } catch (e: Exception) {
             Log.e("MoviesViewModel", "getMovies: ", e)
             _state.emit(State.FailedLoading(e))

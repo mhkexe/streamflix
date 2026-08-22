@@ -32,6 +32,7 @@ import com.nextservices.nextvision.database.AppDatabase
 import com.nextservices.nextvision.databinding.*
 import com.nextservices.nextvision.fragments.home.HomeTvFragment
 import com.nextservices.nextvision.fragments.home.HomeTvFragmentDirections
+import com.nextservices.nextvision.fragments.favorites.FavoritesTvFragment
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import android.app.AlertDialog
@@ -380,16 +381,22 @@ class TvShowViewHolder(
                 val animation = if (hasFocus) AnimationUtils.loadAnimation(context, R.anim.zoom_in) else AnimationUtils.loadAnimation(context, R.anim.zoom_out)
                 startAnimation(animation)
                 animation.fillAfter = true
+                if (hasFocus && context.toActivity()?.getCurrentFragment() is FavoritesTvFragment) {
+                    (context.toActivity()?.getCurrentFragment() as? FavoritesTvFragment)
+                        ?.updateFavoriteBackground(tvShow, true)
+                }
             }
         }
         setPoster(binding.ivTvShowPoster)
         binding.tvTvShowYearOverlay.apply {
             text = tvShow.released?.format("yyyy") ?: ""
-            visibility = if (text.isNullOrEmpty()) View.GONE else View.VISIBLE
+            visibility = if (context.toActivity()?.getCurrentFragment() is FavoritesTvFragment) View.GONE
+            else if (text.isNullOrEmpty()) View.GONE else View.VISIBLE
         }
         binding.tvTvShowRatingOverlay.apply {
             text = tvShow.rating?.let { "★ ${String.format(Locale.ROOT, "%.1f", it)}" } ?: ""
-            visibility = if (text.isNullOrEmpty()) View.GONE else View.VISIBLE
+            visibility = if (context.toActivity()?.getCurrentFragment() is FavoritesTvFragment) View.GONE
+            else if (text.isNullOrEmpty()) View.GONE else View.VISIBLE
         }
         bindRibbons(binding.ivTvShowFavoriteRibbon, binding.ivTvShowWatchedRibbon)
         binding.pbTvShowProgress.apply {
@@ -640,6 +647,21 @@ class TvShowViewHolder(
         val episodeSeason = resolveEpisodeSeason(episodeToWatch)
         binding.btnTvShowWatchNow.apply {
             isVisible = episodeToWatch != null
+            text = if (isIptvProvider()) {
+                context.getString(R.string.movie_watch_now)
+            } else if (episodeToWatch?.watchHistory != null) {
+                context.getString(
+                    R.string.tv_show_resume_season_episode,
+                    episodeSeason?.number ?: 1,
+                    episodeToWatch.number
+                )
+            } else {
+                context.getString(
+                    R.string.tv_show_watch_season_episode,
+                    episodeSeason?.number ?: 1,
+                    episodeToWatch?.number ?: 1
+                )
+            }
             setOnClickListener {
                 if (isIptvProvider()) {
                     handleDirectPlay(findNavController())
@@ -672,7 +694,6 @@ class TvShowViewHolder(
                     findNavController().navigate(R.id.player, args)
                 }
             }
-            text = if (isIptvProvider()) context.getString(R.string.movie_watch_now) else context.getString(R.string.tv_show_watch_season_episode, episodeSeason?.number ?: 1, episodeToWatch?.number ?: 1)
         }
 
         binding.pbTvShowProgressEpisode.apply {
@@ -781,6 +802,21 @@ class TvShowViewHolder(
         val episodeSeason = resolveEpisodeSeason(episodeToWatch)
         binding.btnTvShowWatchNow.apply {
             isVisible = episodeToWatch != null
+            text = if (isIptvProvider()) {
+                context.getString(R.string.movie_watch_now)
+            } else if (episodeToWatch?.watchHistory != null) {
+                context.getString(
+                    R.string.tv_show_resume_season_episode,
+                    episodeSeason?.number ?: 1,
+                    episodeToWatch.number
+                )
+            } else {
+                context.getString(
+                    R.string.tv_show_watch_season_episode,
+                    episodeSeason?.number ?: 1,
+                    episodeToWatch?.number ?: 1
+                )
+            }
             setOnClickListener {
                 if (isIptvProvider()) {
                     handleDirectPlay(findNavController())
@@ -813,7 +849,6 @@ class TvShowViewHolder(
                     findNavController().navigate(R.id.player, args)
                 }
             }
-            text = if (isIptvProvider()) context.getString(R.string.movie_watch_now) else context.getString(R.string.tv_show_watch_season_episode, episodeSeason?.number ?: 1, episodeToWatch?.number ?: 1)
         }
 
         binding.pbTvShowProgressEpisode.apply {

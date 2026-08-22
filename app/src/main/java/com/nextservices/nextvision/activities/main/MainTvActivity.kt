@@ -44,7 +44,6 @@ import com.nextservices.nextvision.utils.UserPreferences
 import com.nextservices.nextvision.utils.StartupTrace
 import com.nextservices.nextvision.utils.getCurrentFragment
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
 
 class MainTvActivity : FragmentActivity() {
 
@@ -113,9 +112,10 @@ class MainTvActivity : FragmentActivity() {
 
         binding.navMain.setupWithNavController(navController)
         binding.navMain.setOnItemSelectedListener { item ->
-            item.onNavDestinationSelected(navController)
-            navController.popBackStack(item.itemId, inclusive = false)
-            true
+            runCatching {
+                item.onNavDestinationSelected(navController)
+                navController.popBackStack(item.itemId, inclusive = false)
+            }.isSuccess
         }
         binding.navMain.setContentFocusTarget(binding.navMainFragment.id)
         updateNavigationVisibility()
@@ -124,7 +124,7 @@ class MainTvActivity : FragmentActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.home, R.id.movies, R.id.tv_shows, R.id.favorites -> {
+                R.id.home, R.id.movies, R.id.tv_shows, R.id.favorites, R.id.premium -> {
                     if (!isStartupCompleted) {
                         binding.navMain.visibility = View.GONE
                         return@addOnDestinationChangedListener
@@ -173,12 +173,14 @@ class MainTvActivity : FragmentActivity() {
                 when (navController.currentDestination?.id) {
                     R.id.home -> if (binding.navMain.hasFocus()) finish() else requestCurrentMenuFocus()
                     else -> {
-                        val handled = (getCurrentFragment() as? PlayerTvFragment)?.onBackPressed() ?: false
+                        val handled = runCatching {
+                            (getCurrentFragment() as? PlayerTvFragment)?.onBackPressed() ?: false
+                        }.getOrDefault(false)
                         if (handled) return
 
-                        if (!navController.popBackStack()) {
-                            finish()
-                        }
+                        val popped = runCatching { navController.popBackStack() }
+                            .getOrDefault(false)
+                        if (!popped) finish()
                     }
                 }
             }
@@ -211,7 +213,7 @@ class MainTvActivity : FragmentActivity() {
         binding.startupProgress.animate().alpha(1f).setDuration(250).start()
 
         lifecycleScope.launch {
-            withTimeoutOrNull(STARTUP_TIMEOUT_MS) { NextVisionApp.preloadReady.await() }
+            NextVisionApp.preloadReady.await()
             hideStartupOverlay()
         }
     }
@@ -238,7 +240,7 @@ class MainTvActivity : FragmentActivity() {
 
         val destinationId = navController.currentDestination?.id
         if (destinationId in setOf(
-                R.id.home, R.id.movies, R.id.tv_shows, R.id.favorites
+                R.id.home, R.id.movies, R.id.tv_shows, R.id.favorites, R.id.premium
             )
         ) {
             binding.navMain.visibility = View.VISIBLE
@@ -257,8 +259,12 @@ class MainTvActivity : FragmentActivity() {
                 return when (event.keyCode) {
                     KeyEvent.KEYCODE_DPAD_LEFT -> binding.navMain.moveFocusLeft()
                     KeyEvent.KEYCODE_DPAD_RIGHT -> binding.navMain.moveFocusRight()
+                    KeyEvent.KEYCODE_DPAD_DOWN -> if (navController.currentDestination?.id == R.id.premium) {
+                        true
+                    } else {
+                        binding.navMainFragment.requestFocus()
+                    }
                     KeyEvent.KEYCODE_DPAD_UP -> true
-                    KeyEvent.KEYCODE_DPAD_DOWN -> binding.navMainFragment.requestFocus()
                     else -> super.dispatchKeyEvent(event)
                 }
             }

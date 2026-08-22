@@ -277,10 +277,8 @@ class MainMobileActivity : FragmentActivity() {
         binding.startupProgress.animate().alpha(1f).setDuration(250).start()
 
         lifecycleScope.launch {
-            withTimeoutOrNull(STARTUP_TIMEOUT_MS) {
-                NextVisionApp.preloadReady.await()
-                StartupState.homeContentReady.first { it }
-            }
+            NextVisionApp.preloadReady.await()
+            StartupState.homeContentReady.first { it }
             binding.startupOverlay.animate()
                 .alpha(0f)
                 .setDuration(300)

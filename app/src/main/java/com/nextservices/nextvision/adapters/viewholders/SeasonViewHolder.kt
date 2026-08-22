@@ -1,6 +1,5 @@
 package com.nextservices.nextvision.adapters.viewholders
 
-import android.view.animation.AnimationUtils
 import androidx.core.view.isVisible
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -81,12 +80,13 @@ class SeasonViewHolder(
                 )
             }
             setOnFocusChangeListener { _, hasFocus ->
-                val animation = when {
-                    hasFocus -> AnimationUtils.loadAnimation(context, R.anim.zoom_in)
-                    else -> AnimationUtils.loadAnimation(context, R.anim.zoom_out)
-                }
-                binding.ivSeasonPoster.startAnimation(animation)
-                animation.fillAfter = true
+                binding.ivSeasonPoster.animate()
+                    .cancel()
+                binding.ivSeasonPoster.animate()
+                    .scaleX(if (hasFocus) 1.05f else 1f)
+                    .scaleY(if (hasFocus) 1.05f else 1f)
+                    .setDuration(if (hasFocus) 180L else 120L)
+                    .start()
             }
         }
 

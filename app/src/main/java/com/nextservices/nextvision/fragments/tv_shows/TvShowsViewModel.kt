@@ -8,6 +8,7 @@ import com.nextservices.nextvision.models.TvShow
 import com.nextservices.nextvision.utils.ParentalControlUtils
 import com.nextservices.nextvision.utils.UserPreferences
 import com.nextservices.nextvision.utils.ProviderChangeNotifier
+import com.nextservices.nextvision.utils.StartupPreloadStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -82,13 +83,14 @@ class TvShowsViewModel(database: AppDatabase) : ViewModel() {
         _state.emit(State.Loading)
 
         try {
-            val tvShows = ParentalControlUtils.filterItems(
-                UserPreferences.currentProvider!!.getTvShows()
-            ).filterIsInstance<TvShow>()
+            val provider = UserPreferences.currentProvider!!
+            val tvShows = StartupPreloadStore.get(provider)?.tvShows
+                ?: provider.getTvShows()
+            val filteredTvShows = ParentalControlUtils.filterItems(tvShows).filterIsInstance<TvShow>()
 
             page = 1
 
-            _state.emit(State.SuccessLoading(tvShows, tvShows.isNotEmpty()))
+            _state.emit(State.SuccessLoading(filteredTvShows, filteredTvShows.isNotEmpty()))
         } catch (e: Exception) {
             Log.e("TvShowsViewModel", "getTvShows: ", e)
             _state.emit(State.FailedLoading(e))

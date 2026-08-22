@@ -38,6 +38,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
     private val qualityAdapter = SettingsAdapter(this, Settings.Quality.list)
     private val audioAdapter = SettingsAdapter(this, Settings.Audio.list)
     private val subtitlesAdapter = SettingsAdapter(this, Settings.Subtitle.list)
+    private val subtitleShortcutAdapter = SettingsAdapter(this, emptyList())
     private val subtitleOffsetAdapter = SettingsAdapter(this, Settings.Subtitle.Offset.list)
     private val captionStyleAdapter = SettingsAdapter(this, Settings.Subtitle.Style.list)
     private val fontColorAdapter = SettingsAdapter(this, Settings.Subtitle.Style.FontColor.list)
@@ -65,8 +66,19 @@ class PlayerSettingsTvView @JvmOverloads constructor(
             AnimationUtils.loadLayoutAnimation(context, R.anim.layout_anim_settings)
     }
 
+    override fun onSubtitleSettingsChanged() {
+        subtitleShortcutAdapter.replaceItems(
+            Settings.Subtitle.list
+        )
+        binding.rvSettings.adapter?.notifyDataSetChanged()
+        if (isShortcutPanel && currentSettings == Setting.SUBTITLES) {
+            focusSelectedItem()
+        }
+    }
+
     private var pendingItem: Item? = null
     private var pendingBinding: ItemSettingTvBinding? = null
+    private var isShortcutPanel = false
     private val pendingHandler = Handler(Looper.getMainLooper())
     private val pendingTimeout = Runnable { onPendingSelectionResult(false) }
 
@@ -122,6 +134,10 @@ class PlayerSettingsTvView @JvmOverloads constructor(
 
     fun onBackPressed(): Boolean {
         clearPendingSelection()
+        if (isShortcutPanel) {
+            hide()
+            return true
+        }
         when (currentSettings) {
             Setting.MAIN -> hide()
             Setting.QUALITY,
@@ -160,6 +176,21 @@ class PlayerSettingsTvView @JvmOverloads constructor(
 
 
     fun show() {
+        isShortcutPanel = false
+        showSetting(Setting.MAIN)
+    }
+
+    fun showQuality() = showShortcutSetting(Setting.QUALITY)
+    fun showServer() = showShortcutSetting(Setting.SERVERS)
+    fun showAudio() = showShortcutSetting(Setting.AUDIO)
+    fun showSubtitles() = showShortcutSetting(Setting.SUBTITLES)
+
+    private fun showShortcutSetting(setting: Setting) {
+        isShortcutPanel = true
+        showSetting(setting)
+    }
+
+    private fun showSetting(setting: Setting) {
         isHiding = false
         this.visibility = View.VISIBLE
 
@@ -175,7 +206,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                 .start()
         }
 
-        displaySettings(Setting.MAIN)
+        displaySettings(setting)
     }
 
     private fun displaySettings(setting: Setting) {
@@ -219,7 +250,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
             Setting.MAIN -> settingsAdapter
             Setting.QUALITY -> qualityAdapter
             Setting.AUDIO -> audioAdapter
-            Setting.SUBTITLES -> subtitlesAdapter
+            Setting.SUBTITLES -> if (isShortcutPanel) subtitleShortcutAdapter else subtitlesAdapter
             Setting.SUBTITLE_OFFSET -> subtitleOffsetAdapter
             Setting.CAPTION_STYLE -> captionStyleAdapter
             Setting.CAPTION_STYLE_FONT_COLOR -> fontColorAdapter
@@ -242,10 +273,23 @@ class PlayerSettingsTvView @JvmOverloads constructor(
 
         binding.rvSettings.scheduleLayoutAnimation()
 
-        if (setting == Setting.SUBTITLE_OFFSET) {
-            focusSelectedSubtitleOffset()
-        } else {
-            binding.rvSettings.requestFocus()
+        focusSelectedItem()
+    }
+
+    private fun focusSelectedItem() {
+        val adapter = binding.rvSettings.adapter as? SettingsAdapter ?: return
+        if (adapter.itemCount == 0) return
+        val selectedPosition = adapter.selectedPosition().takeIf { it >= 0 } ?: 0
+        binding.rvSettings.clearFocus()
+
+        binding.rvSettings.post {
+            (binding.rvSettings.layoutManager as? LinearLayoutManager)
+                ?.scrollToPosition(selectedPosition)
+            binding.rvSettings.post {
+                binding.rvSettings.findViewHolderForAdapterPosition(selectedPosition)
+                    ?.itemView
+                    ?.requestFocus()
+            }
         }
     }
 
@@ -302,8 +346,37 @@ class PlayerSettingsTvView @JvmOverloads constructor(
 
     private class SettingsAdapter(
         private val settingsView: PlayerSettingsTvView,
-        private val items: List<Item>,
+        private var items: List<Item>,
     ) : RecyclerView.Adapter<SettingViewHolder>() {
+
+        fun replaceItems(items: List<Item>) {
+            this.items = items
+            notifyDataSetChanged()
+        }
+
+        fun selectedPosition(): Int = items.indexOfFirst { item ->
+            when (item) {
+                is Settings.Quality -> item.isSelected
+                is Settings.Audio -> item.isSelected
+                is Settings.Subtitle.None -> item.isSelected
+                is Settings.Subtitle.TextTrackInformation -> item.isSelected
+                is Settings.Subtitle.Offset.Value -> item.isSelected
+                is Settings.Subtitle.Style.FontColor -> item.isSelected
+                is Settings.Subtitle.Style.TextSize -> item.isSelected
+                is Settings.Subtitle.Style.FontOpacity -> item.isSelected
+                is Settings.Subtitle.Style.EdgeStyle -> item.isSelected
+                is Settings.Subtitle.Style.BackgroundColor -> item.isSelected
+                is Settings.Subtitle.Style.BackgroundOpacity -> item.isSelected
+                is Settings.Subtitle.Style.WindowColor -> item.isSelected
+                is Settings.Subtitle.Style.WindowOpacity -> item.isSelected
+                is Settings.Subtitle.Style.Margin -> item.isSelected
+                is Settings.Speed -> item.isSelected
+                is Settings.ExtraBuffering -> item.isSelected
+                is Settings.SoftwareDecoder -> item.isSelected
+                is Settings.Server -> item.isSelected
+                else -> false
+            }
+        }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
             SettingViewHolder(
@@ -359,9 +432,8 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                         }
 
                         is Settings.Quality -> {
-                            if (settingsView.beginPendingSelection(item, binding)) {
-                                settingsView.onQualitySelected.invoke(item)
-                            }
+                            settingsView.onQualitySelected.invoke(item)
+                            settingsView.hide()
                         }
 
                         is Settings.Audio -> {
@@ -381,10 +453,8 @@ class PlayerSettingsTvView @JvmOverloads constructor(
 
                                 is Settings.Subtitle.None,
                                 is Settings.Subtitle.TextTrackInformation -> {
-                                    if (settingsView.beginPendingSelection(item, binding)) {
-                                        settingsView.onSubtitleSelected.invoke(item)
-                                        settingsView.completePendingSelectionSoon()
-                                    }
+                                    settingsView.onSubtitleSelected.invoke(item)
+                                    settingsView.hide()
                                 }
 
                                 Settings.Subtitle.LocalSubtitles -> {
@@ -490,15 +560,13 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                         }
 
                         is Settings.Subtitle.OpenSubtitles.Subtitle -> {
-                            if (settingsView.beginPendingSelection(item, binding)) {
-                                settingsView.onOpenSubtitleSelected?.invoke(item)
-                            }
+                            settingsView.onOpenSubtitleSelected?.invoke(item)
+                            settingsView.hide()
                         }
 
                         is Settings.Subtitle.SubDLSubtitles.Subtitle -> {
-                            if (settingsView.beginPendingSelection(item, binding)) {
-                                settingsView.onSubDLSubtitleSelected?.invoke(item)
-                            }
+                            settingsView.onSubDLSubtitleSelected?.invoke(item)
+                            settingsView.hide()
                         }
 
                         is Settings.Speed -> {
@@ -519,9 +587,8 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                         }
 
                         is Settings.Server -> {
-                            if (settingsView.beginPendingSelection(item, binding)) {
-                                settingsView.onServerSelected?.invoke(item)
-                            }
+                            settingsView.onServerSelected?.invoke(item)
+                            settingsView.hide()
                         }
                         else -> {}
                     }

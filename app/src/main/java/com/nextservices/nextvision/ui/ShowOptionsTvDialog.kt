@@ -5,6 +5,7 @@ import android.content.Context
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.WindowManager
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import com.bumptech.glide.Glide
@@ -39,6 +40,15 @@ class ShowOptionsTvDialog(
 
     private val database: AppDatabase
         get() = AppDatabase.getInstance(context)
+
+    override fun show() {
+        if (context.toActivity()?.isFinishing == true || context.toActivity()?.isDestroyed == true) return
+        runCatching { super.show() }
+            .onFailure { error ->
+                if (error is WindowManager.BadTokenException || error is IllegalStateException) return@onFailure
+                throw error
+            }
+    }
 
     private fun checkProviderAndRun(show: AppAdapter.Item, action: () -> Unit) {
         val providerName = when(show){

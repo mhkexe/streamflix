@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/app_background_color"
+    android:paddingStart="72dp"
+    android:paddingTop="48dp"
+    android:paddingEnd="72dp"
+    android:paddingBottom="32dp"
+    android:focusable="false"
+    android:descendantFocusability="blocksDescendants">
+
+    <LinearLayout
+        android:id="@+id/premium_left"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:focusable="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/premium_divider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.42">
+
+        <ImageView
+            android:id="@+id/iv_premium_qr"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:contentDescription="@null"
+            android:focusable="false"
+            android:scaleType="fitCenter" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:maxWidth="320dp"
+            android:text="@string/premium_scan_qr"
+            android:textColor="#C9C9C9"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/premium_divider"
+        android:layout_width="1dp"
+        android:layout_height="300dp"
+        android:alpha="0.18"
+        android:background="#FFFFFF"
+        android:focusable="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/premium_right"
+        app:layout_constraintStart_toEndOf="@id/premium_left"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/premium_right"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="36dp"
+        android:orientation="vertical"
+        android:focusable="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/premium_divider"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/iv_premium_logo"
+            android:layout_width="240dp"
+            android:layout_height="76dp"
+            android:contentDescription="@string/main_menu_premium"
+            android:focusable="false"
+            android:scaleType="fitStart" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:lineSpacingExtra="2dp"
+            android:text="@string/premium_description"
+            android:textColor="#D6D6D6"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical">
+
+            <TextView style="@style/PremiumPoint" android:text="@string/premium_point_full_hd" />
+            <TextView style="@style/PremiumPoint" android:text="@string/premium_point_updated" />
+            <TextView style="@style/PremiumPoint" android:text="@string/premium_point_guide" />
+            <TextView style="@style/PremiumPoint" android:text="@string/premium_point_trial" />
+            <TextView style="@style/PremiumPoint" android:text="@string/premium_point_connections" />
+            <TextView style="@style/PremiumPoint" android:text="@string/premium_point_support" />
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

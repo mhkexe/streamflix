@@ -40,46 +40,59 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
         set(value) {
             if (field === value) return
 
-            value?.let {
-                Settings.Server.init(it)
-                Settings.Quality.init(it, resources)
-                Settings.Audio.init(it, resources)
-                Settings.Subtitle.init(it, resources)
-                Settings.Speed.refresh(it)
+            field?.let { oldPlayer ->
+                playerListener?.let(oldPlayer::removeListener)
             }
+            playerListener = null
 
-            value?.addListener(object : Player.Listener {
-                override fun onEvents(player: Player, events: Player.Events) {
-                    if (events.contains(Player.EVENT_PLAYLIST_METADATA_CHANGED)) {
-                        Settings.Server.init(value)
-                    }
-                    if (events.contains(Player.EVENT_MEDIA_ITEM_TRANSITION)) {
-                        Settings.Server.refresh(value)
-                    }
-                    if (events.contains(Player.EVENT_TRACKS_CHANGED)) {
-                        Settings.Quality.init(value, resources)
-                        Settings.Audio.init(value, resources)
-                        Settings.Subtitle.init(value, resources)
-                    }
-                    if (events.contains(Player.EVENT_PLAYBACK_PARAMETERS_CHANGED)) {
-                        Settings.Speed.refresh(value)
+            value?.let { newPlayer ->
+                Settings.Server.init(newPlayer)
+                Settings.Quality.init(newPlayer, resources)
+                Settings.Audio.init(newPlayer, resources)
+                Settings.Subtitle.init(newPlayer, resources)
+                onSubtitleSettingsChanged()
+                Settings.Speed.refresh(newPlayer)
+
+                playerListener = object : Player.Listener {
+                    override fun onEvents(player: Player, events: Player.Events) {
+                        if (events.contains(Player.EVENT_PLAYLIST_METADATA_CHANGED)) {
+                            Settings.Server.init(newPlayer)
+                        }
+                        if (events.contains(Player.EVENT_MEDIA_ITEM_TRANSITION)) {
+                            Settings.Server.refresh(newPlayer)
+                        }
+                        if (events.contains(Player.EVENT_TRACKS_CHANGED)) {
+                            Settings.Quality.init(newPlayer, resources)
+                            Settings.Audio.init(newPlayer, resources)
+                            Settings.Subtitle.init(newPlayer, resources)
+                            onSubtitleSettingsChanged()
+                        }
+                        if (events.contains(Player.EVENT_PLAYBACK_PARAMETERS_CHANGED)) {
+                            Settings.Speed.refresh(newPlayer)
+                        }
                     }
                 }
-            })
+                newPlayer.addListener(playerListener!!)
+            }
 
             field = value
         }
+    private var playerListener: Player.Listener? = null
     var subtitleView: SubtitleView? = null
     var openSubtitles: List<OpenSubtitles.Subtitle> = listOf()
         set(value) {
             Settings.Subtitle.OpenSubtitles.init(value)
             field = value
+            onSubtitleSettingsChanged()
         }
     var subDLSubtitles: List<SubDL.Subtitle> = listOf()
         set(value) {
             Settings.Subtitle.SubDLSubtitles.init(value)
             field = value
+            onSubtitleSettingsChanged()
         }
+
+    protected open fun onSubtitleSettingsChanged() = Unit
 
     protected var currentSettings = Setting.MAIN
 
@@ -118,7 +131,6 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
                 is Settings.Quality.Auto -> {
                     player.trackSelectionParameters = player.trackSelectionParameters
                         .buildUpon()
-                        .clearOverridesOfType(C.TRACK_TYPE_VIDEO)
                         .setMaxVideoBitrate(Int.MAX_VALUE)
                         .setForceHighestSupportedBitrate(false)
                         .build()
@@ -181,17 +193,19 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
                 }
 
                 is Settings.Subtitle.TextTrackInformation -> {
-                    player.trackSelectionParameters = player.trackSelectionParameters
-                        .buildUpon()
-                        .setOverrideForType(
-                            TrackSelectionOverride(
-                                subtitle.trackGroup.mediaTrackGroup,
-                                listOf(subtitle.trackIndex)
+                    runCatching {
+                        player.trackSelectionParameters = player.trackSelectionParameters
+                            .buildUpon()
+                            .setOverrideForType(
+                                TrackSelectionOverride(
+                                    subtitle.trackGroup.mediaTrackGroup,
+                                    listOf(subtitle.trackIndex)
+                                )
                             )
-                        )
-                        .setTrackTypeDisabled(subtitle.trackGroup.type, false)
-                        .build()
-                    UserPreferences.subtitleName = (subtitle.language ?: subtitle.label).substringBefore(" ")
+                            .setTrackTypeDisabled(subtitle.trackGroup.type, false)
+                            .build()
+                        UserPreferences.subtitleName = (subtitle.language ?: subtitle.label).substringBefore(" ")
+                    }.onFailure { }
                 }
 
                 else -> {}
@@ -408,11 +422,7 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
                 ManualZoom,
             )
             val listTv = listOf(
-                Quality,
-                Audio,
-                Subtitle,
                 Speed,
-                Server,
                 ExtraBuffering,
                 SoftwareDecoder,
                 ManualZoom,

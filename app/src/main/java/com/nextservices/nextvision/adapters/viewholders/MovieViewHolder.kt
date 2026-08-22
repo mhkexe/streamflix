@@ -702,6 +702,11 @@ class MovieViewHolder(
                 }
                 binding.root.startAnimation(animation)
                 animation.fillAfter = true
+
+                if (hasFocus && context.toActivity()?.getCurrentFragment() is FavoritesTvFragment) {
+                    (context.toActivity()?.getCurrentFragment() as? FavoritesTvFragment)
+                        ?.updateFavoriteBackground(movie, true)
+                }
             }
         }
         binding.ivMoviePoster.loadMoviePoster(movie) {
@@ -711,11 +716,13 @@ class MovieViewHolder(
         }
         binding.tvMovieYearOverlay.apply {
             text = movie.released?.format("yyyy") ?: ""
-            visibility = if (text.isNullOrEmpty()) View.GONE else View.VISIBLE
+            visibility = if (context.toActivity()?.getCurrentFragment() is FavoritesTvFragment) View.GONE
+            else if (text.isNullOrEmpty()) View.GONE else View.VISIBLE
         }
         binding.tvMovieRatingOverlay.apply {
             text = movie.rating?.let { "★ ${String.format(Locale.ROOT, "%.1f", it)}" } ?: ""
-            visibility = if (text.isNullOrEmpty()) View.GONE else View.VISIBLE
+            visibility = if (context.toActivity()?.getCurrentFragment() is FavoritesTvFragment) View.GONE
+            else if (text.isNullOrEmpty()) View.GONE else View.VISIBLE
         }
         bindRibbons(binding.ivMovieFavoriteRibbon, binding.ivMovieWatchedRibbon)
         binding.pbMovieProgress.apply {
@@ -897,6 +904,11 @@ class MovieViewHolder(
         binding.tvMovieOverview.setTextColor(ContextCompat.getColor(context, R.color.detail_description))
 
         binding.btnMovieWatchNow.apply {
+            text = if (movie.watchHistory != null) {
+                context.getString(R.string.movie_resume)
+            } else {
+                context.getString(R.string.movie_watch_now)
+            }
             setOnClickListener {
                 // Este botón ya navega al reproductor, no a otra página de detalles.
                 // Generalmente non necesita el cambio de proveedor, pero lo añadimos por seguridad.
@@ -1028,6 +1040,11 @@ class MovieViewHolder(
         binding.tvMovieOverview.setTextColor(ContextCompat.getColor(context, R.color.detail_description))
 
         binding.btnMovieWatchNow.apply {
+            text = if (movie.watchHistory != null) {
+                context.getString(R.string.movie_resume)
+            } else {
+                context.getString(R.string.movie_watch_now)
+            }
             setOnClickListener {
                 checkProviderAndRun {
                     findNavController().navigate(MovieTvFragmentDirections.actionMovieToPlayer(

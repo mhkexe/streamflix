@@ -13,10 +13,14 @@ import com.nextservices.nextvision.utils.UserPreferences
 import com.nextservices.nextvision.utils.StartupTrace
 import com.nextservices.nextvision.providers.TmdbProvider
 import com.nextservices.nextvision.utils.HomeCacheStore
+import com.nextservices.nextvision.utils.StartupPreloadStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class NextVisionApp : Application() {
@@ -87,19 +91,18 @@ class NextVisionApp : Application() {
 
         applicationScope.launch(Dispatchers.IO) {
             StartupTrace.mark("background.database_setup.begin")
-            runCatching { AppDatabase.setup(appContext) }
-            if (UserPreferences.currentProvider == null) {
-                UserPreferences.currentProvider = TmdbProvider("en")
-            }
-            runCatching {
-                val provider = UserPreferences.currentProvider ?: return@runCatching
-                val cached = HomeCacheStore.read(appContext, provider)
-                if (cached.isNullOrEmpty()) {
-                    HomeCacheStore.write(appContext, provider, provider.getHome())
+            try {
+                AppDatabase.setup(appContext)
+                if (UserPreferences.currentProvider == null) {
+                    UserPreferences.currentProvider = TmdbProvider("en")
                 }
+                preloadStartupData(appContext)
+            } catch (error: Exception) {
+                StartupTrace.mark("background.preload.failed ${error.javaClass.simpleName}")
+            } finally {
+                StartupTrace.mark("background.database_setup.end")
+                preloadReady.complete(Unit)
             }
-            StartupTrace.mark("background.database_setup.end")
-            preloadReady.complete(Unit)
         }
 
         applicationScope.launch(Dispatchers.IO) {
@@ -109,6 +112,32 @@ class NextVisionApp : Application() {
             StartupTrace.mark("background.maintenance.end")
         }
         StartupTrace.mark("Application.onCreate.end")
+    }
+
+    private suspend fun preloadStartupData(context: Context) {
+        val provider = UserPreferences.currentProvider ?: return
+        val database = AppDatabase.getInstance(context)
+
+        coroutineScope {
+            val home = async { runCatching { provider.getHome() }.getOrNull() }
+            val movies = async { runCatching { provider.getMovies() }.getOrNull() }
+            val tvShows = async { runCatching { provider.getTvShows() }.getOrNull() }
+            val favoriteMovies = async { runCatching { database.movieDao().getFavorites().first() }.getOrNull() }
+            val favoriteTvShows = async { runCatching { database.tvShowDao().getFavorites().first() }.getOrNull() }
+
+            val homeData = home.await()
+            homeData?.let { HomeCacheStore.write(context, provider, it) }
+            StartupPreloadStore.put(
+                provider,
+                StartupPreloadStore.Data(
+                    home = homeData,
+                    movies = movies.await(),
+                    tvShows = tvShows.await(),
+                )
+            )
+            favoriteMovies.await()
+            favoriteTvShows.await()
+        }
     }
 
     override fun onTrimMemory(level: Int) {

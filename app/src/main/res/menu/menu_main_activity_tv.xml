@@ -25,4 +25,8 @@
         android:id="@id/favorites"
         android:title="@string/main_menu_favorites" />
 
+    <item
+        android:id="@id/premium"
+        android:title="@string/main_menu_premium" />
+
 </menu>

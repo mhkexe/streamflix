@@ -10,4 +10,5 @@
 local.properties
 *.salive
 *.log
+*.apk
 app/src/main/cpp/native-lib.cpp

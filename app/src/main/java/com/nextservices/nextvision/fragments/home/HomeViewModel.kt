@@ -20,6 +20,7 @@ import com.nextservices.nextvision.utils.UserDataCache.toCached
 import com.nextservices.nextvision.utils.UserDataCache.toEpisode
 import com.nextservices.nextvision.utils.UserDataCache.toMovie
 import com.nextservices.nextvision.utils.UserPreferences
+import com.nextservices.nextvision.utils.StartupPreloadStore
 import com.nextservices.nextvision.utils.combine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -354,6 +355,11 @@ class HomeViewModel(database: AppDatabase) : ViewModel() {
         }
 
         loadUserDataCache(provider)
+
+        StartupPreloadStore.get(provider)?.home?.let { preloadedCategories ->
+            _state.emit(State.SuccessLoading(preloadedCategories))
+            return@launch
+        }
 
         try {
             val categories = provider.getHome()

@@ -31,7 +31,7 @@
         android:id="@+id/nav_main"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:minHeight="96dp"
+        android:minHeight="132dp"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:visibility="gone"
@@ -39,7 +39,7 @@
         android:paddingStart="20dp"
         android:paddingTop="8dp"
         android:paddingEnd="20dp"
-        android:paddingBottom="8dp"
+        android:paddingBottom="24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -69,8 +69,8 @@
 
             <ImageView
                 android:id="@+id/startup_logo"
-                android:layout_width="220dp"
-                android:layout_height="220dp"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
                 android:contentDescription="@string/app_name"
                 android:scaleType="centerInside"
                 android:src="@drawable/logo_transparent"

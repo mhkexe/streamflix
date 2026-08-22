@@ -64,6 +64,7 @@
         android:padding="12dp"
         android:src="@drawable/exo_styled_controls_external_player"
         android:tint="#FFFFFF"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/tv_exo_subtitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/tv_exo_title"
@@ -90,6 +91,7 @@
             android:nextFocusDown="@id/exo_bottom_bar"
             android:padding="10dp"
             android:src="@drawable/ic_previous"
+            android:visibility="gone"
             app:tint="#FFFFFF" />
 
         <ImageView
@@ -105,6 +107,7 @@
             android:nextFocusDown="@id/exo_bottom_bar"
             android:padding="10dp"
             android:src="@drawable/ic_refresh"
+            android:visibility="gone"
             app:tint="#FFFFFF" />
 
         <ImageView
@@ -134,6 +137,7 @@
             android:nextFocusDown="@id/exo_bottom_bar"
             android:padding="10dp"
             android:src="@drawable/ic_next"
+            android:visibility="gone"
             app:tint="#FFFFFF" />
 
     </LinearLayout>
@@ -148,9 +152,60 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:nextFocusDown="@id/exo_settings"
+        app:played_color="#FFFFFFFF"
+        app:unplayed_color="#B3FFFFFF"
+        app:scrubber_color="#FFE50914"
         app:layout_constraintBottom_toTopOf="@id/exo_bottom_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/player_shortcuts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="30dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="@id/exo_bottom_bar"
+        app:layout_constraintTop_toTopOf="@id/exo_bottom_bar"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/btn_player_restart"
+            style="@style/PlayerTvShortcut"
+            android:contentDescription="@string/player_restart"
+            android:src="@drawable/ic_refresh" />
+
+        <ImageView
+            android:id="@+id/btn_player_server"
+            style="@style/PlayerTvShortcut"
+            android:contentDescription="@string/player_settings_servers_title"
+            android:src="@drawable/ic_player_settings_servers" />
+
+        <ImageView
+            android:id="@+id/btn_player_quality"
+            style="@style/PlayerTvShortcut"
+            android:contentDescription="@string/player_settings_quality_title"
+            android:src="@drawable/ic_player_settings_quality" />
+
+        <ImageView
+            android:id="@+id/btn_player_audio"
+            style="@style/PlayerTvShortcut"
+            android:contentDescription="@string/player_settings_audio_title"
+            android:src="@drawable/ic_player_settings_audio" />
+
+        <ImageView
+            android:id="@+id/btn_player_subtitle"
+            style="@style/PlayerTvShortcut"
+            android:contentDescription="@string/player_settings_subtitles_title"
+            android:src="@drawable/ic_player_settings_subtitle_on" />
+
+        <ImageView
+            android:id="@+id/btn_player_settings"
+            style="@style/PlayerTvShortcut"
+            android:contentDescription="@string/player_settings_title"
+            android:src="@drawable/exo_styled_controls_settings" />
+    </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@id/exo_bottom_bar"
@@ -158,6 +213,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
         android:layout_marginEnd="30dp"
+        android:layout_marginBottom="28dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -215,6 +271,7 @@
             android:nextFocusRight="@id/exo_settings"
             android:padding="12dp"
             android:src="@drawable/exo_styled_controls_aspect_ratio"
+            android:visibility="gone"
             android:tint="#FFFFFF"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/exo_settings"
@@ -235,6 +292,7 @@
             android:nextFocusRight="@id/exo_settings"
             android:padding="12dp"
             android:src="@drawable/exo_styled_controls_settings"
+            android:visibility="gone"
             android:tint="#FFFFFF"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

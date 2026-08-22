@@ -223,7 +223,13 @@ class HomeTvFragment : Fragment() {
 
         appAdapter.submitList(
             categories
-                .filter { it.list.isNotEmpty() && it.name != Category.FAVORITE_MOVIES && it.name != Category.FAVORITE_TV_SHOWS }
+                .filter {
+                    it.list.isNotEmpty() &&
+                        it.name != Category.CONTINUE_WATCHING &&
+                        it.name != getString(R.string.home_continue_watching) &&
+                        it.name != Category.FAVORITE_MOVIES &&
+                        it.name != Category.FAVORITE_TV_SHOWS
+                }
                 .onEach { category ->
                     if (category.name != getString(R.string.home_continue_watching)) {
                         category.list.forEach { show ->

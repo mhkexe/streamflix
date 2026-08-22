@@ -26,13 +26,44 @@
         app:show_timeout="2000"
         app:surface_type="surface_view" />
 
+    <FrameLayout
+        android:id="@+id/btn_player_server_loading"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:clickable="false"
+        android:focusable="false"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible">
+
+        <ProgressBar
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/progress_server_loading" />
+
+        <TextView
+            android:id="@+id/tv_player_server_loading_percent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="#FFFFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            tools:text="99%" />
+    </FrameLayout>
+
     <ImageView
         android:id="@+id/iv_player_logo"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginEnd="28dp"
         android:layout_marginTop="24dp"
-        android:alpha="0.8"
+        android:alpha="0.65"
         android:contentDescription="@string/app_name"
         android:importantForAccessibility="no"
         android:scaleType="centerInside"

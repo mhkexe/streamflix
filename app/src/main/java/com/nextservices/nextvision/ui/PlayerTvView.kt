@@ -88,7 +88,7 @@ class PlayerTvView @JvmOverloads constructor(
         when (event.keyCode) {
             KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
                 return if (event.action == KeyEvent.ACTION_DOWN) {
-                    onMediaPreviousClicked?.invoke() ?: false
+                    runCatching { onMediaPreviousClicked?.invoke() ?: false }.getOrDefault(true)
                 } else {
                     true
                 }
@@ -96,7 +96,7 @@ class PlayerTvView @JvmOverloads constructor(
 
             KeyEvent.KEYCODE_MEDIA_NEXT -> {
                 return if (event.action == KeyEvent.ACTION_DOWN) {
-                    onMediaNextClicked?.invoke() ?: false
+                    runCatching { onMediaNextClicked?.invoke() ?: false }.getOrDefault(true)
                 } else {
                     true
                 }

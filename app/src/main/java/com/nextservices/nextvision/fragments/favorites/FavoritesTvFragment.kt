@@ -17,6 +17,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.nextservices.nextvision.R
 import com.nextservices.nextvision.adapters.AppAdapter
 import com.nextservices.nextvision.database.AppDatabase
@@ -28,6 +29,8 @@ import com.nextservices.nextvision.ui.SpacingItemDecoration
 import com.nextservices.nextvision.utils.UserPreferences
 import com.nextservices.nextvision.utils.dp
 import com.nextservices.nextvision.utils.viewModelsFactory
+import com.nextservices.nextvision.utils.loadMovieBanner
+import com.nextservices.nextvision.utils.loadTvShowBanner
 import kotlinx.coroutines.launch
 
 class FavoritesTvFragment : Fragment() {
@@ -296,6 +299,15 @@ class FavoritesTvFragment : Fragment() {
         binding.tvFavoritesEmpty.isVisible = gridItems.isEmpty()
         binding.rvFavorites.isVisible = gridItems.isNotEmpty()
         appAdapter.submitList(gridItems)
+    }
+
+    fun updateFavoriteBackground(item: AppAdapter.Item, focused: Boolean) {
+        if (!focused) return
+        when (item) {
+            is Movie -> binding.ivFavoritesBackground.loadMovieBanner(item)
+            is TvShow -> binding.ivFavoritesBackground.loadTvShowBanner(item)
+            else -> return
+        }
     }
 
     private fun showSortDialog() {
