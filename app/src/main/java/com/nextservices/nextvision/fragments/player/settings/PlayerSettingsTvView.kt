@@ -59,6 +59,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
 
     override var onSubtitlesClicked: (() -> Unit)? = null
     var onManualZoomClicked: (() -> Unit)? = null
+    var onHidden: (() -> Unit)? = null
 
     init {
         binding.rvSettings.addItemDecoration(SpacingItemDecoration(6.dp(context)))
@@ -331,6 +332,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                 .withEndAction {
                     isHiding = false
                     this@PlayerSettingsTvView.visibility = View.GONE
+                    onHidden?.invoke()
                 }
                 .start()
         }
@@ -705,7 +707,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                                 null -> context.getString(R.string.player_settings_quality_auto)
                                 else -> context.getString(
                                     R.string.player_settings_quality_auto_selected,
-                                    track.height
+                                    Settings.Quality.labelForHeight(track.height)
                                 )
                             }
 
@@ -713,7 +715,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                         }
                         is Settings.Quality.VideoTrackInformation -> context.getString(
                             R.string.player_settings_quality,
-                            item.height
+                            Settings.Quality.labelForHeight(item.height)
                         )
                     }
 
@@ -786,12 +788,12 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                                 null -> context.getString(R.string.player_settings_quality_auto)
                                 else -> context.getString(
                                     R.string.player_settings_quality_auto_selected,
-                                    track.height
+                                    Settings.Quality.labelForHeight(track.height)
                                 )
                             }
                             is Settings.Quality.VideoTrackInformation -> context.getString(
                                 R.string.player_settings_quality,
-                                selected.height
+                                Settings.Quality.labelForHeight(selected.height)
                             )
                         }
                         Settings.Audio -> Settings.Audio.selected?.name

@@ -48,16 +48,20 @@ class EpisodeViewHolder(
     private val context = itemView.context
     private lateinit var episode: Episode
 
-    private fun formatWatchedTime(positionMillis: Long): String {
+    private fun formatWatchedTime(positionMillis: Long, durationMillis: Long): String {
         val totalSeconds = (positionMillis / 1000).coerceAtLeast(0)
+        val durationSeconds = (durationMillis / 1000).coerceAtLeast(0)
         val hours = totalSeconds / 3600
         val minutes = (totalSeconds % 3600) / 60
         val seconds = totalSeconds % 60
-        return if (hours > 0) {
-            String.format(java.util.Locale.ROOT, "%d:%02d:%02d watched", hours, minutes, seconds)
-        } else {
-            String.format(java.util.Locale.ROOT, "%d:%02d watched", minutes, seconds)
-        }
+        val durationHours = durationSeconds / 3600
+        val durationMinutes = (durationSeconds % 3600) / 60
+        val durationRemainderSeconds = durationSeconds % 60
+        val watched = if (hours > 0) "%d:%02d:%02d".format(java.util.Locale.ROOT, hours, minutes, seconds)
+        else "%d:%02d".format(java.util.Locale.ROOT, minutes, seconds)
+        val total = if (durationHours > 0) "%d:%02d:%02d".format(java.util.Locale.ROOT, durationHours, durationMinutes, durationRemainderSeconds)
+        else "%d:%02d".format(java.util.Locale.ROOT, durationMinutes, durationRemainderSeconds)
+        return "$watched / $total"
     }
 
     fun bind(episode: Episode) {
@@ -359,23 +363,8 @@ class EpisodeViewHolder(
         binding.tvEpisodeTvShowTitle.text = episode.tvShow?.title ?: ""
 
         binding.tvEpisodeInfo.text = episode.season?.takeIf { it.number != 0 }?.let { season ->
-            context.getString(
-                R.string.episode_item_info,
-                season.number,
-                episode.number,
-                episode.title ?: context.getString(
-                    R.string.episode_number,
-                    episode.number
-                )
-            )
-        } ?: context.getString(
-            R.string.episode_item_info_episode_only,
-            episode.number,
-            episode.title ?: context.getString(
-                R.string.episode_number,
-                episode.number
-            )
-        )
+            context.getString(R.string.home_continue_watching_episode, season.number, episode.number)
+        } ?: context.getString(R.string.home_continue_watching_episode_only, episode.number)
     }
 
     private fun displayContinueWatchingTvItem(binding: ItemEpisodeContinueWatchingTvBinding) {
@@ -465,26 +454,11 @@ class EpisodeViewHolder(
         binding.tvEpisodeTvShowTitle.text = episode.tvShow?.title ?: ""
 
         binding.tvEpisodeInfo.text = episode.season?.takeIf { it.number != 0 }?.let { season ->
-            context.getString(
-                R.string.episode_item_info,
-                season.number,
-                episode.number,
-                episode.title ?: context.getString(
-                    R.string.episode_number,
-                    episode.number
-                )
-            )
-        } ?: context.getString(
-            R.string.episode_item_info_episode_only,
-            episode.number,
-            episode.title ?: context.getString(
-                R.string.episode_number,
-                episode.number
-            )
-        )
+            context.getString(R.string.home_continue_watching_episode, season.number, episode.number)
+        } ?: context.getString(R.string.home_continue_watching_episode_only, episode.number)
         binding.tvEpisodeWatched.apply {
             episode.watchHistory?.let {
-                text = formatWatchedTime(it.lastPlaybackPositionMillis)
+                text = formatWatchedTime(it.lastPlaybackPositionMillis, it.durationMillis)
                 visibility = View.VISIBLE
             } ?: run { visibility = View.GONE }
         }

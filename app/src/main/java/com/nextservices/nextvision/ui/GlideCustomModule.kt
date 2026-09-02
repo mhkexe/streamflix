@@ -5,8 +5,12 @@ import android.graphics.drawable.PictureDrawable
 import android.webkit.CookieManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.annotation.GlideModule
+import com.bumptech.glide.load.DecodeFormat
+import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.module.AppGlideModule
+import com.bumptech.glide.request.RequestOptions
+import android.graphics.Bitmap
 import com.caverock.androidsvg.SVG
 import com.nextservices.nextvision.utils.ArtworkRequestHeaders
 import com.nextservices.nextvision.utils.DnsResolver
@@ -24,6 +28,37 @@ import javax.net.ssl.X509TrustManager
 
 @GlideModule
 class GlideCustomModule : AppGlideModule() {
+
+    override fun applyOptions(context: Context, builder: com.bumptech.glide.GlideBuilder) {
+        builder.setBitmapPool(SafeBitmapPool())
+        builder.setDefaultRequestOptions(
+            RequestOptions()
+                .format(DecodeFormat.PREFER_RGB_565)
+                .disallowHardwareConfig()
+        )
+    }
+
+    private class SafeBitmapPool : BitmapPool {
+        override fun put(bitmap: Bitmap) = Unit
+
+        override fun get(width: Int, height: Int, config: Bitmap.Config): Bitmap = allocate(width, height)
+
+        override fun getDirty(width: Int, height: Int, config: Bitmap.Config): Bitmap = allocate(width, height)
+
+        override fun clearMemory() = Unit
+
+        override fun trimMemory(level: Int) = Unit
+
+        override fun getMaxSize(): Long = 0L
+
+        override fun setSizeMultiplier(sizeMultiplier: Float) = Unit
+
+        private fun allocate(width: Int, height: Int): Bitmap = Bitmap.createBitmap(
+            width.coerceAtLeast(1),
+            height.coerceAtLeast(1),
+            Bitmap.Config.ARGB_8888,
+        )
+    }
 
     private fun getOkHttpClient(context: Context): OkHttpClient {
         val appCache = Cache(File(context.cacheDir, "glide-okhttp-cache"), 10 * 1024 * 1024)

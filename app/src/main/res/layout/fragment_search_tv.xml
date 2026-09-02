@@ -41,7 +41,7 @@
 				android:background="@drawable/bg_search_mic_tv"
 				android:padding="10dp"
 				android:src="@drawable/ic_mic"
-				android:tint="@color/search_mic_icon_tint_tv" />
+				app:tint="@color/search_mic_icon_tint_tv" />
 			<TextView
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
@@ -138,7 +138,7 @@
 				android:alpha="0.7"
 				android:contentDescription="@null"
 				android:src="@drawable/ic_search_white"
-				android:tint="#FFFFFF" />
+				app:tint="#FFFFFF" />
 			<TextView
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"

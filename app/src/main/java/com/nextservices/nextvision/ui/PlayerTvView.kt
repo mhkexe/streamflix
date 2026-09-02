@@ -27,6 +27,7 @@ class PlayerTvView @JvmOverloads constructor(
 
     var onMediaPreviousClicked: (() -> Boolean)? = null
     var onMediaNextClicked: (() -> Boolean)? = null
+    var onSeekFeedback: ((Boolean) -> Unit)? = null
 
     private var zoomToast: Toast? = null
 
@@ -132,6 +133,7 @@ class PlayerTvView @JvmOverloads constructor(
 
         try {
             player.seekTo(player.currentPosition + offsetMs)
+            onSeekFeedback?.invoke(offsetMs > 0)
         } catch (_: IllegalStateException) {
             // The player may be released between dispatching the key and seeking.
         }

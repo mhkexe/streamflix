@@ -1,2 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<color xmlns:android="http://schemas.android.com/apk/res/android">#B3FFFFFF</color>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:color="#B3FFFFFF" />
+</selector>

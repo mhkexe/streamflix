@@ -27,6 +27,38 @@
         app:surface_type="surface_view" />
 
     <FrameLayout
+        android:id="@+id/layout_seek_feedback"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:focusable="false"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/iv_seek_feedback_back"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_gravity="center_vertical|start"
+            android:layout_marginStart="72dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_forward_10_tv"
+            android:scaleX="-1" />
+
+        <ImageView
+            android:id="@+id/iv_seek_feedback_forward"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="72dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_forward_10_tv" />
+    </FrameLayout>
+
+    <FrameLayout
         android:id="@+id/btn_player_server_loading"
         android:layout_width="128dp"
         android:layout_height="128dp"
@@ -59,11 +91,11 @@
 
     <ImageView
         android:id="@+id/iv_player_logo"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_marginEnd="28dp"
         android:layout_marginTop="24dp"
-        android:alpha="0.65"
+        android:alpha="0.5"
         android:contentDescription="@string/app_name"
         android:importantForAccessibility="no"
         android:scaleType="centerInside"

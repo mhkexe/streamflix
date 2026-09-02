@@ -556,6 +556,8 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
             companion object : Settings() {
                 val list = mutableListOf<Quality>()
 
+                fun labelForHeight(height: Int): String = if (height >= 2160) "4K" else "${height}p"
+
                 val selected: Quality
                     get() = list.find { it.isSelected } ?: Auto
 
@@ -604,7 +606,8 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
                                 .setForceHighestSupportedBitrate(false)
                                 .build()
                         }
-                }
+                        }
+
             }
 
             abstract val isSelected: Boolean
@@ -688,6 +691,7 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
                                         )
                                     }
                             }
+
                             .sortedBy { it.name }
                     )
                 }

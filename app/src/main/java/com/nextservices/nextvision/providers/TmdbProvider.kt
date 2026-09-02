@@ -26,6 +26,7 @@ import com.nextservices.nextvision.utils.TMDb3
 import com.nextservices.nextvision.utils.TMDb3.original
 import com.nextservices.nextvision.utils.TMDb3.w500
 import com.nextservices.nextvision.utils.UserPreferences
+import com.nextservices.nextvision.utils.TmdbFilterOptions
 import com.nextservices.nextvision.utils.safeSubList
 import android.util.Base64
 import android.util.Log
@@ -472,6 +473,17 @@ class TmdbProvider(override val language: String) : Provider {
         return movies
     }
 
+    suspend fun getFilteredMovies(options: TmdbFilterOptions, page: Int = 1): List<Movie> =
+        TMDb3.Discover.movie(options.toQuery(isTv = false, page = page)).results
+            .filter { isReleased(it.releaseDate) }
+            .map { movie ->
+                Movie(
+                    id = movie.id.toString(), title = movie.title, overview = movie.overview,
+                    released = movie.releaseDate, rating = movie.voteAverage.toDouble(),
+                    poster = movie.posterPath?.w500, banner = movie.backdropPath?.original,
+                )
+            }
+
     override suspend fun getTvShows(page: Int): List<TvShow> {
         val tvShows = TMDb3.TvSeriesLists.popular(page = page, language = language).results.filter {
             isReleased(it.firstAirDate)
@@ -489,6 +501,17 @@ class TmdbProvider(override val language: String) : Provider {
 
         return tvShows
     }
+
+    suspend fun getFilteredTvShows(options: TmdbFilterOptions, page: Int = 1): List<TvShow> =
+        TMDb3.Discover.tv(options.toQuery(isTv = true, page = page)).results
+            .filter { isReleased(it.firstAirDate) }
+            .map { tv ->
+                TvShow(
+                    id = tv.id.toString(), title = tv.name, overview = tv.overview,
+                    released = tv.firstAirDate, rating = tv.voteAverage.toDouble(),
+                    poster = tv.posterPath?.w500, banner = tv.backdropPath?.original,
+                )
+            }
 
     override suspend fun getMovie(id: String): Movie {
         val movie = TMDb3.Movies.details(
@@ -835,8 +858,20 @@ class TmdbProvider(override val language: String) : Provider {
             servers
         }
 
-        Log.i("NextVisionES", "[SERVERS LIST] -> Found ${finalServers.size} servers: ${finalServers.joinToString { it.name }}")
-        return finalServers.distinctBy { it.id }
+        val distinctServers = finalServers.distinctBy { it.id }
+        val firstServer = distinctServers.firstOrNull()
+        val yoru4k = distinctServers.firstOrNull {
+            it.name.equals("Yoru 4K", ignoreCase = true)
+        }
+        val orderedServers = if (firstServer != null && yoru4k != null && yoru4k != firstServer) {
+            listOf(firstServer, yoru4k) +
+                distinctServers.filter { it != firstServer && it != yoru4k }
+        } else {
+            distinctServers
+        }
+
+        Log.i("NextVisionES", "[SERVERS LIST] -> Found ${orderedServers.size} servers: ${orderedServers.joinToString { it.name }}")
+        return orderedServers
     }
 
     override suspend fun getVideo(server: Video.Server): Video {

@@ -6,7 +6,8 @@
     android:layout_height="wrap_content"
     android:background="@drawable/bg_item_movie_tv"
     android:focusable="true"
-    android:focusableInTouchMode="true">
+    android:focusableInTouchMode="true"
+    android:foreground="@drawable/fg_poster_selection_tv">
 
     <ImageView
         android:id="@+id/iv_movie_poster"
@@ -22,19 +23,6 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/iv_movie_favorite_ribbon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_margin="8dp"
-        android:elevation="2dp"
-        android:src="@drawable/ic_favorite_badge"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="@id/iv_movie_poster"
-        app:layout_constraintTop_toTopOf="@id/iv_movie_poster"
-        tools:ignore="ContentDescription"
-        tools:visibility="visible" />
-
-    <ImageView
         android:id="@+id/iv_movie_watched_ribbon"
         android:layout_width="24dp"
         android:layout_height="24dp"
@@ -44,7 +32,7 @@
         android:src="@drawable/ic_watched"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="@id/iv_movie_poster"
-        app:layout_constraintTop_toBottomOf="@id/iv_movie_favorite_ribbon"
+        app:layout_constraintTop_toTopOf="@id/iv_movie_poster"
         tools:ignore="ContentDescription"
         tools:visibility="visible" />
 

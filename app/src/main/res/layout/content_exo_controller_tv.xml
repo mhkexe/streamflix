@@ -79,20 +79,42 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <ImageView
-            android:id="@+id/btn_custom_prev"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:background="@drawable/bg_btn_exoplayer_tv"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:nextFocusRight="@id/exo_replay"
-            android:nextFocusUp="@id/tv_exo_subtitle"
-            android:nextFocusDown="@id/exo_bottom_bar"
-            android:padding="10dp"
-            android:src="@drawable/ic_previous"
-            android:visibility="gone"
-            app:tint="#FFFFFF" />
+        <LinearLayout
+            android:layout_width="96dp"
+            android:layout_height="104dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/btn_custom_prev"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_btn_exoplayer_tv"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:nextFocusRight="@id/exo_replay"
+                android:nextFocusUp="@id/tv_exo_subtitle"
+                android:nextFocusDown="@id/exo_bottom_bar"
+                android:padding="8dp"
+                android:src="@drawable/ic_previous"
+                android:visibility="gone"
+                app:tint="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/tv_previous_episode_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:background="@drawable/bg_btn_exoplayer_tv"
+                android:paddingStart="6dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="6dp"
+                android:paddingBottom="2dp"
+                android:text="@string/player_previous_episode"
+                android:textColor="#FFFFFFFF"
+                android:textSize="12sp"
+                android:visibility="gone" />
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/exo_replay"
@@ -125,20 +147,42 @@
             android:tint="#FFFFFF"
             tools:ignore="ContentDescription,PrivateResource,UseAppTint" />
 
-        <ImageView
-            android:id="@+id/btn_custom_next"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:background="@drawable/bg_btn_exoplayer_tv"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:nextFocusLeft="@id/exo_play_pause"
-            android:nextFocusUp="@id/tv_exo_subtitle"
-            android:nextFocusDown="@id/exo_bottom_bar"
-            android:padding="10dp"
-            android:src="@drawable/ic_next"
-            android:visibility="gone"
-            app:tint="#FFFFFF" />
+        <LinearLayout
+            android:layout_width="96dp"
+            android:layout_height="104dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/btn_custom_next"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_btn_exoplayer_tv"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:nextFocusLeft="@id/exo_play_pause"
+                android:nextFocusUp="@id/tv_exo_subtitle"
+                android:nextFocusDown="@id/exo_bottom_bar"
+                android:padding="8dp"
+                android:src="@drawable/ic_next"
+                android:visibility="gone"
+                app:tint="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/tv_next_episode_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:background="@drawable/bg_btn_exoplayer_tv"
+                android:paddingStart="6dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="6dp"
+                android:paddingBottom="2dp"
+                android:text="@string/player_next_episode"
+                android:textColor="#FFFFFFFF"
+                android:textSize="12sp"
+                android:visibility="gone" />
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -153,7 +197,7 @@
         android:focusableInTouchMode="true"
         android:nextFocusDown="@id/exo_settings"
         app:played_color="#FFFFFFFF"
-        app:unplayed_color="#B3FFFFFF"
+        app:unplayed_color="#66FFFFFF"
         app:scrubber_color="#FFE50914"
         app:layout_constraintBottom_toTopOf="@id/exo_bottom_bar"
         app:layout_constraintEnd_toEndOf="parent"
@@ -175,6 +219,13 @@
             style="@style/PlayerTvShortcut"
             android:contentDescription="@string/player_restart"
             android:src="@drawable/ic_refresh" />
+
+        <ImageView
+            android:id="@+id/btn_player_episodes"
+            style="@style/PlayerTvShortcut"
+            android:contentDescription="@string/player_episodes_list"
+            android:src="@drawable/ic_playlist_tv"
+            android:visibility="gone" />
 
         <ImageView
             android:id="@+id/btn_player_server"

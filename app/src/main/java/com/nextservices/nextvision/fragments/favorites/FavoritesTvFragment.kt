@@ -12,10 +12,11 @@ import android.view.ViewConfiguration
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.nextservices.nextvision.R
@@ -24,13 +25,17 @@ import com.nextservices.nextvision.database.AppDatabase
 import com.nextservices.nextvision.databinding.FragmentFavoritesTvBinding
 import com.nextservices.nextvision.models.Movie
 import com.nextservices.nextvision.models.TvShow
+import com.nextservices.nextvision.models.Category
 import com.nextservices.nextvision.ui.ShowOptionsTvDialog
+import com.nextservices.nextvision.ui.CollectionOptionsTvDialog
 import com.nextservices.nextvision.ui.SpacingItemDecoration
 import com.nextservices.nextvision.utils.UserPreferences
 import com.nextservices.nextvision.utils.dp
 import com.nextservices.nextvision.utils.viewModelsFactory
 import com.nextservices.nextvision.utils.loadMovieBanner
 import com.nextservices.nextvision.utils.loadTvShowBanner
+import com.nextservices.nextvision.utils.UniverseRepository
+import com.nextservices.nextvision.utils.UniverseCollection
 import kotlinx.coroutines.launch
 
 class FavoritesTvFragment : Fragment() {
@@ -45,6 +50,8 @@ class FavoritesTvFragment : Fragment() {
     private val longPressHandler = Handler(Looper.getMainLooper())
     private var pendingLongPress: Runnable? = null
     private var gridColumnCount = 4
+    private var universeCollections: List<UniverseCollection> = emptyList()
+    private var favoriteSections: List<FavoritesViewModel.FavoriteSection> = emptyList()
     private val rearrangeBackCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
             setRearrangeMode(false)
@@ -65,42 +72,26 @@ class FavoritesTvFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        gridColumnCount = maxOf(4, resources.configuration.screenWidthDp / 180)
         binding.rvFavorites.apply {
-            layoutManager = object : GridLayoutManager(requireContext(), gridColumnCount) {
-                init {
-                    spanSizeLookup = object : SpanSizeLookup() {
-                        override fun getSpanSize(position: Int): Int =
-                            if (appAdapter.items.getOrNull(position) is FavoriteSectionHeader) {
-                                gridColumnCount
-                            } else {
-                                1
-                            }
-                    }
-                }
-
-                override fun onInterceptFocusSearch(focused: View, direction: Int): View? {
-                    if (direction == View.FOCUS_UP) {
-                        val itemView = binding.rvFavorites.findContainingItemView(focused)
-                        val position = itemView?.let(binding.rvFavorites::getChildAdapterPosition)
-                            ?: RecyclerView.NO_POSITION
-                        if (isInFirstGridRow(position)) {
-                            return super.onInterceptFocusSearch(focused, direction)
-                        }
-                    }
-                    return super.onInterceptFocusSearch(focused, direction)
-                }
-            }
+            layoutManager = LinearLayoutManager(requireContext())
             adapter = appAdapter.apply {
                 stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             }
-            addItemDecoration(SpacingItemDecoration(10.dp(requireContext())))
+            addItemDecoration(SpacingItemDecoration(4.dp(requireContext())))
         }
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, rearrangeBackCallback)
         setRearrangeMode(false)
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.sections.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect(::display)
+            viewModel.sections.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect {
+                favoriteSections = it
+                display(it)
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            universeCollections = runCatching { UniverseRepository.load(requireContext()) }.getOrDefault(emptyList())
+            if (!isAdded || _binding == null) return@launch
+            display(favoriteSections)
         }
     }
 
@@ -134,10 +125,35 @@ class FavoritesTvFragment : Fragment() {
                 handleRearrangeKey(FavoritesViewModel.Section.TV_SHOWS, item.id, event)
             }
         } else {
-            appAdapter.onMovieClickListener = null
+            appAdapter.onMovieClickListener = { movie ->
+                if (movie.id.startsWith(COLLECTION_ID_PREFIX)) {
+                    findNavController().navigate(
+                        R.id.collection,
+                        Bundle().apply { putInt("id", movie.id.removePrefix(COLLECTION_ID_PREFIX).toInt()) },
+                    )
+                } else {
+                    findNavController().navigate(FavoritesTvFragmentDirections.actionFavoritesToMovie(id = movie.id))
+                }
+            }
             appAdapter.onTvShowClickListener = null
-            appAdapter.onMovieLongClickListener = null
-            appAdapter.onTvShowLongClickListener = null
+            appAdapter.onMovieLongClickListener = { movie ->
+                if (movie.id.startsWith(COLLECTION_ID_PREFIX)) {
+                    movie.id.removePrefix(COLLECTION_ID_PREFIX).toIntOrNull()?.let { collectionId ->
+                        CollectionOptionsTvDialog(
+                            requireContext(),
+                            collectionId,
+                            movie.title,
+                            movie.poster,
+                            movie.banner,
+                        ).show()
+                    }
+                } else {
+                    ShowOptionsTvDialog(requireContext(), movie).show()
+                }
+            }
+            appAdapter.onTvShowLongClickListener = { item ->
+                ShowOptionsTvDialog(requireContext(), item).show()
+            }
             appAdapter.onMovieKeyListener = null
             appAdapter.onTvShowKeyListener = null
         }
@@ -216,12 +232,6 @@ class FavoritesTvFragment : Fragment() {
         moveSelectionMode = true
     }
 
-    private fun isInFirstGridRow(position: Int): Boolean {
-        val firstItemPosition = appAdapter.items.indexOfFirst { it !is FavoriteSectionHeader }
-        return firstItemPosition >= 0 &&
-            position in firstItemPosition until (firstItemPosition + gridColumnCount)
-    }
-
     private fun toggleSelection(section: FavoritesViewModel.Section, id: String) {
         val key = selectionKey(section, id)
         if (!selectedItems.add(key)) selectedItems.remove(key)
@@ -281,24 +291,41 @@ class FavoritesTvFragment : Fragment() {
     private fun selectionKey(section: FavoritesViewModel.Section, id: String) = "${section.key}:$id"
 
     private fun display(sections: List<FavoritesViewModel.FavoriteSection>) {
-        val gridItems = sections.flatMap { favoriteSection ->
-            if (favoriteSection.items.isEmpty()) return@flatMap emptyList()
+        if (!isAdded || _binding == null) return
+        val categoryItems = sections.mapNotNull { favoriteSection ->
+            if (favoriteSection.items.isEmpty()) return@mapNotNull null
             val title = when (favoriteSection.section) {
                 FavoritesViewModel.Section.MOVIES -> getString(R.string.home_favorite_movies)
                 FavoritesViewModel.Section.TV_SHOWS -> getString(R.string.home_favorite_tv_shows)
             }
-            listOf<AppAdapter.Item>(FavoriteSectionHeader(title, favoriteSection.section)) +
-                favoriteSection.items.onEach { item ->
-                    item.itemType = when (item) {
-                        is Movie -> AppAdapter.Type.MOVIE_GRID_TV_ITEM
-                        is TvShow -> AppAdapter.Type.TV_SHOW_GRID_TV_ITEM
-                        else -> item.itemType
-                    }
+            Category(title, favoriteSection.items.onEach { item ->
+                item.itemType = when (item) {
+                    is Movie -> AppAdapter.Type.MOVIE_TV_ITEM
+                    is TvShow -> AppAdapter.Type.TV_SHOW_TV_ITEM
+                    else -> item.itemType
                 }
+            }).apply {
+                itemType = AppAdapter.Type.CATEGORY_TV_ITEM
+                itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
+            }
         }
-        binding.tvFavoritesEmpty.isVisible = gridItems.isEmpty()
-        binding.rvFavorites.isVisible = gridItems.isNotEmpty()
-        appAdapter.submitList(gridItems)
+        val collections = universeCollections.map { collection ->
+            Movie(
+                id = "$COLLECTION_ID_PREFIX${collection.id}",
+                title = collection.title,
+                poster = collection.posterUrl,
+                banner = collection.backdropUrl,
+            ).apply { itemType = AppAdapter.Type.MOVIE_TV_ITEM }
+        }
+        val allItems = categoryItems + listOfNotNull(
+            Category(getString(R.string.explore_collections), collections).apply {
+                itemType = AppAdapter.Type.CATEGORY_TV_ITEM
+                itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
+            }.takeIf { collections.isNotEmpty() },
+        )
+        binding.tvFavoritesEmpty.isVisible = allItems.isEmpty()
+        binding.rvFavorites.isVisible = allItems.isNotEmpty()
+        appAdapter.submitList(allItems)
     }
 
     fun updateFavoriteBackground(item: AppAdapter.Item, focused: Boolean) {
@@ -335,5 +362,9 @@ class FavoritesTvFragment : Fragment() {
         appAdapter.onSaveInstanceState(binding.rvFavorites)
         _binding = null
         super.onDestroyView()
+    }
+
+    private companion object {
+        const val COLLECTION_ID_PREFIX = "collection:"
     }
 }

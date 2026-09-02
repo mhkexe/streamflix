@@ -124,8 +124,8 @@
     <string name="player_settings_quality_label">Qualità</string>
     <string name="player_settings_quality_sub_label_auto">Auto (%dp)</string>
     <string name="player_settings_quality_auto">Auto</string>
-    <string name="player_settings_quality_auto_selected">Auto • %dp</string>
-    <string name="player_settings_quality">%dp</string>
+    <string name="player_settings_quality_auto_selected">Auto • %sp</string>
+    <string name="player_settings_quality">%sp</string>
     <string name="player_settings_audio_title">Audio</string>
     <string name="player_settings_audio_label">Audio</string>
     <string name="player_settings_subtitles_title">Sottotitoli/Sottotitoli per non udenti</string>

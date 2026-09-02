@@ -16,6 +16,7 @@ import com.nextservices.nextvision.database.AppDatabase
 import com.nextservices.nextvision.databinding.FragmentMoviesTvBinding
 import com.nextservices.nextvision.models.Movie
 import com.nextservices.nextvision.providers.Provider
+import com.nextservices.nextvision.ui.bindTmdbFilterButtons
 import com.nextservices.nextvision.utils.UserPreferences
 import com.nextservices.nextvision.utils.CacheUtils
 import com.nextservices.nextvision.utils.viewModelsFactory
@@ -46,6 +47,12 @@ class MoviesTvFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initializeMovies()
+        bindTmdbFilterButtons(
+            requireContext(), false,
+            binding.btnGenreFilter, binding.btnYearFilter, binding.btnSortFilter,
+            binding.btnClearFilter,
+            { viewModel.currentFilters }, viewModel::applyFilters,
+        )
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { state ->
@@ -109,6 +116,11 @@ class MoviesTvFragment : Fragment() {
             adapter = appAdapter.apply {
                 stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             }
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    updateFilterVisibility(recyclerView)
+                }
+            })
             setItemSpacing(requireContext().resources.getDimension(R.dimen.movies_spacing).toInt())
         }
 
@@ -130,6 +142,25 @@ class MoviesTvFragment : Fragment() {
         val focused = activity?.currentFocus ?: return false
         val itemView = binding.vgvMovies.findContainingItemView(focused) ?: return false
         return binding.vgvMovies.getChildAdapterPosition(itemView) < TV_GRID_COLUMNS
+    }
+
+    fun requestFilterFocus(): Boolean {
+        binding.filterBar.translationY = 0f
+        return binding.btnGenreFilter.requestFocus()
+    }
+
+    fun isFilterFocused(): Boolean {
+        return binding.filterBar.hasFocus()
+    }
+
+    private fun updateFilterVisibility(recyclerView: RecyclerView) {
+        val firstChild = recyclerView.getChildAt(0) ?: return
+        val firstVisiblePosition = recyclerView.getChildAdapterPosition(firstChild)
+        binding.filterBar.translationY = if (firstVisiblePosition < TV_GRID_COLUMNS) {
+            0f
+        } else {
+            -binding.filterBar.bottom.toFloat()
+        }
     }
 
     private companion object {

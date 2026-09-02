@@ -216,6 +216,10 @@ object TMDb3 {
         }
     }
 
+    object Collections {
+        suspend fun detail(id: Int): Collection.Detail = service.getCollectionDetails(id)
+    }
+
     object MovieLists {
 
         suspend fun popular(
@@ -1019,6 +1023,12 @@ object TMDb3 {
             @QueryMap params: Map<String, String> = emptyMap(),
         ): Movie.Detail
 
+        @GET("collection/{collection_id}")
+        suspend fun getCollectionDetails(
+            @Path("collection_id") collectionId: Int,
+            @QueryMap params: Map<String, String> = emptyMap(),
+        ): Collection.Detail
+
 
         @GET("person/{person_id}")
         suspend fun getPersonDetails(
@@ -1087,6 +1097,23 @@ object TMDb3 {
     data class GenresResponse(
         val genres: List<Genre>,
     )
+
+    data class Collection(
+        val id: Int,
+        val name: String,
+        val overview: String? = null,
+        @SerializedName("poster_path") val posterPath: String? = null,
+        @SerializedName("backdrop_path") val backdropPath: String? = null,
+    ) {
+        data class Detail(
+            val id: Int,
+            val name: String,
+            val overview: String? = null,
+            @SerializedName("poster_path") val posterPath: String? = null,
+            @SerializedName("backdrop_path") val backdropPath: String? = null,
+            val parts: List<Movie> = emptyList(),
+        )
+    }
 
     sealed class MultiItem {
 

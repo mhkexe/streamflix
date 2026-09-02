@@ -261,12 +261,6 @@ object UserPreferences {
         }
     }
 
-    var updateCheckEnabled: Boolean
-        get() = Key.UPDATE_CHECK_ENABLED.getBoolean() ?: true
-        set(value) {
-            Key.UPDATE_CHECK_ENABLED.setBoolean(value)
-        }
-
     fun unlockParentalControls() {
         parentalControlFailedAttempts = 0
         parentalControlLockedUntilMillis = 0L
@@ -523,6 +517,14 @@ object UserPreferences {
     fun setFavoriteSortMode(providerName: String, mode: String) {
         prefs.edit { putString("FAVORITE_SORT_MODE_$providerName", mode) }
     }
+    fun getPreferredServer(providerName: String, seriesId: String): String? {
+        val key = "PREFERRED_SERVER_${providerName}_$seriesId"
+        return prefs.getString(key, null)
+    }
+
+    fun setPreferredServer(providerName: String, seriesId: String, serverName: String) {
+        prefs.edit { putString("PREFERRED_SERVER_${providerName}_$seriesId", serverName) }
+    }
 
     private enum class Key {
         APP_LAYOUT,
@@ -566,7 +568,6 @@ object UserPreferences {
         PARENTAL_CONTROL_HARD_LOCKED,
         SELECTED_THEME,
         BYPASS_WS_ADVERTISED_HOST,
-        UPDATE_CHECK_ENABLED,
         PROVIDER_LANGUAGE,
         FAVORITE_PROVIDERS;
 

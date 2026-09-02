@@ -17,6 +17,7 @@ import com.nextservices.nextvision.databinding.FragmentMoviesMobileBinding
 import com.nextservices.nextvision.models.Movie
 import com.nextservices.nextvision.providers.Provider
 import com.nextservices.nextvision.ui.SpacingItemDecoration
+import com.nextservices.nextvision.ui.bindTmdbFilterButtons
 import com.nextservices.nextvision.utils.UserPreferences
 import com.nextservices.nextvision.utils.dp
 import com.nextservices.nextvision.utils.viewModelsFactory
@@ -48,6 +49,12 @@ class MoviesMobileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initializeMovies()
+        bindTmdbFilterButtons(
+            requireContext(), false,
+            binding.btnGenreFilter, binding.btnYearFilter, binding.btnSortFilter,
+            binding.btnClearFilter,
+            { viewModel.currentFilters }, viewModel::applyFilters,
+        )
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { state ->
@@ -109,6 +116,13 @@ class MoviesMobileFragment : Fragment() {
             adapter = appAdapter.apply {
                 stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             }
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    val hiddenOffset = -binding.filterBar.height.toFloat()
+                    binding.filterBar.translationY = (binding.filterBar.translationY - dy)
+                        .coerceIn(hiddenOffset, 0f)
+                }
+            })
             addItemDecoration(
                 SpacingItemDecoration(10.dp(requireContext()))
             )

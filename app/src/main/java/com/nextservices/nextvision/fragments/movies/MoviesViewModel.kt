@@ -9,6 +9,8 @@ import com.nextservices.nextvision.utils.ParentalControlUtils
 import com.nextservices.nextvision.utils.UserPreferences
 import com.nextservices.nextvision.utils.ProviderChangeNotifier
 import com.nextservices.nextvision.utils.StartupPreloadStore
+import com.nextservices.nextvision.providers.TmdbProvider
+import com.nextservices.nextvision.utils.TmdbFilterOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -65,6 +67,8 @@ class MoviesViewModel(database: AppDatabase) : ViewModel() {
     }.flowOn(Dispatchers.IO)
 
     private var page = 1
+    private var filterOptions = TmdbFilterOptions()
+    val currentFilters: TmdbFilterOptions get() = filterOptions
 
     sealed class State {
         data object Loading : State()
@@ -83,8 +87,13 @@ class MoviesViewModel(database: AppDatabase) : ViewModel() {
 
         try {
             val provider = UserPreferences.currentProvider!!
-            val movies = StartupPreloadStore.get(provider)?.movies
-                ?: provider.getMovies()
+            val movies = if (filterOptions == TmdbFilterOptions() && provider !is TmdbProvider) {
+                provider.getMovies()
+            } else if (provider is TmdbProvider) {
+                provider.getFilteredMovies(filterOptions)
+            } else {
+                provider.getMovies()
+            }
             val filteredMovies = ParentalControlUtils.filterItems(movies).filterIsInstance<Movie>()
 
             page = 1
@@ -96,14 +105,21 @@ class MoviesViewModel(database: AppDatabase) : ViewModel() {
         }
     }
 
+    fun applyFilters(options: TmdbFilterOptions) {
+        filterOptions = options
+        getMovies()
+    }
+
     fun loadMoreMovies() = viewModelScope.launch(Dispatchers.IO) {
         val currentState = _state.value
         if (currentState is State.SuccessLoading) {
             _state.emit(State.LoadingMore)
 
             try {
+                val provider = UserPreferences.currentProvider!!
                 val movies = ParentalControlUtils.filterItems(
-                    UserPreferences.currentProvider!!.getMovies(page + 1)
+                    if (provider is TmdbProvider) provider.getFilteredMovies(filterOptions, page + 1)
+                    else provider.getMovies(page + 1)
                 ).filterIsInstance<Movie>()
 
                 page += 1

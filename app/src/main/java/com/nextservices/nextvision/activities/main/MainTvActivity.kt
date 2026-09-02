@@ -13,7 +13,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.viewModels
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -22,6 +21,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.NavController
 import androidx.navigation.navOptions
 import androidx.navigation.ui.onNavDestinationSelected
+import androidx.recyclerview.widget.RecyclerView
 import com.tanasi.navigation.widget.setupWithNavController
 import com.nextservices.nextvision.BuildConfig
 import com.nextservices.nextvision.R
@@ -34,7 +34,6 @@ import com.nextservices.nextvision.fragments.home.HomeTvFragment
 import com.nextservices.nextvision.fragments.movies.MoviesTvFragment
 import com.nextservices.nextvision.fragments.favorites.FavoritesTvFragment
 import com.nextservices.nextvision.fragments.tv_shows.TvShowsTvFragment
-import com.nextservices.nextvision.ui.UpdateAppTvDialog
 import com.nextservices.nextvision.providers.IptvProvider
 import com.nextservices.nextvision.providers.Provider
 import com.nextservices.nextvision.providers.TmdbProvider
@@ -55,14 +54,35 @@ class MainTvActivity : FragmentActivity() {
     private var _binding: ActivityMainTvBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel by viewModels<MainViewModel>()
-
     private var isStartupCompleted = false
     private var startupLoadingShown = false
-    private var updateCheckStarted = false
 
-    private lateinit var updateAppDialog: UpdateAppTvDialog
     private lateinit var navController: NavController
+    private var pendingBackFocusDestination: Int? = null
+
+    private val focusRestoreDestinations = setOf(
+        R.id.home,
+        R.id.movies,
+        R.id.tv_shows,
+        R.id.favorites,
+        R.id.collection,
+    )
+
+    private val detailDestinations = setOf(
+        R.id.movie,
+        R.id.tv_show,
+        R.id.season,
+        R.id.people,
+        R.id.player,
+    )
+
+    private data class FocusSnapshot(
+        val viewId: Int,
+        val recyclerViewId: Int,
+        val adapterPosition: Int,
+    )
+
+    private val focusSnapshots = mutableMapOf<Int, FocusSnapshot>()
 
     override fun attachBaseContext(newBase: android.content.Context) {
         StartupTrace.mark("MainTvActivity.attachBaseContext.begin")
@@ -123,6 +143,13 @@ class MainTvActivity : FragmentActivity() {
         setupStartupOverlay(savedInstanceState != null)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
+            val previousDestination = navController.previousBackStackEntry?.destination?.id
+            if (destination.id in detailDestinations &&
+                previousDestination in focusRestoreDestinations
+            ) {
+                rememberCurrentFocus(previousDestination)
+            }
+
             when (destination.id) {
                 R.id.home, R.id.movies, R.id.tv_shows, R.id.favorites, R.id.premium -> {
                     if (!isStartupCompleted) {
@@ -132,34 +159,24 @@ class MainTvActivity : FragmentActivity() {
                     binding.navMain.visibility = View.VISIBLE
                     updateNavigationVisibility()
                     binding.navMain.post {
-                        requestCurrentMenuFocus()
-                    }
-                }
-                else -> binding.navMain.visibility = View.GONE
-            }
-        }
-
-        lifecycleScope.launch {
-            viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { state ->
-                when (state) {
-                    is MainViewModel.State.SuccessCheckingUpdate -> {
-                        updateAppDialog = UpdateAppTvDialog(this@MainTvActivity, state.newReleases).also {
-                            it.setOnUpdateClickListener { _ ->
-                                if (!it.isLoading) viewModel.downloadUpdate(this@MainTvActivity, state.asset)
-                            }
-                            it.show()
+                        if (pendingBackFocusDestination == destination.id &&
+                            restoreContentFocusWhenReady(destination.id)
+                        ) {
+                            pendingBackFocusDestination = null
+                        } else {
+                            requestCurrentMenuFocus()
                         }
                     }
-                    MainViewModel.State.DownloadingUpdate -> if (::updateAppDialog.isInitialized) updateAppDialog.isLoading = true
-                    is MainViewModel.State.SuccessDownloadingUpdate -> {
-                        viewModel.installUpdate(this@MainTvActivity, state.apk)
-                        if (::updateAppDialog.isInitialized) updateAppDialog.hide()
+                }
+                else -> {
+                    binding.navMain.visibility = View.GONE
+                    if (pendingBackFocusDestination == destination.id) {
+                        binding.navMainFragment.post {
+                            if (restoreContentFocusWhenReady(destination.id)) {
+                                pendingBackFocusDestination = null
+                            }
+                        }
                     }
-                    MainViewModel.State.InstallingUpdate -> if (::updateAppDialog.isInitialized) updateAppDialog.isLoading = true
-                    is MainViewModel.State.FailedUpdate -> {
-                        Toast.makeText(this@MainTvActivity, state.error.message ?: "Update failed", Toast.LENGTH_SHORT).show()
-                    }
-                    else -> {}
                 }
             }
         }
@@ -178,9 +195,23 @@ class MainTvActivity : FragmentActivity() {
                         }.getOrDefault(false)
                         if (handled) return
 
+                        val currentDestination = navController.currentDestination?.id
+                        val returnDestination = navController.previousBackStackEntry?.destination?.id
+                        pendingBackFocusDestination = if (
+                            currentDestination in detailDestinations &&
+                            returnDestination in focusRestoreDestinations
+                        ) {
+                            returnDestination
+                        } else {
+                            null
+                        }
+
                         val popped = runCatching { navController.popBackStack() }
                             .getOrDefault(false)
-                        if (!popped) finish()
+                        if (!popped) {
+                            pendingBackFocusDestination = null
+                            finish()
+                        }
                     }
                 }
             }
@@ -262,7 +293,7 @@ class MainTvActivity : FragmentActivity() {
                     KeyEvent.KEYCODE_DPAD_DOWN -> if (navController.currentDestination?.id == R.id.premium) {
                         true
                     } else {
-                        binding.navMainFragment.requestFocus()
+                        requestFirstFilterFocus() || binding.navMainFragment.requestFocus()
                     }
                     KeyEvent.KEYCODE_DPAD_UP -> true
                     else -> super.dispatchKeyEvent(event)
@@ -270,8 +301,11 @@ class MainTvActivity : FragmentActivity() {
             }
 
             if (event.keyCode == KeyEvent.KEYCODE_DPAD_UP && canOpenNavigationMenu()) {
-                if (isAtTopContentFocus()) {
+                if (isFilterContentFocus()) {
                     return requestCurrentMenuFocus()
+                }
+                if (isAtTopContentFocus()) {
+                    return requestFirstFilterFocus() || requestCurrentMenuFocus()
                 }
                 val currentFocus = currentFocus
                 val upwardTarget = currentFocus?.focusSearch(View.FOCUS_UP)
@@ -282,6 +316,61 @@ class MainTvActivity : FragmentActivity() {
         }
 
         return super.dispatchKeyEvent(event)
+    }
+
+    private fun rememberCurrentFocus(destinationId: Int?) {
+        if (destinationId == null) return
+        val focusedView = currentFocus ?: return
+        if (isDescendantOfNav(focusedView)) return
+
+        var parent = focusedView.parent
+        while (parent != null && parent !is RecyclerView) {
+            parent = parent.parent
+        }
+        val recyclerView = parent as? RecyclerView
+        val containingItem = recyclerView?.findContainingItemView(focusedView)
+        val adapterPosition = if (recyclerView != null && containingItem != null) {
+            recyclerView.getChildAdapterPosition(containingItem)
+        } else {
+            RecyclerView.NO_POSITION
+        }
+        focusSnapshots[destinationId] = FocusSnapshot(
+            viewId = focusedView.id,
+            recyclerViewId = recyclerView?.id ?: View.NO_ID,
+            adapterPosition = adapterPosition,
+        )
+    }
+
+    private fun restoreContentFocus(destinationId: Int): Boolean {
+        val snapshot = focusSnapshots[destinationId] ?: return false
+        val root = binding.navMainFragment
+        if (snapshot.viewId != View.NO_ID) {
+            root.findViewById<View>(snapshot.viewId)?.takeIf { it.isFocusable }?.let {
+                it.requestFocus()
+                return true
+            }
+        }
+        if (snapshot.recyclerViewId != View.NO_ID && snapshot.adapterPosition != RecyclerView.NO_POSITION) {
+            val recyclerView = root.findViewById<RecyclerView>(snapshot.recyclerViewId) ?: return false
+            recyclerView.scrollToPosition(snapshot.adapterPosition)
+            recyclerView.post {
+                recyclerView.findViewHolderForAdapterPosition(snapshot.adapterPosition)
+                    ?.itemView
+                    ?.requestFocus()
+            }
+            return true
+        }
+        return false
+    }
+
+    private fun restoreContentFocusWhenReady(destinationId: Int): Boolean {
+        val restored = restoreContentFocus(destinationId)
+        if (focusSnapshots.containsKey(destinationId)) {
+            binding.navMainFragment.postDelayed({
+                restoreContentFocus(destinationId)
+            }, 300L)
+        }
+        return restored
     }
 
     private fun canOpenNavigationMenu(): Boolean = when (getCurrentFragment()) {
@@ -308,6 +397,14 @@ class MainTvActivity : FragmentActivity() {
         }
     }
 
+    private fun isFilterContentFocus(): Boolean {
+        return when (val fragment = getCurrentFragment()) {
+            is MoviesTvFragment -> fragment.isFilterFocused()
+            is TvShowsTvFragment -> fragment.isFilterFocused()
+            else -> false
+        }
+    }
+
     private fun requestCurrentMenuFocus(): Boolean {
         val destinationId = navController.currentDestination?.id ?: return false
         val menuItem = binding.navMain.menu.findItem(destinationId)
@@ -318,6 +415,14 @@ class MainTvActivity : FragmentActivity() {
         }
 
         return binding.navMain.requestSelectedMenuFocus()
+    }
+
+    private fun requestFirstFilterFocus(): Boolean {
+        return when (val fragment = getCurrentFragment()) {
+            is MoviesTvFragment -> fragment.requestFilterFocus()
+            is TvShowsTvFragment -> fragment.requestFilterFocus()
+            else -> false
+        }
     }
 
     private fun applyThemeNavigationChrome() {

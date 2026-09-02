@@ -9,6 +9,8 @@ import com.nextservices.nextvision.utils.ParentalControlUtils
 import com.nextservices.nextvision.utils.UserPreferences
 import com.nextservices.nextvision.utils.ProviderChangeNotifier
 import com.nextservices.nextvision.utils.StartupPreloadStore
+import com.nextservices.nextvision.providers.TmdbProvider
+import com.nextservices.nextvision.utils.TmdbFilterOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -66,6 +68,8 @@ class TvShowsViewModel(database: AppDatabase) : ViewModel() {
     }.flowOn(Dispatchers.IO)
 
     private var page = 1
+    private var filterOptions = TmdbFilterOptions()
+    val currentFilters: TmdbFilterOptions get() = filterOptions
 
     sealed class State {
         data object Loading : State()
@@ -84,8 +88,13 @@ class TvShowsViewModel(database: AppDatabase) : ViewModel() {
 
         try {
             val provider = UserPreferences.currentProvider!!
-            val tvShows = StartupPreloadStore.get(provider)?.tvShows
-                ?: provider.getTvShows()
+            val tvShows = if (filterOptions == TmdbFilterOptions() && provider !is TmdbProvider) {
+                provider.getTvShows()
+            } else if (provider is TmdbProvider) {
+                provider.getFilteredTvShows(filterOptions)
+            } else {
+                provider.getTvShows()
+            }
             val filteredTvShows = ParentalControlUtils.filterItems(tvShows).filterIsInstance<TvShow>()
 
             page = 1
@@ -97,14 +106,21 @@ class TvShowsViewModel(database: AppDatabase) : ViewModel() {
         }
     }
 
+    fun applyFilters(options: TmdbFilterOptions) {
+        filterOptions = options
+        getTvShows()
+    }
+
     fun loadMoreTvShows() = viewModelScope.launch(Dispatchers.IO) {
         val currentState = _state.value
         if (currentState is State.SuccessLoading) {
             _state.emit(State.LoadingMore)
 
             try {
+                val provider = UserPreferences.currentProvider!!
                 val tvShows = ParentalControlUtils.filterItems(
-                    UserPreferences.currentProvider!!.getTvShows(page + 1)
+                    if (provider is TmdbProvider) provider.getFilteredTvShows(filterOptions, page + 1)
+                    else provider.getTvShows(page + 1)
                 ).filterIsInstance<TvShow>()
 
                 page += 1

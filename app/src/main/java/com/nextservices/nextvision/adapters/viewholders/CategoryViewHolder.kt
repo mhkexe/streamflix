@@ -84,7 +84,8 @@ class CategoryViewHolder(
         binding.rvCategory.apply {
             val categoryAdapter = (adapter as? AppAdapter) ?: AppAdapter().also { adapter = it }
             categoryAdapter.apply {
-                isLooping = category.name.contains("trending", ignoreCase = true)
+                isLooping = category.name.contains("trending", ignoreCase = true) ||
+                    category.name.contains("collection", ignoreCase = true)
                 this.onMovieClickListener = onMovieClick
                 this.onTvShowClickListener = onTvShowClick
                 this.onMovieLongClickListener = onMovieLongClick
@@ -110,7 +111,8 @@ class CategoryViewHolder(
 
             val categoryAdapter = (adapter as? AppAdapter) ?: AppAdapter().also { adapter = it }
             categoryAdapter.apply {
-                isLooping = category.name.contains("trending", ignoreCase = true)
+                isLooping = category.name.contains("trending", ignoreCase = true) ||
+                    category.name.contains("collection", ignoreCase = true)
                 this.onMovieClickListener = onMovieClick
                 this.onTvShowClickListener = onTvShowClick
                 this.onMovieLongClickListener = onMovieLongClick

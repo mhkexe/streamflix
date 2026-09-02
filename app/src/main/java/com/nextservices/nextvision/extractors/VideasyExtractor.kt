@@ -19,12 +19,11 @@ class VideasyExtractor : Extractor() {
         val movieOnly: Boolean = false
     )
 
-    private val englishServers = listOf(
-        ServerConfig("Neon", "mb-flix"),
-        ServerConfig("Yoru", "cdn", movieOnly = true),
+   private val englishServers = listOf(
+        ServerConfig("Yoru 4K", "cdn"),
         ServerConfig("Cypher", "downloader2"),
-        ServerConfig("Sage", "1movies"),
         ServerConfig("Breach", "m4uhd"),
+        ServerConfig("Neon", "vsrc"),
         ServerConfig("Vyse", "hdmovie")
     )
 
@@ -47,7 +46,7 @@ class VideasyExtractor : Extractor() {
                     
                     Video.Server(
                         id = "${config.name} (Videasy)",
-                        name = "${config.name} (Videasy)",
+                        name = "${config.name}",
                         src = url
                     )
                 }
@@ -161,6 +160,7 @@ class VideasyExtractor : Extractor() {
 
         if (sources != null && sources.length() > 0) {
             val source = sources.getJSONObject(0)
+            val playlist = resultJson.optString("playlist")
             
             // Find ServerConfig based on endpoint in URL
             val config = englishServers.find { link.contains(it.endpoint) }
@@ -170,7 +170,7 @@ class VideasyExtractor : Extractor() {
             val mimeType = if (isMp4Server) MimeTypes.VIDEO_MP4 else MimeTypes.APPLICATION_M3U8
 
             return Video(
-                source = source.optString("url"),
+                source = if (playlist.isNotEmpty()) playlist else source.optString("url"),
                 type = mimeType,
                 subtitles = subtitles,
                 headers = mapOf("Referer" to "https://player.videasy.to/")

@@ -113,8 +113,8 @@
 	<string name="player_settings_quality_label">الجودة</string>
 	<string name="player_settings_quality_sub_label_auto">تلقائي (%dp)</string>
 	<string name="player_settings_quality_auto">تلقائي</string>
-	<string name="player_settings_quality_auto_selected">تلقائي • %dp</string>
-	<string name="player_settings_quality">%dp</string>
+    <string name="player_settings_quality_auto_selected">تلقائي • %sp</string>
+    <string name="player_settings_quality">%sp</string>
 	<string name="player_settings_audio_title">الصوت</string>
 	<string name="player_settings_audio_label">الصوت</string>
 	<string name="player_settings_subtitles_title">الترجمة/التعليقات المغلقة</string>

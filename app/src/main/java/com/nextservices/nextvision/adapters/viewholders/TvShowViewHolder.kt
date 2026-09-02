@@ -251,7 +251,7 @@ class TvShowViewHolder(
             true
         }
         setPoster(binding.ivTvShowPoster)
-        bindRibbons(binding.ivTvShowFavoriteRibbon, binding.ivTvShowWatchedRibbon)
+        bindRibbons(binding.ivTvShowWatchedRibbon)
         binding.pbTvShowProgress.apply {
             val watchHistory = tvShow.episodeToWatch?.watchHistory
             progress = when {
@@ -300,7 +300,7 @@ class TvShowViewHolder(
             }
         }
         setPoster(binding.ivTvShowPoster)
-        bindRibbons(binding.ivTvShowFavoriteRibbon, binding.ivTvShowWatchedRibbon)
+        bindRibbons(binding.ivTvShowWatchedRibbon)
         binding.pbTvShowProgress.apply {
             val watchHistory = tvShow.episodeToWatch?.watchHistory
             progress = when {
@@ -339,7 +339,7 @@ class TvShowViewHolder(
             true
         }
         setPoster(binding.ivTvShowPoster)
-        bindRibbons(binding.ivTvShowFavoriteRibbon, binding.ivTvShowWatchedRibbon)
+        bindRibbons(binding.ivTvShowWatchedRibbon)
         binding.pbTvShowProgress.apply {
             val watchHistory = tvShow.episodeToWatch?.watchHistory
             progress = when {
@@ -398,7 +398,7 @@ class TvShowViewHolder(
             visibility = if (context.toActivity()?.getCurrentFragment() is FavoritesTvFragment) View.GONE
             else if (text.isNullOrEmpty()) View.GONE else View.VISIBLE
         }
-        bindRibbons(binding.ivTvShowFavoriteRibbon, binding.ivTvShowWatchedRibbon)
+        bindRibbons(binding.ivTvShowWatchedRibbon)
         binding.pbTvShowProgress.apply {
             val watchHistory = tvShow.episodeToWatch?.watchHistory
             progress = when {
@@ -573,11 +573,10 @@ class TvShowViewHolder(
         }
     }
 
-    private fun bindRibbons(favoriteRibbon: View, watchedRibbon: View) {
+    private fun bindRibbons(watchedRibbon: View) {
         ribbonStateJob?.cancel()
 
         val boundTvShowId = tvShow.id
-        favoriteRibbon.isVisible = tvShow.isFavorite
         watchedRibbon.isVisible = false
         val lifecycleOwner = itemView.findViewTreeLifecycleOwner()
             ?: context.toActivity()
@@ -587,11 +586,10 @@ class TvShowViewHolder(
             combine(
                 database.tvShowDao().getByIdAsFlow(boundTvShowId),
                 database.episodeDao().isTvShowFullyWatchedAsFlow(boundTvShowId),
-            ) { persistedTvShow, isFullyWatched ->
-                (persistedTvShow?.isFavorite ?: tvShow.isFavorite) to isFullyWatched
-            }.collect { (isFavorite, isFullyWatched) ->
+            ) { _, isFullyWatched ->
+                isFullyWatched
+            }.collect { isFullyWatched ->
                 if (tvShow.id == boundTvShowId) {
-                    favoriteRibbon.isVisible = isFavorite
                     watchedRibbon.isVisible = isFullyWatched
                 }
             }
@@ -646,7 +644,7 @@ class TvShowViewHolder(
         val episodeToWatch = tvShow.episodeToWatch
         val episodeSeason = resolveEpisodeSeason(episodeToWatch)
         binding.btnTvShowWatchNow.apply {
-            isVisible = episodeToWatch != null
+            isVisible = true
             text = if (isIptvProvider()) {
                 context.getString(R.string.movie_watch_now)
             } else if (episodeToWatch?.watchHistory != null) {
@@ -665,7 +663,7 @@ class TvShowViewHolder(
             setOnClickListener {
                 if (isIptvProvider()) {
                     handleDirectPlay(findNavController())
-                } else {
+                } else if (episodeToWatch != null) {
                     val videoType = Video.Type.Episode(
                         id = episodeToWatch!!.id,
                         number = episodeToWatch.number,
@@ -694,6 +692,7 @@ class TvShowViewHolder(
                     findNavController().navigate(R.id.player, args)
                 }
             }
+            requestFocus()
         }
 
         binding.pbTvShowProgressEpisode.apply {
@@ -714,40 +713,22 @@ class TvShowViewHolder(
         }
 
         binding.btnTvShowFavorite.apply {
-            fun Boolean.drawable() = when (this) {
-                true -> R.drawable.ic_favorite_enable
-                false -> R.drawable.ic_favorite_disable
-            }
-
             setOnClickListener {
                 checkProviderAndRun {
                     itemView.findViewTreeLifecycleOwner()?.lifecycleScope?.launch(Dispatchers.IO) {
-                        val dao = database.tvShowDao()
-                        val current = dao.getById(tvShow.id)?.isFavorite ?: false
-                        val newValue = !current
+                        val newValue = !(database.tvShowDao().getById(tvShow.id)?.isFavorite ?: false)
                         val resolvedTvShow = ArtworkRepair.resolveTvShowForFavorite(context, tvShow, newValue)
-
-                        dao.upsertFavorite(resolvedTvShow, newValue)
-
+                        database.tvShowDao().upsertFavorite(resolvedTvShow, newValue)
                         withContext(Dispatchers.Main) {
-                            tvShow.poster = resolvedTvShow.poster
-                            tvShow.banner = resolvedTvShow.banner
                             tvShow.isFavorite = newValue
                             isSelected = newValue
-                            setImageDrawable(
-                                ContextCompat.getDrawable(context, newValue.drawable())
-                            )
                         }
                     }
                 }
             }
-
             isSelected = tvShow.isFavorite
-            isSelected = tvShow.isFavorite
-            setImageDrawable(
-                ContextCompat.getDrawable(context, tvShow.isFavorite.drawable())
-            )
         }
+
     }
 
     private fun displayTvShowTv(binding: ContentTvShowTvBinding) {
@@ -801,8 +782,10 @@ class TvShowViewHolder(
         val episodeToWatch = tvShow.episodeToWatch
         val episodeSeason = resolveEpisodeSeason(episodeToWatch)
         binding.btnTvShowWatchNow.apply {
-            isVisible = episodeToWatch != null
-            text = if (isIptvProvider()) {
+            isVisible = true
+            text = if (episodeToWatch == null && !isIptvProvider()) {
+                context.getString(R.string.loading)
+            } else if (isIptvProvider()) {
                 context.getString(R.string.movie_watch_now)
             } else if (episodeToWatch?.watchHistory != null) {
                 context.getString(
@@ -820,9 +803,9 @@ class TvShowViewHolder(
             setOnClickListener {
                 if (isIptvProvider()) {
                     handleDirectPlay(findNavController())
-                } else {
+                } else if (episodeToWatch != null) {
                     val videoType = Video.Type.Episode(
-                        id = episodeToWatch!!.id,
+                        id = episodeToWatch.id,
                         number = episodeToWatch.number,
                         title = episodeToWatch.title,
                         poster = episodeToWatch.poster,
@@ -849,6 +832,7 @@ class TvShowViewHolder(
                     findNavController().navigate(R.id.player, args)
                 }
             }
+            requestFocus()
         }
 
         binding.pbTvShowProgressEpisode.apply {
@@ -869,38 +853,22 @@ class TvShowViewHolder(
         }
 
         binding.btnTvShowFavorite.apply {
-            fun Boolean.drawable() = when (this) {
-                true -> R.drawable.ic_favorite_enable
-                false -> R.drawable.ic_favorite_disable
-            }
-
             setOnClickListener {
                 checkProviderAndRun {
                     itemView.findViewTreeLifecycleOwner()?.lifecycleScope?.launch(Dispatchers.IO) {
-                        val dao = database.tvShowDao()
-                        val current = dao.getById(tvShow.id)?.isFavorite ?: false
-                        val newValue = !current
+                        val newValue = !(database.tvShowDao().getById(tvShow.id)?.isFavorite ?: false)
                         val resolvedTvShow = ArtworkRepair.resolveTvShowForFavorite(context, tvShow, newValue)
-
-                        dao.upsertFavorite(resolvedTvShow, newValue)
-
+                        database.tvShowDao().upsertFavorite(resolvedTvShow, newValue)
                         withContext(Dispatchers.Main) {
-                            tvShow.poster = resolvedTvShow.poster
-                            tvShow.banner = resolvedTvShow.banner
                             tvShow.isFavorite = newValue
                             isSelected = newValue
-                            setImageDrawable(
-                                ContextCompat.getDrawable(context, newValue.drawable())
-                            )
                         }
                     }
                 }
             }
-
-            setImageDrawable(
-                ContextCompat.getDrawable(context, tvShow.isFavorite.drawable())
-            )
+            isSelected = tvShow.isFavorite
         }
+
     }
 
     private fun displaySeasonsMobile(binding: ContentTvShowSeasonsMobileBinding) {

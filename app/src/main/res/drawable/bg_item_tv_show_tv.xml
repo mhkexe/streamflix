@@ -14,14 +14,10 @@
     </item>
 
     <item android:state_focused="true">
-        <layer-list>
-            <item android:bottom="-3dp" android:left="-3dp" android:right="-3dp" android:top="-3dp">
-                <shape android:shape="rectangle">
-                    <corners android:radius="10dp" />
-                    <stroke android:width="3dp" android:color="#FFFFFF" />
-                </shape>
-            </item>
-        </layer-list>
+        <shape android:shape="rectangle">
+            <corners android:radius="10dp" />
+            <stroke android:width="3dp" android:color="#FFFFFF" />
+        </shape>
     </item>
 
     <item>

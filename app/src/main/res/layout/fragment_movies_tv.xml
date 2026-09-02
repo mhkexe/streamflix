@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipChildren="false"
     tools:context=".fragments.movies.MoviesTvFragment">
 
     <androidx.leanback.widget.VerticalGridView
@@ -15,7 +16,7 @@
         android:descendantFocusability="afterDescendants"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:paddingTop="112dp"
+        android:paddingTop="228dp"
         android:paddingBottom="16dp"
         android:paddingStart="@dimen/movies_spacing"
         android:paddingEnd="@dimen/movies_spacing"
@@ -27,6 +28,50 @@
         app:layout_constraintTop_toTopOf="parent"
         app:numberOfColumns="6"
         tools:listitem="@layout/item_movie_grid_tv" />
+
+    <LinearLayout
+        android:id="@+id/filter_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginEnd="24dp"
+        android:clipChildren="false"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/btn_genre_filter"
+            style="@style/TmdbFilterButton"
+            android:layout_width="170dp"
+            android:layout_height="match_parent"
+            android:text="@string/tmdb_filter_genre_any" />
+
+        <TextView
+            android:id="@+id/btn_year_filter"
+            style="@style/TmdbFilterButton"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:text="@string/tmdb_filter_any_year" />
+
+        <TextView
+            android:id="@+id/btn_sort_filter"
+            style="@style/TmdbFilterButton"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:text="@string/tmdb_filter_most_popular" />
+
+        <TextView
+            android:id="@+id/btn_clear_filter"
+            style="@style/TmdbFilterButton"
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:text="@string/tmdb_filter_clear" />
+    </LinearLayout>
 
     <include
         android:id="@+id/is_loading"

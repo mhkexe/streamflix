@@ -481,7 +481,7 @@ class PlayerSettingsMobileView @JvmOverloads constructor(
                                 null -> context.getString(R.string.player_settings_quality_auto)
                                 else -> context.getString(
                                     R.string.player_settings_quality_auto_selected,
-                                    track.height
+                                    Settings.Quality.labelForHeight(track.height)
                                 )
                             }
 
@@ -489,7 +489,7 @@ class PlayerSettingsMobileView @JvmOverloads constructor(
                         }
                         is Settings.Quality.VideoTrackInformation -> context.getString(
                             R.string.player_settings_quality,
-                            item.height
+                            Settings.Quality.labelForHeight(item.height)
                         )
                     }
 
@@ -565,12 +565,12 @@ class PlayerSettingsMobileView @JvmOverloads constructor(
                                 null -> context.getString(R.string.player_settings_quality_auto)
                                 else -> context.getString(
                                     R.string.player_settings_quality_auto_selected,
-                                    track.height
+                                    Settings.Quality.labelForHeight(track.height)
                                 )
                             }
                             is Settings.Quality.VideoTrackInformation -> context.getString(
                                 R.string.player_settings_quality,
-                                selected.height
+                                Settings.Quality.labelForHeight(selected.height)
                             )
                         }
                         Settings.Audio -> Settings.Audio.selected?.name

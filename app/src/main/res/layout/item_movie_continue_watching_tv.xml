@@ -7,7 +7,8 @@
     android:background="@drawable/bg_item_movie_tv"
     android:clipToOutline="true"
     android:focusable="true"
-    android:focusableInTouchMode="true">
+    android:focusableInTouchMode="true"
+    android:foreground="@drawable/fg_poster_selection_tv">
 
     <ImageView
         android:id="@+id/iv_movie_poster"
@@ -22,11 +23,12 @@
 
     <View
         android:layout_width="0dp"
-        android:layout_height="88dp"
+        android:layout_height="0dp"
         android:background="@drawable/fg_continue_watching_bottom_tv"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar
         android:id="@+id/pb_movie_progress"
@@ -50,12 +52,12 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="#FFFFFF"
-        android:textSize="16sp"
+        android:textSize="15sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@id/tv_movie_info"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginBottom="36dp"
+        android:layout_marginBottom="0dp"
         tools:text="Movie title" />
 
     <TextView
@@ -66,12 +68,12 @@
         android:layout_marginEnd="10dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="#C8C8C8"
-        android:textSize="13sp"
+        android:textColor="#D8D8D8"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/tv_movie_watched"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginBottom="14dp"
+        android:layout_marginBottom="10dp"
         tools:text="Movie  •  1h 45 min" />
 
     <TextView
@@ -79,9 +81,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
-        android:layout_marginBottom="14dp"
+        android:layout_marginBottom="10dp"
         android:textColor="#FFFFFF"
-        android:textSize="12sp"
+        android:textSize="11sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

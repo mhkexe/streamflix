@@ -2,13 +2,13 @@ package com.nextservices.nextvision.ui
 
 import android.app.Dialog
 import android.content.Context
+import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
-import com.bumptech.glide.Glide
 import com.nextservices.nextvision.R
 import com.nextservices.nextvision.adapters.AppAdapter
 import com.nextservices.nextvision.database.AppDatabase
@@ -18,6 +18,7 @@ import com.nextservices.nextvision.fragments.home.HomeTvFragmentDirections
 import com.nextservices.nextvision.models.Episode
 import com.nextservices.nextvision.models.Movie
 import com.nextservices.nextvision.models.TvShow
+import com.nextservices.nextvision.models.Video
 import com.nextservices.nextvision.utils.loadMoviePoster
 import com.nextservices.nextvision.utils.loadTvShowPoster
 import com.nextservices.nextvision.utils.ArtworkRepair
@@ -27,6 +28,7 @@ import com.nextservices.nextvision.utils.format
 import com.nextservices.nextvision.utils.getCurrentFragment
 import com.nextservices.nextvision.utils.toActivity
 import com.nextservices.nextvision.providers.Provider
+import com.nextservices.nextvision.providers.IptvProvider
 import java.util.Calendar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -50,6 +52,24 @@ class ShowOptionsTvDialog(
             }
     }
 
+    override fun onStart() {
+        super.onStart()
+        window?.apply {
+            setBackgroundDrawableResource(android.R.color.transparent)
+            decorView.setPadding(0, 0, 0, 0)
+            attributes = attributes?.also { params -> params.gravity = Gravity.END }
+            setLayout(
+                (context.resources.displayMetrics.widthPixels * 0.35).toInt(),
+                WindowManager.LayoutParams.MATCH_PARENT,
+            )
+        }
+    }
+
+    private fun navController() = context.toActivity()?.getCurrentFragment()?.let {
+        NavHostFragment.findNavController(it)
+    } ?: (context.toActivity()?.supportFragmentManager
+        ?.findFragmentById(R.id.nav_main_fragment) as? NavHostFragment)?.navController
+
     private fun checkProviderAndRun(show: AppAdapter.Item, action: () -> Unit) {
         val providerName = when(show){
             is Movie -> show.providerName
@@ -66,6 +86,97 @@ class ShowOptionsTvDialog(
         action()
     }
 
+    private fun openDetails(show: AppAdapter.Item) {
+        val controller = navController() ?: return
+        when (show) {
+            is Movie -> controller.navigate(R.id.movie, Bundle().apply { putString("id", show.id) })
+            is TvShow -> controller.navigate(R.id.tv_show, Bundle().apply {
+                putString("id", show.id)
+                putString("poster", show.poster)
+                putString("banner", show.banner)
+            })
+        }
+        hide()
+    }
+
+    private fun playMovie(movie: Movie) {
+        navController()?.navigate(
+            R.id.action_global_player,
+            Bundle().apply {
+                putString("id", movie.id)
+                putString("title", movie.title)
+                putString("subtitle", movie.released?.format("yyyy") ?: "")
+                putSerializable("videoType", Video.Type.Movie(
+                    id = movie.id,
+                    title = movie.title,
+                    releaseDate = movie.released?.format("yyyy-MM-dd") ?: "",
+                    poster = movie.poster ?: movie.banner ?: "",
+                    imdbId = movie.imdbId,
+                ))
+            },
+        )
+        hide()
+    }
+
+    private fun playTvShow(tvShow: TvShow) {
+        val controller = navController() ?: return
+        val episode = tvShow.episodeToWatch
+        if (episode == null || Provider.providers.keys.find {
+                it.name == (tvShow.providerName ?: UserPreferences.currentProvider?.name)
+            } is IptvProvider
+        ) {
+            val videoType = Video.Type.Episode(
+                id = tvShow.id,
+                number = 1,
+                title = tvShow.title,
+                poster = tvShow.poster,
+                overview = tvShow.overview,
+                tvShow = Video.Type.Episode.TvShow(
+                    id = tvShow.id,
+                    title = tvShow.title,
+                    poster = tvShow.poster,
+                    banner = tvShow.banner,
+                    releaseDate = tvShow.released?.format("yyyy-MM-dd"),
+                    imdbId = tvShow.imdbId,
+                ),
+                season = Video.Type.Episode.Season(number = 1, title = "Live"),
+            )
+            controller.navigate(R.id.action_global_player, Bundle().apply {
+                putString("id", tvShow.id)
+                putString("title", tvShow.title)
+                putString("subtitle", tvShow.title)
+                putSerializable("videoType", videoType)
+            })
+        } else {
+            val videoType = Video.Type.Episode(
+                id = episode.id,
+                number = episode.number,
+                title = episode.title,
+                poster = episode.poster,
+                overview = episode.overview,
+                tvShow = Video.Type.Episode.TvShow(
+                    id = tvShow.id,
+                    title = tvShow.title,
+                    poster = tvShow.poster,
+                    banner = tvShow.banner,
+                    releaseDate = tvShow.released?.format("yyyy-MM-dd"),
+                    imdbId = tvShow.imdbId,
+                ),
+                season = Video.Type.Episode.Season(
+                    number = episode.season?.number ?: 1,
+                    title = episode.season?.title ?: "",
+                ),
+            )
+            controller.navigate(R.id.action_global_player, Bundle().apply {
+                putString("id", episode.id)
+                putString("title", tvShow.title)
+                putString("subtitle", tvShow.title)
+                putSerializable("videoType", videoType)
+            })
+        }
+        hide()
+    }
+
     init {
         setContentView(binding.root)
 
@@ -79,26 +190,13 @@ class ShowOptionsTvDialog(
             is TvShow -> displayTvShow(show)
         }
 
-
-        window?.attributes = window?.attributes?.also { param ->
-            param.gravity = Gravity.END
-        }
-        window?.setLayout(
-            (context.resources.displayMetrics.widthPixels * 0.35).toInt(),
-            context.resources.displayMetrics.heightPixels
-        )
+        binding.btnOptionShowWatched.visibility = View.GONE
+        binding.btnOptionEpisodeMarkAllPreviousWatched.visibility = View.GONE
+            binding.btnOptionProgramClear.visibility = View.GONE
     }
 
 
     private fun displayEpisode(episode: Episode) {
-        val provider = UserPreferences.currentProvider
-
-        Glide.with(context)
-            .load(episode.poster ?: episode.tvShow?.poster)
-            .fallback(R.drawable.glide_fallback_cover)
-            .fitCenter()
-            .into(binding.ivOptionsShowPoster)
-
         binding.tvOptionsShowTitle.text = episode.tvShow?.title ?: ""
 
         binding.tvShowSubtitle.text = episode.season?.takeIf { it.number != 0 }?.let { season ->
@@ -289,19 +387,27 @@ class ShowOptionsTvDialog(
     }
 
     private fun displayMovie(movie: Movie) {
-        binding.ivOptionsShowPoster.loadMoviePoster(movie) {
-            fallback(R.drawable.glide_fallback_cover)
-            fitCenter()
-        }
-
         binding.tvOptionsShowTitle.text = movie.title
 
         binding.tvShowSubtitle.text = movie.released?.format("yyyy")
 
+        binding.btnOptionPlay.apply {
+            text = if (movie.watchHistory != null) context.getString(R.string.movie_resume)
+            else context.getString(R.string.movie_watch_now)
+            setOnClickListener {
+                checkProviderAndRun(movie) { playMovie(movie) }
+            }
+            requestFocus()
+        }
+        binding.btnOptionViewDetails.apply {
+            setOnClickListener { openDetails(movie) }
+            visibility = View.VISIBLE
+        }
+
 
         binding.btnOptionEpisodeOpenTvShow.visibility = View.GONE
 
-        val freshMovie = database.movieDao().getById(movie.id) ?: movie
+        val freshMovie = movie
 
         binding.btnOptionShowFavorite.apply {
             setOnClickListener {
@@ -330,7 +436,6 @@ class ShowOptionsTvDialog(
             }
             visibility = View.VISIBLE
 
-            requestFocus()
         }
 
         binding.btnOptionShowWatched.apply {
@@ -389,19 +494,31 @@ class ShowOptionsTvDialog(
     }
 
     private fun displayTvShow(tvShow: TvShow) {
-        binding.ivOptionsShowPoster.loadTvShowPoster(tvShow) {
-            fallback(R.drawable.glide_fallback_cover)
-            fitCenter()
-        }
-
         binding.tvOptionsShowTitle.text = tvShow.title
 
         binding.tvShowSubtitle.text = tvShow.released?.format("yyyy")
 
+        binding.btnOptionPlay.apply {
+            val episode = tvShow.episodeToWatch
+            text = if (episode?.watchHistory != null) {
+                context.getString(R.string.movie_resume)
+            } else {
+                context.getString(R.string.movie_watch_now)
+            }
+            setOnClickListener {
+                checkProviderAndRun(tvShow) { playTvShow(tvShow) }
+            }
+            requestFocus()
+        }
+        binding.btnOptionViewDetails.apply {
+            setOnClickListener { openDetails(tvShow) }
+            visibility = View.VISIBLE
+        }
+
 
         binding.btnOptionEpisodeOpenTvShow.visibility = View.GONE
 
-        val freshTvShow = database.tvShowDao().getById(tvShow.id) ?: tvShow
+        val freshTvShow = tvShow
 
         binding.btnOptionShowFavorite.apply {
             setOnClickListener {
@@ -434,7 +551,6 @@ class ShowOptionsTvDialog(
             }
             visibility = View.VISIBLE
 
-            requestFocus()
         }
 
         binding.btnOptionShowWatched.visibility = View.GONE

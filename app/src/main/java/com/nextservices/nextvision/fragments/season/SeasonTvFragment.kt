@@ -184,11 +184,15 @@ class SeasonTvFragment : Fragment() {
             .firstOrNull()
             ?.let { releasedEpisodes.indexOf(it) }
             ?: releasedEpisodes.indexOfLast { it.isWatched }
+        val selectedEpisodeIndex = args.selectedEpisodeId?.let { selectedId ->
+            releasedEpisodes.indexOfFirst { it.id == selectedId }
+        } ?: -1
 
         appAdapter.submitList(preparedEpisodes)
 
         if (focusedEpisodeIndex == null) {
             val scrollIndex = when {
+                selectedEpisodeIndex >= 0 -> selectedEpisodeIndex
                 lastWatchedIndex == -1 -> 0
                 lastWatchedIndex < releasedEpisodes.lastIndex -> lastWatchedIndex + 1
                 else -> lastWatchedIndex

@@ -112,6 +112,7 @@ class PlayerMobileFragment : Fragment() {
     private var _binding: FragmentPlayerMobileBinding? = null
     private val binding get() = _binding!!
     private var isSetupDone = false
+    private var chooserReceiverRegistered = false
 
     private val PlayerControlView.binding
         get() = ContentExoControllerMobileBinding.bind(this.findViewById(R.id.cl_exo_controller))
@@ -247,7 +248,7 @@ class PlayerMobileFragment : Fragment() {
             isSetupDone = true
         }
         isIgnoringPip = false
-        if (::player.isInitialized) {
+        if (::player.isInitialized && _binding != null) {
             binding.pvPlayer.useController = true
             // Resume playback after returning from bypass or any pause
             if (!player.isPlaying) {
@@ -257,12 +258,15 @@ class PlayerMobileFragment : Fragment() {
         
         try {
             val filter = IntentFilter("ACTION_PLAYER_CHOSEN")
-            ContextCompat.registerReceiver(
-                requireContext(),
-                chooserReceiver,
-                filter,
-                ContextCompat.RECEIVER_NOT_EXPORTED
-            )
+            if (!chooserReceiverRegistered) {
+                ContextCompat.registerReceiver(
+                    requireContext(),
+                    chooserReceiver,
+                    filter,
+                    ContextCompat.RECEIVER_NOT_EXPORTED
+                )
+                chooserReceiverRegistered = true
+            }
         } catch (ignored: Exception) {}
     }
 
@@ -337,12 +341,19 @@ class PlayerMobileFragment : Fragment() {
                                 })
                                 .build()
                             binding.settings.setOnServerSelectedListener { server ->
-                                viewModel.getVideo(state.servers.find { server.id == it.id }!!)
+                                state.servers.find { server.id == it.id }?.let { selectedServer ->
+                                    rememberPreferredServer(selectedServer)
+                                    viewModel.getVideo(selectedServer)
+                                }
                             }
-                            val preferredServer = state.servers.firstOrNull {
-                                it.name.equals(args.preferredServerName, ignoreCase = true)
+                            val preferredServerName = preferredServerName()
+                            servers = state.servers.sortedByDescending {
+                                it.name.equals(preferredServerName, ignoreCase = true)
                             }
-                            viewModel.getVideo(preferredServer ?: state.servers.first())
+                            val preferredServer = servers.firstOrNull {
+                                it.name.equals(preferredServerName, ignoreCase = true)
+                            }
+                            viewModel.getVideo(preferredServer ?: servers.first())
                         }
 
                     }
@@ -560,9 +571,10 @@ class PlayerMobileFragment : Fragment() {
         }
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         releasePlayer()
-        try {
-            requireContext().unregisterReceiver(chooserReceiver)
-        } catch (ignored: Exception) {}
+        if (chooserReceiverRegistered) {
+            runCatching { requireContext().unregisterReceiver(chooserReceiver) }
+            chooserReceiverRegistered = false
+        }
         _binding = null
         isSetupDone = false
     }
@@ -655,6 +667,7 @@ class PlayerMobileFragment : Fragment() {
                 Toast.LENGTH_SHORT
             ).show()
         }
+
 
         binding.pvPlayer.controller.binding.exoReplay.setOnClickListener {
             player.seekTo(0)
@@ -907,10 +920,30 @@ class PlayerMobileFragment : Fragment() {
         }
     }
 
+    private fun preferredServerName(): String? {
+        val providerName = UserPreferences.currentProvider?.name ?: return args.preferredServerName
+        val mediaId = when (val videoType = args.videoType) {
+            is Video.Type.Movie -> videoType.id
+            is Video.Type.Episode -> videoType.tvShow.id
+        }
+        return UserPreferences.getPreferredServer(providerName, mediaId)
+            ?: args.preferredServerName
+    }
+
+    private fun rememberPreferredServer(server: Video.Server) {
+        val providerName = UserPreferences.currentProvider?.name ?: return
+        val mediaId = when (val videoType = args.videoType) {
+            is Video.Type.Movie -> videoType.id
+            is Video.Type.Episode -> videoType.tvShow.id
+        }
+        UserPreferences.setPreferredServer(providerName, mediaId, server.name)
+    }
+
 
     private fun displayVideo(video: Video, server: Video.Server) {
         currentVideo = video
         currentServer = server
+        rememberPreferredServer(server)
         updatePlayerHeader()
 
         val extraBuffering = PlayerSettingsView.Settings.ExtraBuffering.isEnabled
@@ -1178,6 +1211,7 @@ class PlayerMobileFragment : Fragment() {
         player.prepare()
         player.play()
     }
+
 
     private fun enterPIPMode() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -1558,9 +1592,11 @@ class PlayerMobileFragment : Fragment() {
 
     private fun releasePlayer() {
         stopProgressHandler()
-        binding.pvPlayer.player = null
-        binding.settings.player = null
-        binding.settings.subtitleView = null
+        if (_binding != null) {
+            binding.pvPlayer.player = null
+            binding.settings.player = null
+            binding.settings.subtitleView = null
+        }
         if (::player.isInitialized) {
             player.release()
         }

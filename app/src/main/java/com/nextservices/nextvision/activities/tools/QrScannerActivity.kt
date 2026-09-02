@@ -126,7 +126,7 @@ class QrScannerActivity : AppCompatActivity() {
         setContentView(binding.root)
         applyThemeWindowChrome()
 
-        cameraManager = getSystemService(CameraManager::class.java)
+        cameraManager = getSystemService(Context.CAMERA_SERVICE) as? CameraManager
 
         binding.qrScannerClose.setOnClickListener { finish() }
         binding.qrScannerPreview.surfaceTextureListener = textureListener

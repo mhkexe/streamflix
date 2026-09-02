@@ -112,16 +112,20 @@ class MovieViewHolder(
     private var itemSelected: Boolean = false
     private var ribbonStateJob: Job? = null
 
-    private fun formatWatchedTime(positionMillis: Long): String {
+    private fun formatWatchedTime(positionMillis: Long, durationMillis: Long): String {
         val totalSeconds = (positionMillis / 1000).coerceAtLeast(0)
+        val durationSeconds = (durationMillis / 1000).coerceAtLeast(0)
         val hours = totalSeconds / 3600
         val minutes = (totalSeconds % 3600) / 60
         val seconds = totalSeconds % 60
-        return if (hours > 0) {
-            String.format(Locale.ROOT, "%d:%02d:%02d watched", hours, minutes, seconds)
-        } else {
-            String.format(Locale.ROOT, "%d:%02d watched", minutes, seconds)
-        }
+        val durationHours = durationSeconds / 3600
+        val durationMinutes = (durationSeconds % 3600) / 60
+        val durationRemainderSeconds = durationSeconds % 60
+        val watched = if (hours > 0) "%d:%02d:%02d".format(Locale.ROOT, hours, minutes, seconds)
+        else "%d:%02d".format(Locale.ROOT, minutes, seconds)
+        val total = if (durationHours > 0) "%d:%02d:%02d".format(Locale.ROOT, durationHours, durationMinutes, durationRemainderSeconds)
+        else "%d:%02d".format(Locale.ROOT, durationMinutes, durationRemainderSeconds)
+        return "$watched / $total"
     }
     private val TAG = "TrailerChoiceDebug" // Logging Tag
 
@@ -383,7 +387,7 @@ class MovieViewHolder(
             centerCrop()
             transition(DrawableTransitionOptions.withCrossFade())
         }
-        bindRibbons(binding.ivMovieFavoriteRibbon, binding.ivMovieWatchedRibbon)
+        bindRibbons(binding.ivMovieWatchedRibbon)
 
         binding.tvMovieQuality.apply {
             text = movie.quality ?: ""
@@ -481,6 +485,9 @@ class MovieViewHolder(
                             fragment.releasePinnedBackground()
                         }
                     }
+                    is FavoritesTvFragment -> {
+                        if (hasFocus) fragment.updateFavoriteBackground(movie, true)
+                    }
                 }
             }
         }
@@ -490,7 +497,7 @@ class MovieViewHolder(
             centerCrop()
             transition(DrawableTransitionOptions.withCrossFade())
         }
-        bindRibbons(binding.ivMovieFavoriteRibbon, binding.ivMovieWatchedRibbon)
+        bindRibbons(binding.ivMovieWatchedRibbon)
         binding.pbMovieProgress.apply {
             val watchHistory = movie.watchHistory
             progress = when {
@@ -542,10 +549,10 @@ class MovieViewHolder(
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.ivMoviePoster)
         binding.tvMovieTitle.text = movie.title
-        binding.tvMovieInfo.text = context.getString(R.string.movie_item_type)
+        binding.tvMovieInfo.text = context.getString(R.string.home_continue_watching_movies)
         binding.tvMovieWatched.apply {
             movie.watchHistory?.let {
-                text = formatWatchedTime(it.lastPlaybackPositionMillis)
+                text = formatWatchedTime(it.lastPlaybackPositionMillis, it.durationMillis)
                 visibility = View.VISIBLE
             } ?: run { visibility = View.GONE }
         }
@@ -586,10 +593,10 @@ class MovieViewHolder(
             transition(DrawableTransitionOptions.withCrossFade())
         }
         binding.tvMovieTitle.text = movie.title
-        binding.tvMovieInfo.text = context.getString(R.string.movie_item_type)
+        binding.tvMovieInfo.text = context.getString(R.string.home_continue_watching_movies)
         binding.tvMovieWatched.apply {
             movie.watchHistory?.let {
-                text = formatWatchedTime(it.lastPlaybackPositionMillis)
+                text = formatWatchedTime(it.lastPlaybackPositionMillis, it.durationMillis)
                 visibility = View.VISIBLE
             } ?: run { visibility = View.GONE }
         }
@@ -636,7 +643,7 @@ class MovieViewHolder(
             centerCrop()
             transition(DrawableTransitionOptions.withCrossFade())
         }
-        bindRibbons(binding.ivMovieFavoriteRibbon, binding.ivMovieWatchedRibbon)
+        bindRibbons(binding.ivMovieWatchedRibbon)
 
         binding.tvMovieQuality.apply {
             text = movie.quality ?: ""
@@ -724,7 +731,7 @@ class MovieViewHolder(
             visibility = if (context.toActivity()?.getCurrentFragment() is FavoritesTvFragment) View.GONE
             else if (text.isNullOrEmpty()) View.GONE else View.VISIBLE
         }
-        bindRibbons(binding.ivMovieFavoriteRibbon, binding.ivMovieWatchedRibbon)
+        bindRibbons(binding.ivMovieWatchedRibbon)
         binding.pbMovieProgress.apply {
             val watchHistory = movie.watchHistory
             progress = when {
@@ -751,8 +758,7 @@ class MovieViewHolder(
             view.setPadding(0, 0, 0, 0)
         }
     }
-    private fun bindRibbons(favoriteRibbon: View, watchedRibbon: View) {
-        favoriteRibbon.visibility = if (movie.isFavorite) View.VISIBLE else View.GONE
+    private fun bindRibbons(watchedRibbon: View) {
         watchedRibbon.visibility = if (movie.isWatched) View.VISIBLE else View.GONE
 
         ribbonStateJob?.cancel()
@@ -764,7 +770,6 @@ class MovieViewHolder(
         ribbonStateJob = lifecycleOwner.lifecycleScope.launch {
             database.movieDao().getByIdAsFlow(boundMovieId).collect { persistedMovie ->
                 if (movie.id != boundMovieId || persistedMovie == null) return@collect
-                favoriteRibbon.visibility = if (persistedMovie.isFavorite) View.VISIBLE else View.GONE
                 watchedRibbon.visibility = if (persistedMovie.isWatched) View.VISIBLE else View.GONE
             }
         }
@@ -945,40 +950,22 @@ class MovieViewHolder(
         }
 
         binding.btnMovieFavorite.apply {
-
-            fun Boolean.drawable() = when (this) {
-                true -> R.drawable.ic_favorite_enable
-                false -> R.drawable.ic_favorite_disable
-            }
-
             setOnClickListener {
                 checkProviderAndRun {
                     itemView.findViewTreeLifecycleOwner()?.lifecycleScope?.launch(Dispatchers.IO) {
-                        val dao = database.movieDao()
-                        val current = dao.getById(movie.id)?.isFavorite ?: false
-                        val newValue = !current
+                        val newValue = !(database.movieDao().getById(movie.id)?.isFavorite ?: false)
                         val resolvedMovie = ArtworkRepair.resolveMovieForFavorite(context, movie, newValue)
-
-                        dao.upsertFavorite(resolvedMovie, newValue)
-
+                        database.movieDao().upsertFavorite(resolvedMovie, newValue)
                         withContext(Dispatchers.Main) {
-                            movie.poster = resolvedMovie.poster
-                            movie.banner = resolvedMovie.banner
                             movie.isFavorite = newValue
                             isSelected = newValue
-                            setImageDrawable(
-                                ContextCompat.getDrawable(context, newValue.drawable())
-                            )
                         }
                     }
                 }
             }
-
             isSelected = movie.isFavorite
-            setImageDrawable(
-                ContextCompat.getDrawable(context, movie.isFavorite.drawable())
-            )
         }
+
     }
 
     private fun displayMovieTv(binding: ContentMovieTvBinding) {
@@ -1055,6 +1042,7 @@ class MovieViewHolder(
                     ))
                 }
             }
+            requestFocus()
         }
 
         binding.pbMovieProgress.apply {
@@ -1079,40 +1067,22 @@ class MovieViewHolder(
         }
 
         binding.btnMovieFavorite.apply {
-
-            fun Boolean.drawable() = when (this) {
-                true -> R.drawable.ic_favorite_enable
-                false -> R.drawable.ic_favorite_disable
-            }
-
             setOnClickListener {
                 checkProviderAndRun {
                     itemView.findViewTreeLifecycleOwner()?.lifecycleScope?.launch(Dispatchers.IO) {
-                        val dao = database.movieDao()
-                        val current = dao.getById(movie.id)?.isFavorite ?: false
-                        val newValue = !current
+                        val newValue = !(database.movieDao().getById(movie.id)?.isFavorite ?: false)
                         val resolvedMovie = ArtworkRepair.resolveMovieForFavorite(context, movie, newValue)
-
-                        dao.upsertFavorite(resolvedMovie, newValue)
-
+                        database.movieDao().upsertFavorite(resolvedMovie, newValue)
                         withContext(Dispatchers.Main) {
-                            movie.poster = resolvedMovie.poster
-                            movie.banner = resolvedMovie.banner
                             movie.isFavorite = newValue
                             isSelected = newValue
-                            setImageDrawable(
-                                ContextCompat.getDrawable(context, newValue.drawable())
-                            )
                         }
                     }
                 }
             }
-
             isSelected = movie.isFavorite
-            setImageDrawable(
-                ContextCompat.getDrawable(context, movie.isFavorite.drawable())
-            )
         }
+
     }
 
     private fun displayCastMobile(binding: ContentMovieCastMobileBinding) {

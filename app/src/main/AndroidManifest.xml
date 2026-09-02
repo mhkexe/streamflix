@@ -59,7 +59,7 @@
     <application
         android:name=".NextVisionApp"
         android:allowBackup="true"
-        android:banner="@drawable/nextvision_app_icon"
+        android:banner="@drawable/nextvision_tv_banner"
         android:icon="@drawable/nextvision_app_icon"
         android:label="@string/app_name"
         android:logo="@drawable/nextvision_logo"

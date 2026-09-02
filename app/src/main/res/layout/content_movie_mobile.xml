@@ -20,24 +20,6 @@
         tools:layout_constraintDimensionRatio="2:3"
         tools:layout_height="0dp" />
 
-    <ImageView
-        android:id="@+id/btn_movie_favorite"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="12dp"
-        android:background="@drawable/bg_detail_favorite_tv"
-        android:clickable="true"
-        android:focusable="true"
-        android:padding="10dp"
-        android:src="@drawable/ic_favorite_disable"
-        android:tint="@drawable/color_button_text"
-        android:importantForAccessibility="no"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="UseAppTint" />
-
     <TextView
         android:id="@+id/tv_movie_title"
         android:layout_width="0dp"
@@ -186,12 +168,29 @@
         app:layout_constraintStart_toEndOf="@id/btn_movie_watch_now"
         app:layout_constraintTop_toBottomOf="@id/tv_movie_genres" />
 
+    <TextView
+        android:id="@+id/btn_movie_favorite"
+        style="@style/AppTheme.Widget.Mobile.Button.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="26dp"
+        android:layout_marginEnd="10dp"
+        android:contentDescription="@string/option_show_favorite"
+        android:drawableStart="@drawable/ic_favorite_state"
+        android:drawableTint="@color/favorite_icon_tint"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/btn_movie_trailer"
+        app:layout_constraintTop_toBottomOf="@id/tv_movie_genres" />
+
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrier2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="btn_movie_watch_now,pb_movie_progress,btn_movie_trailer" />
+        app:constraint_referenced_ids="btn_movie_watch_now,pb_movie_progress,btn_movie_trailer,btn_movie_favorite" />
 
     <TextView
         android:id="@+id/tv_movie_overview"

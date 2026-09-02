@@ -1,0 +1,1415 @@
+[
+  {
+    "id": 556,
+    "name": "Spider-Man Collection",
+    "overview": "A superhero film series based on the Marvel Comics character Spider-Man. The series is centered on Peter Parker, an academically gifted but socially inept freelance photographer who gets bitten by a genetically modified spider and gains spider-like abilities, all of which he uses to fight crime as a spider-masked vigilante, learning for himself that with great power comes great responsibility.",
+    "posterPath": "https://image.tmdb.org/t/p/w500/bp5PqLa06QA1LsELA1SsKZ008H7.jpg",
+    "backdropPath": "https://image.tmdb.org/t/p/original/waZqriYTuBE3WqXI3SDGi3kfDQE.jpg",
+    "parts": [
+      {
+        "id": 557,
+        "title": "Spider-Man",
+        "overview": "After being bitten by a genetically altered spider at Oscorp, nerdy but endearing high school student Peter Parker is endowed with amazing powers to become the superhero known as Spider-Man.",
+        "releaseDate": "2002-05-01",
+        "voteAverage": 7.351,
+        "posterPath": "https://image.tmdb.org/t/p/w500/or6XJBVpcEbIkma0V9zshnbEtx4.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/zQ8AxTPiCiS5nnwXpwTBPBHSaa5.jpg"
+      },
+      {
+        "id": 558,
+        "title": "Spider-Man 2",
+        "overview": "Peter Parker is going through a major identity crisis. Burned out from being Spider-Man, he decides to shelve his superhero alter ego, which leaves the city suffering in the wake of carnage left by the evil Doc Ock. In the meantime, Parker still can't act on his feelings for Mary Jane Watson, a girl he's loved since childhood. A certain anger begins to brew in his best friend Harry Osborn as well...",
+        "releaseDate": "2004-06-25",
+        "voteAverage": 7.328,
+        "posterPath": "https://image.tmdb.org/t/p/w500/aGuvNAaaZuWXYQQ6N2v7DeuP6mB.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/6al048Lat3eLVQOuKtc9h6Tu94d.jpg"
+      },
+      {
+        "id": 559,
+        "title": "Spider-Man 3",
+        "overview": "The seemingly invincible Spider-Man goes up against an all-new crop of villains—including the shape-shifting Sandman. While Spider-Man’s superpowers are altered by an alien organism, his alter ego, Peter Parker, deals with nemesis Eddie Brock and also gets caught up in a love triangle.",
+        "releaseDate": "2007-05-01",
+        "voteAverage": 6.479,
+        "posterPath": "https://image.tmdb.org/t/p/w500/qFmwhVUoUSXjkKRmca5yGDEXBIj.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/FfAU0PUs8AJkMU2VbkVNFtRXR4.jpg"
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "name": "Star Wars Collection",
+    "overview": "An epic space-opera theatrical film series, which depicts the adventures of various characters \"a long time ago in a galaxy far, far away….\"",
+    "posterPath": "https://image.tmdb.org/t/p/w500/pWVLFh4OuejTpUaDQbB1C4zoS2p.jpg",
+    "backdropPath": "https://image.tmdb.org/t/p/original/iY2ujEY2m68OTTlPFTiHub9joHS.jpg",
+    "parts": [
+      {
+        "id": 11,
+        "title": "Star Wars",
+        "overview": "Princess Leia is captured and held hostage by the evil Imperial forces in their effort to take over the galactic Empire. Venturesome Luke Skywalker and dashing captain Han Solo team together with the loveable robot duo R2-D2 and C-3PO to rescue the beautiful princess and restore peace and justice in the Empire.",
+        "releaseDate": "1977-05-25",
+        "voteAverage": 8.207,
+        "posterPath": "https://image.tmdb.org/t/p/w500/fai0rspsNeJCS69wHNjOdWxcI7P.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/yUiXA68FfQeA8cRBhd0Ao0jIRZt.jpg"
+      },
+      {
+        "id": 1891,
+        "title": "The Empire Strikes Back",
+        "overview": "The epic saga continues as Luke Skywalker, in hopes of defeating the evil Galactic Empire, learns the ways of the Jedi from aging master Yoda. But Darth Vader is more determined than ever to capture Luke. Meanwhile, rebel leader Princess Leia, cocky Han Solo, Chewbacca, and droids C-3PO and R2-D2 are thrown into various stages of capture, betrayal and despair.",
+        "releaseDate": "1980-05-20",
+        "voteAverage": 8.393,
+        "posterPath": "https://image.tmdb.org/t/p/w500/nNAeTmF4CtdSgMDplXTDPOpYzsX.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/k9pshruhCpJAdH9RaGJO6jaWQ4X.jpg"
+      },
+      {
+        "id": 1892,
+        "title": "Return of the Jedi",
+        "overview": "Luke Skywalker leads a mission to rescue his friend Han Solo from the clutches of Jabba the Hutt, the Emperor prepares to crush the Rebellion with a more powerful Death Star, and the Rebel fleet mounts a massive attack on the space station. Luke Skywalker confronts Darth Vader in a final climactic duel before the evil Emperor.",
+        "releaseDate": "1983-05-25",
+        "voteAverage": 7.911,
+        "posterPath": "https://image.tmdb.org/t/p/w500/jQYlydvHm3kUix1f8prMucrplhm.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/ziECpBRIyclmBNaFSWlvCfsKbMD.jpg"
+      },
+      {
+        "id": 1893,
+        "title": "Star Wars: Episode I - The Phantom Menace",
+        "overview": "Anakin Skywalker, a young slave strong with the Force, is discovered on Tatooine. Meanwhile, the evil Sith have returned, enacting their plot for revenge against the Jedi.",
+        "releaseDate": "1999-05-19",
+        "voteAverage": 6.582,
+        "posterPath": "https://image.tmdb.org/t/p/w500/6wkfovpn7Eq8dYNKaG5PY3q2oq6.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/3TeGmKJfkik1D1rIoqGb1aR4k9c.jpg"
+      },
+      {
+        "id": 1894,
+        "title": "Star Wars: Episode II - Attack of the Clones",
+        "overview": "Following an assassination attempt on Senator Padmé Amidala, Jedi Knights Anakin Skywalker and Obi-Wan Kenobi investigate a mysterious plot into the heart of the Separatist movement and the beginning of the Clone Wars.",
+        "releaseDate": "2002-05-15",
+        "voteAverage": 6.597,
+        "posterPath": "https://image.tmdb.org/t/p/w500/oZNPzxqM2s5DyVWab09NTQScDQt.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/abwxHfymXGAbbH3lo9PDEJEfvtW.jpg"
+      },
+      {
+        "id": 1895,
+        "title": "Star Wars: Episode III - Revenge of the Sith",
+        "overview": "When the sinister Sith unveil a thousand-year-old plot to rule the galaxy, the Republic crumbles and from its ashes rises the evil Galactic Empire. Jedi hero Anakin Skywalker must choose a side.",
+        "releaseDate": "2005-05-17",
+        "voteAverage": 7.473,
+        "posterPath": "https://image.tmdb.org/t/p/w500/xfSAoBEm9MNBjmlNcDYLvLSMlnq.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/jniabJVBSW3EqLlyhjxWCZjVkiE.jpg"
+      },
+      {
+        "id": 140607,
+        "title": "Star Wars: The Force Awakens",
+        "overview": "Thirty years after defeating the Galactic Empire, Han Solo and his allies face a new threat from the evil Kylo Ren and his army of Stormtroopers.",
+        "releaseDate": "2015-12-15",
+        "voteAverage": 7.242,
+        "posterPath": "https://image.tmdb.org/t/p/w500/wqnLdwVXoBjKibFRR5U3y0aDUhs.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/k6EOrckWFuz7I4z4wiRwz8zsj4H.jpg"
+      },
+      {
+        "id": 181812,
+        "title": "Star Wars: The Rise of Skywalker",
+        "overview": "The surviving Resistance faces the First Order once again as the journey of Rey, Finn and Poe Dameron continues. With the power and knowledge of generations behind them, the final battle begins.",
+        "releaseDate": "2019-12-18",
+        "voteAverage": 6.251,
+        "posterPath": "https://image.tmdb.org/t/p/w500/db32LaOibwEliAmSL2jjDF6oDdj.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/jOzrELAzFxtMx2I4uDGHOotdfsS.jpg"
+      },
+      {
+        "id": 181808,
+        "title": "Star Wars: The Last Jedi",
+        "overview": "Rey develops her newly discovered abilities with the guidance of Luke Skywalker, who is unsettled by the strength of her powers. Meanwhile, the Resistance prepares to do battle with the First Order.",
+        "releaseDate": "2017-12-13",
+        "voteAverage": 6.741,
+        "posterPath": "https://image.tmdb.org/t/p/w500/ySaaKHOLAQU5HoZqWmzDIj1VvZ1.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/bIUaCtWaRgd78SnoHJDI8TNf7Sd.jpg"
+      }
+    ]
+  },
+  {
+    "id": 86311,
+    "name": "The Avengers Collection",
+    "overview": "A superhero film series produced by Marvel Studios based on the Marvel Comics superhero team of the same name, and part of the Marvel Cinematic Universe (MCU).  The series features an ensemble cast from the Marvel Cinematic Universe series films, as they join forces for the peacekeeping organization S.H.I.E.L.D. led by Nick Fury.",
+    "posterPath": "https://image.tmdb.org/t/p/w500/yFSIUVTCvgYrpalUktulvk3Gi5Y.jpg",
+    "backdropPath": "https://image.tmdb.org/t/p/original/2UNUv4NJdC36E5myDHACBJ99EwL.jpg",
+    "parts": [
+      {
+        "id": 24428,
+        "title": "The Avengers",
+        "overview": "When an unexpected enemy emerges and threatens global safety and security, Nick Fury, director of the international peacekeeping agency known as S.H.I.E.L.D., finds himself in need of a team to pull the world back from the brink of disaster. Spanning the globe, a daring recruitment effort begins!",
+        "releaseDate": "2012-04-25",
+        "voteAverage": 8.073,
+        "posterPath": "https://image.tmdb.org/t/p/w500/RYMX2wcKCBAr24UyPD7xwmjaTn.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/gHLs7Fy3DzLmLsD4lmfqL55KGcl.jpg"
+      },
+      {
+        "id": 99861,
+        "title": "Avengers: Age of Ultron",
+        "overview": "When Tony Stark tries to jumpstart a dormant peacekeeping program, things go awry and Earth’s Mightiest Heroes are put to the ultimate test as the fate of the planet hangs in the balance. As the villainous Ultron emerges, it is up to The Avengers to stop him from enacting his terrible plans, and soon uneasy alliances and unexpected action pave the way for an epic and unique global adventure.",
+        "releaseDate": "2015-04-22",
+        "voteAverage": 7.277,
+        "posterPath": "https://image.tmdb.org/t/p/w500/4ssDuvEDkSArWEdyBl2X5EHvYKU.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/kIBK5SKwgqIIuRKhhWrJn3XkbPq.jpg"
+      },
+      {
+        "id": 299536,
+        "title": "Avengers: Infinity War",
+        "overview": "As the Avengers and their allies have continued to protect the world from threats too large for any one hero to handle, a new danger has emerged from the cosmic shadows: Thanos. A despot of intergalactic infamy, his goal is to collect all six Infinity Stones, artifacts of unimaginable power, and use them to inflict his twisted will on all of reality. Everything the Avengers have fought for has led up to this moment - the fate of Earth and existence itself has never been more uncertain.",
+        "releaseDate": "2018-04-25",
+        "voteAverage": 8.242,
+        "posterPath": "https://image.tmdb.org/t/p/w500/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/mDfJG3LC3Dqb67AZ52x3Z0jU0uB.jpg"
+      },
+      {
+        "id": 299534,
+        "title": "Avengers: Endgame",
+        "overview": "After the devastating events of Avengers: Infinity War, the universe is in ruins due to the efforts of the Mad Titan, Thanos. With the help of remaining allies, the Avengers must assemble once more in order to undo Thanos' actions and restore order to the universe once and for all, no matter what consequences may be in store.",
+        "releaseDate": "2019-04-24",
+        "voteAverage": 8.241,
+        "posterPath": "https://image.tmdb.org/t/p/w500/ulzhLuWrPK07P1YkdWQLZnQh1JL.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/2xfV5Zdq4kCsFVReRXJKnJaUFCD.jpg"
+      },
+      {
+        "id": 1003596,
+        "title": "Avengers: Doomsday",
+        "overview": "Beloved heroes from three distinct universes are set on a deadly collision course and face an existential threat unlike anything they've ever encountered.",
+        "releaseDate": "2026-12-16",
+        "voteAverage": 0.0,
+        "posterPath": "https://image.tmdb.org/t/p/w500/jzPwsojjFStf5lR5Nm07w2hH56G.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/s4v0UX1anfXm0UvloLsTTJ4v222.jpg"
+      },
+      {
+        "id": 1003598,
+        "title": "Avengers: Secret Wars",
+        "overview": "An upcoming film in Phase Six of the Marvel Cinematic Universe (MCU) and the finale of The Multiverse Saga.",
+        "releaseDate": "2027-12-15",
+        "voteAverage": 0.0,
+        "posterPath": "https://image.tmdb.org/t/p/w500/f0YBuh4hyiAheXhh4JnJWoKi9g5.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/rytc6Lf4447C0CDncwFa4gxe0vY.jpg"
+      }
+    ]
+  },
+  {
+    "id": 645,
+    "name": "James Bond Collection",
+    "overview": "The James Bond Collection is a legendary spy film series based on Ian Fleming’s novels, following MI6 agent 007, James Bond, as he takes on global threats with style, gadgets, and charm. Produced by EON Productions, the franchise spans 25 official films (1962–2021) and has featured six actors, from Sean Connery to Daniel Craig. Known for its thrilling action, iconic villains, Bond girls, and unforgettable theme songs, the series remains a cornerstone of the spy genre. With espionage, luxury cars, and shaken-not-stirred martinis, Bond continues to captivate audiences worldwide.",
+    "posterPath": "https://image.tmdb.org/t/p/w500/ofwSiqOFShhunAIYYdSMHMJQSx2.jpg",
+    "backdropPath": "https://image.tmdb.org/t/p/original/dOSECZImeyZldoq0ObieBE0lwie.jpg",
+    "parts": [
+      {
+        "id": 253,
+        "title": "Live and Let Die",
+        "overview": "James Bond must investigate a mysterious murder case of a British agent in New Orleans. Soon he finds himself up against a gangster boss named Mr. Big.",
+        "releaseDate": "1973-06-27",
+        "voteAverage": 6.503,
+        "posterPath": "https://image.tmdb.org/t/p/w500/39qkrjqMZs6utwNmihVImC3ghas.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/hzmmXx6UeYQeylioNbliFKjSbV7.jpg"
+      },
+      {
+        "id": 646,
+        "title": "Dr. No",
+        "overview": "Agent 007 battles mysterious Dr. No, a scientific genius bent on destroying the U.S. space program. As the countdown to disaster begins, Bond must go to Jamaica, where he encounters beautiful Honey Ryder, to confront a megalomaniacal villain in his massive island headquarters.",
+        "releaseDate": "1962-10-07",
+        "voteAverage": 6.982,
+        "posterPath": "https://image.tmdb.org/t/p/w500/9zCOLJmLNst0sCPZlkW1IRoH65E.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/srgq7bzZsuDw7NoGXdazRXp7Hl6.jpg"
+      },
+      {
+        "id": 657,
+        "title": "From Russia with Love",
+        "overview": "Agent 007 is back in the second installment of the James Bond series, this time battling a secret crime organization known as SPECTRE. Russians Rosa Klebb and Kronsteen are out to snatch a decoding device known as the Lektor, using the ravishing Tatiana to lure Bond into helping them. Bond willingly travels to meet Tatiana in Istanbul, where he must rely on his wits to escape with his life in a series of deadly encounters with the enemy.",
+        "releaseDate": "1963-10-10",
+        "voteAverage": 7.062,
+        "posterPath": "https://image.tmdb.org/t/p/w500/zx4V17FP8oclNvOpTgs2iCCtiYk.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/8JMiQa0OqsCYvbNUrQIrMzwV7g2.jpg"
+      },
+      {
+        "id": 658,
+        "title": "Goldfinger",
+        "overview": "Special agent 007 comes face to face with one of the most notorious villains of all time, and now he must outwit and outgun the powerful tycoon to prevent him from cashing in on a devious scheme to raid Fort Knox -- and obliterate the world's economy.",
+        "releaseDate": "1964-09-20",
+        "voteAverage": 7.36,
+        "posterPath": "https://image.tmdb.org/t/p/w500/aKNFzaqQgPzsGXnsMc4kJH5hFIV.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/mM4WeXqJd2tu1gCF5GYyAZf2Npl.jpg"
+      },
+      {
+        "id": 660,
+        "title": "Thunderball",
+        "overview": "A criminal organization has obtained two nuclear bombs and are asking for a 100 million pound ransom in the form of diamonds in seven days or they will use the weapons. The secret service sends James Bond to the Bahamas to once again save the world.",
+        "releaseDate": "1965-12-11",
+        "voteAverage": 6.667,
+        "posterPath": "https://image.tmdb.org/t/p/w500/wCc4qllaTDsQN8zgGkAgQrKO6N9.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/7DLCXCQx52YLle1qTokrjROTwVV.jpg"
+      },
+      {
+        "id": 667,
+        "title": "You Only Live Twice",
+        "overview": "A mysterious spacecraft captures Russian and American space capsules and brings the two superpowers to the brink of war. James Bond investigates the case in Japan and comes face to face with his archenemy Blofeld.",
+        "releaseDate": "1967-06-13",
+        "voteAverage": 6.587,
+        "posterPath": "https://image.tmdb.org/t/p/w500/gIhS0VC7YzI8pj6zfS3KxsxV0dS.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/cpZAXIYA0lkZMpAt7d1MmH8ojNV.jpg"
+      },
+      {
+        "id": 668,
+        "title": "On Her Majesty's Secret Service",
+        "overview": "With the help of Marc-Ange Draco, head of the Unione Corse crime syndicate, and Draco's troubled daughter Tracy, James Bond tracks his archnemesis, Ernst Stravro Blofeld, to a mountaintop retreat in the Swiss Alps, where he is training an army of beautiful, lethal women.",
+        "releaseDate": "1969-12-18",
+        "voteAverage": 6.556,
+        "posterPath": "https://image.tmdb.org/t/p/w500/m3KfbxvqaiAvRJ6MpguA3GuLdDQ.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/58pMrmwwcKamJIdjUlinE6QX1Fs.jpg"
+      },
+      {
+        "id": 681,
+        "title": "Diamonds Are Forever",
+        "overview": "Diamonds are stolen only to be sold again in the international market. James Bond infiltrates a smuggling mission to find out who's guilty. The mission takes him to Las Vegas where Bond meets his archenemy Blofeld.",
+        "releaseDate": "1971-12-14",
+        "voteAverage": 6.402,
+        "posterPath": "https://image.tmdb.org/t/p/w500/ooDT0eKrWCxJCsn9JehPkD0QYNj.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/pyTDtQCn5sG8gi2zkM5ZylSNmtJ.jpg"
+      },
+      {
+        "id": 682,
+        "title": "The Man with the Golden Gun",
+        "overview": "Cool government operative James Bond searches for a stolen invention that can turn the sun's heat into a destructive weapon. He soon crosses paths with the menacing Francisco Scaramanga, a hitman so skilled he has a seven-figure working fee. Bond then joins forces with the swimsuit-clad Mary Goodnight, and together they track Scaramanga to a Thai tropical isle hideout where the killer-for-hire lures the slick spy into a deadly maze for a final duel.",
+        "releaseDate": "1974-12-04",
+        "voteAverage": 6.458,
+        "posterPath": "https://image.tmdb.org/t/p/w500/xVkbKwGnBVNQ122GN5bCTMyPbWz.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/3tpNEbRahT8smy7RraaWa0xg9Gv.jpg"
+      },
+      {
+        "id": 691,
+        "title": "The Spy Who Loved Me",
+        "overview": "Russian and British submarines with nuclear missiles on board both vanish from sight without a trace. England and Russia both blame each other as James Bond tries to solve the riddle of the disappearing ships. But the KGB also has an agent on the case.",
+        "releaseDate": "1977-07-07",
+        "voteAverage": 6.818,
+        "posterPath": "https://image.tmdb.org/t/p/w500/3ZxHKFxMYvAko680DsRgAZKWcLi.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/lhPq8R8qgoyLNWvVTiqZSkYGLPX.jpg"
+      },
+      {
+        "id": 698,
+        "title": "Moonraker",
+        "overview": "After Drax Industries' Moonraker space shuttle is hijacked, secret agent James Bond is assigned to investigate, traveling to California to meet the company's owner, the mysterious Hugo Drax. With the help of scientist Dr. Holly Goodhead, Bond soon uncovers Drax's nefarious plans for humanity, all the while fending off an old nemesis, Jaws, and venturing to Venice, Rio, the Amazon...and even outer space.",
+        "releaseDate": "1979-06-26",
+        "voteAverage": 6.185,
+        "posterPath": "https://image.tmdb.org/t/p/w500/6LrJdXNmu5uHOVALZxVYd44Lva0.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/mrDC5DLx2wljt4HZGwgkmqlzfcF.jpg"
+      },
+      {
+        "id": 699,
+        "title": "For Your Eyes Only",
+        "overview": "A British spy ship has sunk and on board was a hi-tech encryption device. James Bond is sent to find the device that holds British launching instructions before the enemy Soviets get to it first.",
+        "releaseDate": "1981-06-24",
+        "voteAverage": 6.546,
+        "posterPath": "https://image.tmdb.org/t/p/w500/xV4Nnr6DjjERlqNikqDQX8LUgua.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/z7Jp7HAsY7MqXzPYzTjJnmOQk2r.jpg"
+      },
+      {
+        "id": 700,
+        "title": "Octopussy",
+        "overview": "James Bond is sent to investigate after a fellow “00” agent is found dead with a priceless Fabergé egg. Bond follows the mystery and uncovers a smuggling scandal and a Russian General who wants to provoke a new World War.",
+        "releaseDate": "1983-06-05",
+        "voteAverage": 6.356,
+        "posterPath": "https://image.tmdb.org/t/p/w500/yoosZitM9igSk3Sd0sBXIhKlAh1.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/xTS1qCmhzH3vq7cuextO5vQA6eW.jpg"
+      },
+      {
+        "id": 707,
+        "title": "A View to a Kill",
+        "overview": "A newly-developed microchip designed by Zorin Industries for the British Government that can survive the electromagnetic radiation caused by a nuclear explosion has landed in the hands of the KGB. James Bond must find out how and why. His suspicions soon lead him to big industry leader Max Zorin who forms a plan to destroy his only competition in Silicon Valley by triggering a massive earthquake in the San Francisco Bay.",
+        "releaseDate": "1985-05-24",
+        "voteAverage": 6.256,
+        "posterPath": "https://image.tmdb.org/t/p/w500/arJF829RP9cYvh0NU70dC5TtXSa.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/hvGWyyC8wER1I8ExSXNtFBs7Mgd.jpg"
+      },
+      {
+        "id": 709,
+        "title": "Licence to Kill",
+        "overview": "After capturing the notorious drug lord Franz Sanchez, Bond's close friend and former CIA agent Felix Leiter is left for dead and his wife is murdered. Bond goes rogue and seeks vengeance on those responsible, as he infiltrates Sanchez's organization from the inside.",
+        "releaseDate": "1989-06-13",
+        "voteAverage": 6.439,
+        "posterPath": "https://image.tmdb.org/t/p/w500/8nzJve63EXA79HGAyidZwivZrQ2.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/p6VFbg5lhWj0RCgXf5dj6IDMPvt.jpg"
+      },
+      {
+        "id": 710,
+        "title": "GoldenEye",
+        "overview": "When a powerful secret defense system is stolen, James Bond is assigned to stop a Russian crime syndicate from using it.",
+        "releaseDate": "1995-11-16",
+        "voteAverage": 6.905,
+        "posterPath": "https://image.tmdb.org/t/p/w500/z0ljRnNxIO7CRBhLEO0DvLgAFPR.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/fIWsCpYR9iGDMSbMTSAzy8L7Kg5.jpg"
+      },
+      {
+        "id": 714,
+        "title": "Tomorrow Never Dies",
+        "overview": "A deranged media mogul is staging international incidents to pit the world's superpowers against each other. Now James Bond must take on this evil mastermind in an adrenaline-charged battle to end his reign of terror and prevent global pandemonium.",
+        "releaseDate": "1997-12-11",
+        "voteAverage": 6.387,
+        "posterPath": "https://image.tmdb.org/t/p/w500/gZm002w7q9yLOkltxT76TWGfdZX.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/fesAgiKA0pc04vScDTAQe1f9nd4.jpg"
+      },
+      {
+        "id": 10764,
+        "title": "Quantum of Solace",
+        "overview": "Betrayed by Vesper, the woman he loved, 007 fights the urge to make his latest mission personal. Pursuing his determination to uncover the truth, Bond and M interrogate Mr. White, who reveals that the organization that blackmailed Vesper is far more complex and dangerous than anyone had imagined.",
+        "releaseDate": "2008-10-29",
+        "voteAverage": 6.342,
+        "posterPath": "https://image.tmdb.org/t/p/w500/e3DXXLJHGqMx9yYpXsql1XNljmM.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/uGs5Z7dMguf7kxWubGFcp9EhKcy.jpg"
+      },
+      {
+        "id": 36557,
+        "title": "Casino Royale",
+        "overview": "Le Chiffre, a banker to the world's terrorists, is scheduled to participate in a high-stakes poker game in Montenegro, where he intends to use his winnings to establish his financial grip on the terrorist market. M sends Bond—on his maiden mission as a 00 Agent—to attend this game and prevent Le Chiffre from winning. With the help of Vesper Lynd and Felix Leiter, Bond enters the most important poker game in his already dangerous career.",
+        "releaseDate": "2006-11-14",
+        "voteAverage": 7.576,
+        "posterPath": "https://image.tmdb.org/t/p/w500/lMrxYKKhd4lqRzwUHAy5gcx9PSO.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/klJMCIblHLFwCuGjKz7tyOpekIC.jpg"
+      },
+      {
+        "id": 36643,
+        "title": "The World Is Not Enough",
+        "overview": "Greed, revenge, world dominance and high-tech terrorism – it's all in a day's work for Bond, who's on a mission to protect a beautiful oil heiress from a notorious terrorist. In a race against time that culminates in a dramatic submarine showdown, Bond works to defuse the international power struggle that has the world's oil supply hanging in the balance.",
+        "releaseDate": "1999-11-17",
+        "voteAverage": 6.288,
+        "posterPath": "https://image.tmdb.org/t/p/w500/wCb2msgoZPK01WIqry24M4xsM73.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/n2jVDMcBEWsLFooO7W1ZkcMUtWS.jpg"
+      },
+      {
+        "id": 36669,
+        "title": "Die Another Day",
+        "overview": "James Bond is sent to investigate the connection between a North Korean terrorist and a diamond mogul, who is funding the development of an international space weapon.",
+        "releaseDate": "2002-11-17",
+        "voteAverage": 5.996,
+        "posterPath": "https://image.tmdb.org/t/p/w500/bZmGqOhMhaLn8AoFMvFDct4tbrL.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/ibJEhfV4CudcL3iaUgvhkBrfMCO.jpg"
+      },
+      {
+        "id": 37724,
+        "title": "Skyfall",
+        "overview": "When Bond's latest assignment goes gravely wrong, agents around the world are exposed and MI6 headquarters is attacked. While M faces challenges to her authority and position from Gareth Mallory, the new Chairman of the Intelligence and Security Committee, it's up to Bond, aided only by field agent Eve, to locate the mastermind behind the attack.",
+        "releaseDate": "2012-10-24",
+        "voteAverage": 7.265,
+        "posterPath": "https://image.tmdb.org/t/p/w500/d0IVecFQvsGdSbnMAHqiYsNYaJT.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/wkA622CCN2X0uwpgqYEOnUYEDf5.jpg"
+      },
+      {
+        "id": 206647,
+        "title": "Spectre",
+        "overview": "A cryptic message from Bond’s past sends him on a trail to uncover a sinister organization. While M battles political forces to keep the secret service alive, Bond peels back the layers of deceit to reveal the terrible truth behind SPECTRE.",
+        "releaseDate": "2015-10-26",
+        "voteAverage": 6.57,
+        "posterPath": "https://image.tmdb.org/t/p/w500/zj8ongFhtWNsVlfjOGo8pSr7PQg.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/8lBViysvNJBPkl6zG1LVAaW3qhj.jpg"
+      },
+      {
+        "id": 708,
+        "title": "The Living Daylights",
+        "overview": "After a defecting Russian general reveals a plot to assassinate foreign spies, James Bond is assigned a secret mission to dispatch the new head of the KGB to prevent an escalation of tensions between the Soviet Union and the West.",
+        "releaseDate": "1987-06-29",
+        "voteAverage": 6.549,
+        "posterPath": "https://image.tmdb.org/t/p/w500/1oRlmWX9hewpn2B44wawBjHd7dx.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/ebaq0ecL1Tu39rIExfHwE4ToFl2.jpg"
+      },
+      {
+        "id": 370172,
+        "title": "No Time to Die",
+        "overview": "Bond has left active service and is enjoying a tranquil life in Jamaica. His peace is short-lived when his old friend Felix Leiter from the CIA turns up asking for help. The mission to rescue a kidnapped scientist turns out to be far more treacherous than expected, leading Bond onto the trail of a mysterious villain armed with dangerous new technology.",
+        "releaseDate": "2021-09-29",
+        "voteAverage": 7.338,
+        "posterPath": "https://image.tmdb.org/t/p/w500/iUgygt3fscRoKWCV1d0C7FbM9TP.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/bz7pwNGCbV576COsDcYN9MbEACC.jpg"
+      },
+      {
+        "id": 36670,
+        "title": "Never Say Never Again",
+        "overview": "James Bond returns as the secret agent 007 to battle the evil organization SPECTRE. Bond must defeat Largo, who has stolen two atomic warheads for nuclear blackmail. But Bond has an ally in Largo's girlfriend, the willowy Domino, who falls for Bond and seeks revenge.",
+        "releaseDate": "1983-10-07",
+        "voteAverage": 6.083,
+        "posterPath": "https://image.tmdb.org/t/p/w500/zhoAL4o1STGgLbLxJ9r1ijfyHC9.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/45uCcAUB8Ljz3uKb1y1JHtT5aCT.jpg"
+      },
+      {
+        "id": 1184696,
+        "title": "Untitled James Bond Film",
+        "overview": "The 26th installment in the franchise. Plot TBA.",
+        "releaseDate": "",
+        "voteAverage": 0.0,
+        "posterPath": "https://image.tmdb.org/t/p/w500/AqH9lbww9UvHjQNnlKZve6r0iu8.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/2YFb5544lY4y2jXkg4kLK3yWTgC.jpg"
+      }
+    ]
+  },
+  {
+    "id": 1241,
+    "name": "Harry Potter Collection",
+    "overview": "The Harry Potter films are a fantasy series based on the series of seven Harry Potter novels by British writer J. K. Rowling.",
+    "posterPath": "https://image.tmdb.org/t/p/w500/eVPs2Y0LyvTLZn6AP5Z6O2rtiGB.jpg",
+    "backdropPath": "https://image.tmdb.org/t/p/original/kmEsQL2vOTA0jnM28fXS45Ky8kX.jpg",
+    "parts": [
+      {
+        "id": 671,
+        "title": "Harry Potter and the Philosopher's Stone",
+        "overview": "Harry Potter has lived under the stairs at his aunt and uncle's house his whole life. But on his 11th birthday, he learns he's a powerful wizard—with a place waiting for him at the Hogwarts School of Witchcraft and Wizardry. As he learns to harness his newfound powers with the help of the school's kindly headmaster, Harry uncovers the truth about his parents' deaths—and about the villain who's to blame.",
+        "releaseDate": "2001-11-16",
+        "voteAverage": 7.903,
+        "posterPath": "https://image.tmdb.org/t/p/w500/wuMc08IPKEatf9rnMNXvIDxqP4W.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/1XAC6RPT01UX9EQGy2JVn5c8pgy.jpg"
+      },
+      {
+        "id": 672,
+        "title": "Harry Potter and the Chamber of Secrets",
+        "overview": "Cars fly, trees fight back, and a mysterious house-elf comes to warn Harry Potter at the start of his second year at Hogwarts. Adventure and danger await when bloody writing on a wall announces: The Chamber Of Secrets Has Been Opened. To save Hogwarts will require all of Harry, Ron and Hermione's magical abilities and courage.",
+        "releaseDate": "2002-11-13",
+        "voteAverage": 7.707,
+        "posterPath": "https://image.tmdb.org/t/p/w500/sdEOH0992YZ0QSxgXNIGLq1ToUi.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/1stUIsjawROZxjiCMtqqXqgfZWC.jpg"
+      },
+      {
+        "id": 674,
+        "title": "Harry Potter and the Goblet of Fire",
+        "overview": "When his name emerges from the Goblet of Fire, Harry Potter becomes a competitor in a grueling battle for glory among three wizarding schools. Signs of Voldemort's return emerge as Harry's friends help him prepare for the Triwizard Tournament.",
+        "releaseDate": "2005-11-16",
+        "voteAverage": 7.8,
+        "posterPath": "https://image.tmdb.org/t/p/w500/fECBtHlr0RB3foNHDiCBXeg9Bv9.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/1OV7hau4D3rWGS5bu8sqBYeVpe.jpg"
+      },
+      {
+        "id": 767,
+        "title": "Harry Potter and the Half-Blood Prince",
+        "overview": "Dumbledore tries to prepare Harry for the final battle with Voldemort while Death Eaters wreak havoc in both Muggle and Wizard worlds.",
+        "releaseDate": "2009-07-15",
+        "voteAverage": 7.681,
+        "posterPath": "https://image.tmdb.org/t/p/w500/z7uo9zmQdQwU5ZJHFpv2Upl30i1.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/ze6Mx4QE5mQVXRYmG2flncqqle4.jpg"
+      },
+      {
+        "id": 673,
+        "title": "Harry Potter and the Prisoner of Azkaban",
+        "overview": "Harry Potter's life is in danger once more as dangerous wizard Sirius Black has escaped from Azkaban Prison and is heading to Hogwarts.",
+        "releaseDate": "2004-05-31",
+        "voteAverage": 8.01,
+        "posterPath": "https://image.tmdb.org/t/p/w500/aWxwnYoe8p2d2fcxOqtvAtJ72Rw.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/htmYEfH7TQgzsXHCnNXxmoYKQtL.jpg"
+      },
+      {
+        "id": 675,
+        "title": "Harry Potter and the Order of the Phoenix",
+        "overview": "When a new professor's methods leave Hogwarts unprepared to fight the rising tide of evil, Harry teaches students how to defend against the dark arts.",
+        "releaseDate": "2007-07-08",
+        "voteAverage": 7.673,
+        "posterPath": "https://image.tmdb.org/t/p/w500/5aOyriWkPec0zUDxmHFP9qMmBaj.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/pkxPkHOPJjOvzfQOclANEBT8OfK.jpg"
+      },
+      {
+        "id": 12444,
+        "title": "Harry Potter and the Deathly Hallows: Part 1",
+        "overview": "Harry, Ron and Hermione walk away from their last year at Hogwarts to find and destroy the remaining Horcruxes, putting an end to Voldemort's bid for immortality. But with Harry's beloved Dumbledore dead and Voldemort's unscrupulous Death Eaters on the loose, the world is more dangerous than ever.",
+        "releaseDate": "2010-11-17",
+        "voteAverage": 7.732,
+        "posterPath": "https://image.tmdb.org/t/p/w500/iGoXIpQb7Pot00EEdwpwPajheZ5.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/vcrgU0KaNj5mKUCIQSUdiQwTE9y.jpg"
+      },
+      {
+        "id": 12445,
+        "title": "Harry Potter and the Deathly Hallows: Part 2",
+        "overview": "Harry, Ron and Hermione continue their quest to vanquish the evil Voldemort once and for all. Just as things begin to look hopeless for the young wizards, Harry discovers a trio of magical objects that endow him with powers to rival Voldemort's formidable skills.",
+        "releaseDate": "2011-07-12",
+        "voteAverage": 8.08,
+        "posterPath": "https://image.tmdb.org/t/p/w500/c54HpQmuwXjHq2C9wmoACjxoom3.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/cbcpDn6XJaIGoOil1bKuskU8ds4.jpg"
+      }
+    ]
+  },
+  {
+    "id": 748,
+    "name": "X-Men Collection",
+    "overview": "A superhero film series about a team of mutant superheroes based on the Marvel Comics superheroes of the same name.",
+    "posterPath": "https://image.tmdb.org/t/p/w500/31rqs6ZxFdi5nWZZaFPIr17q8jt.jpg",
+    "backdropPath": "https://image.tmdb.org/t/p/original/ykVHlrE3aSvHYeIXOrWDsYZ18vv.jpg",
+    "parts": [
+      {
+        "id": 36657,
+        "title": "X-Men",
+        "overview": "Two mutants, Rogue and Wolverine, come to a private academy for their kind whose resident superhero team, the X-Men, must oppose a terrorist organization with similar powers.",
+        "releaseDate": "2000-07-13",
+        "voteAverage": 7.02,
+        "posterPath": "https://image.tmdb.org/t/p/w500/bRDAc4GogyS9ci3ow7UnInOcriN.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/3QUVzbcNyfGe3ocWkYAT8emK8Co.jpg"
+      },
+      {
+        "id": 36658,
+        "title": "X2",
+        "overview": "Professor Charles Xavier and his team of genetically gifted superheroes face a rising tide of anti-mutant sentiment led by Col. William Stryker. Storm, Wolverine and Jean Grey must join Magneto and Mystique to unhinge Stryker's scheme to exterminate all mutants.",
+        "releaseDate": "2003-04-27",
+        "voteAverage": 7.044,
+        "posterPath": "https://image.tmdb.org/t/p/w500/bst4alFUXCxISwdRUKSMhhkrX1M.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/7TYITrR804tLITNur3b8VLCK6tw.jpg"
+      },
+      {
+        "id": 36668,
+        "title": "X-Men: The Last Stand",
+        "overview": "When a cure is found to treat mutations, lines are drawn amongst the X-Men led by Professor Charles Xavier, and Magneto's Brotherhood of Mutants.",
+        "releaseDate": "2006-05-24",
+        "voteAverage": 6.425,
+        "posterPath": "https://image.tmdb.org/t/p/w500/a2xicU8DpKtRizOHjQLC1JyCSRS.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/nLMXULCGLnzRxz11txPzPqbOHSz.jpg"
+      },
+      {
+        "id": 49538,
+        "title": "X-Men: First Class",
+        "overview": "Before Charles Xavier and Erik Lensherr took the names Professor X and Magneto, they were two young men discovering their powers for the first time. Before they were arch-enemies, they were closest of friends, working together with other mutants (some familiar, some new), to stop the greatest threat the world has ever known.",
+        "releaseDate": "2011-06-01",
+        "voteAverage": 7.305,
+        "posterPath": "https://image.tmdb.org/t/p/w500/hNEokmUke0dazoBhttFN0o3L7Xv.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/yhp5Pt4GugkCs5mz63qWz5khHXe.jpg"
+      },
+      {
+        "id": 127585,
+        "title": "X-Men: Days of Future Past",
+        "overview": "The ultimate X-Men ensemble fights a war for the survival of the species across two time periods as they join forces with their younger selves in an epic battle that must change the past – to save our future.",
+        "releaseDate": "2014-05-15",
+        "voteAverage": 7.535,
+        "posterPath": "https://image.tmdb.org/t/p/w500/tYfijzolzgoMOtegh1Y7j2Enorg.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/3czpqXzFy5UcNuD1AubecRLWkwD.jpg"
+      },
+      {
+        "id": 246655,
+        "title": "X-Men: Apocalypse",
+        "overview": "After the re-emergence of the world's first mutant, world-destroyer Apocalypse, the X-Men must unite to defeat his extinction level plan.",
+        "releaseDate": "2016-05-18",
+        "voteAverage": 6.528,
+        "posterPath": "https://image.tmdb.org/t/p/w500/ikA8UhYdTGpqbatFa93nIf6noSr.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/sTQNRqLbfCXolrb5CizAW1dj528.jpg"
+      },
+      {
+        "id": 320288,
+        "title": "Dark Phoenix",
+        "overview": "The X-Men face their most formidable and powerful foe when one of their own, Jean Grey, starts to spiral out of control. During a rescue mission in outer space, Jean is nearly killed when she's hit by a mysterious cosmic force. Once she returns home, this force not only makes her infinitely more powerful, but far more unstable. The X-Men must now band together to save her soul and battle aliens that want to use Grey's new abilities to rule the galaxy.",
+        "releaseDate": "2019-06-05",
+        "voteAverage": 5.96,
+        "posterPath": "https://image.tmdb.org/t/p/w500/cCTJPelKGLhALq3r51A9uMonxKj.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/cjRUhKyt2Jo3V1KNzc5tpPNfccG.jpg"
+      }
+    ]
+  },
+  {
+    "id": 9485,
+    "name": "The Fast and the Furious Collection",
+    "overview": "An action film series centered on illegal street racing and heists.",
+    "posterPath": "https://image.tmdb.org/t/p/w500/zOCnMPoUxgJK1RFPfN4PcnT16gr.jpg",
+    "backdropPath": "https://image.tmdb.org/t/p/original/z5A5W3WYJc3UVEWljSGwdjDgQ0j.jpg",
+    "parts": [
+      {
+        "id": 584,
+        "title": "2 Fast 2 Furious",
+        "overview": "It's a major double-cross when former police officer Brian O'Conner teams up with his ex-con buddy Roman Pearce to transport a shipment of \"dirty\" money for shady Miami-based import-export dealer Carter Verone. But the guys are actually working with undercover agent Monica Fuentes to bring Verone down.",
+        "releaseDate": "2003-06-05",
+        "voteAverage": 6.5,
+        "posterPath": "https://image.tmdb.org/t/p/w500/6nDZExrDKIXvSAghsFKVFRVJuSf.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/90ooE5SbUEO0OVJHewNO7pgySb6.jpg"
+      },
+      {
+        "id": 9615,
+        "title": "The Fast and the Furious: Tokyo Drift",
+        "overview": "In order to avoid a jail sentence, Sean Boswell heads to Tokyo to live with his military father. In a low-rent section of the city, Sean gets caught up in the underground world of drift racing",
+        "releaseDate": "2006-06-03",
+        "voteAverage": 6.557,
+        "posterPath": "https://image.tmdb.org/t/p/w500/46xqGOwHbh2TH2avWSw3SMXph4E.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/dMARcKLrv0T7kVJ4iQR3vqTTdtT.jpg"
+      },
+      {
+        "id": 9799,
+        "title": "The Fast and the Furious",
+        "overview": "Dominic Toretto is a Los Angeles street racer suspected of masterminding a series of big-rig hijackings. When undercover cop Brian O'Conner infiltrates Toretto's iconoclastic crew, he falls for Toretto's sister and must choose a side: the gang or the LAPD.",
+        "releaseDate": "2001-06-22",
+        "voteAverage": 7.014,
+        "posterPath": "https://image.tmdb.org/t/p/w500/gqY0ITBgT7A82poL9jv851qdnIb.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/jY9ef5nqY4xIIMu3yzW3qamUCoi.jpg"
+      },
+      {
+        "id": 51497,
+        "title": "Fast Five",
+        "overview": "Former cop Brian O'Conner partners with ex-con Dom Toretto on the opposite side of the law. Since Brian and Mia Toretto broke Dom out of custody, they've blown across many borders to elude authorities. Now backed into a corner in Rio de Janeiro, they must pull one last job in order to gain their freedom.",
+        "releaseDate": "2011-04-20",
+        "voteAverage": 7.244,
+        "posterPath": "https://image.tmdb.org/t/p/w500/gEfQjjQwY7fh5bI4GlG0RrBu7Pz.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/c1Q8jLoaruQ9m5lCrVlXOaJJtu7.jpg"
+      },
+      {
+        "id": 82992,
+        "title": "Fast & Furious 6",
+        "overview": "Hobbs has Dominic and Brian reassemble their crew to take down a team of mercenaries; Dominic unexpectedly gets sidetracked with facing his presumed deceased girlfriend, Letty.",
+        "releaseDate": "2013-05-21",
+        "voteAverage": 6.8,
+        "posterPath": "https://image.tmdb.org/t/p/w500/thSmnRdrzPBBospIOJjLZBReqzo.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/xDp29MSWa7O3ROC13r6dPTFnREJ.jpg"
+      },
+      {
+        "id": 168259,
+        "title": "Furious 7",
+        "overview": "Deckard Shaw seeks revenge against Dominic Toretto and his family for his comatose brother.",
+        "releaseDate": "2015-04-01",
+        "voteAverage": 7.214,
+        "posterPath": "https://image.tmdb.org/t/p/w500/ktofZ9Htrjiy0P6LEowsDaxd3Ri.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/ehzI1mVcnHqB58NqPyQwpMqcVoz.jpg"
+      },
+      {
+        "id": 13804,
+        "title": "Fast & Furious",
+        "overview": "When a crime brings them back to L.A., fugitive ex-con Dom Toretto reignites his feud with agent Brian O'Conner. But as they are forced to confront a shared enemy, Dom and Brian must give in to an uncertain new trust if they hope to outmaneuver him. And the two men will find the best way to get revenge: push the limits of what's possible behind the wheel.",
+        "releaseDate": "2009-04-02",
+        "voteAverage": 6.7,
+        "posterPath": "https://image.tmdb.org/t/p/w500/lUtVoRukW7WNtUySwd8hWlByBds.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/25HepicRtrzZ3MVCqhfoxGDbHjw.jpg"
+      },
+      {
+        "id": 337339,
+        "title": "The Fate of the Furious",
+        "overview": "When a mysterious woman seduces Dom into the world of crime and a betrayal of those closest to him, the crew face trials that will test them as never before.",
+        "releaseDate": "2017-04-12",
+        "voteAverage": 6.9,
+        "posterPath": "https://image.tmdb.org/t/p/w500/dImWM7GJqryWJO9LHa3XQ8DD5NH.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/3IJ8kG8i84PncXkSovu0PaZQfjM.jpg"
+      },
+      {
+        "id": 385687,
+        "title": "Fast X",
+        "overview": "Over many missions and against impossible odds, Dom Toretto and his family have outsmarted, out-nerved and outdriven every foe in their path. Now, they confront the most lethal opponent they've ever faced: A terrifying threat emerging from the shadows of the past who's fueled by blood revenge, and who is determined to shatter this family and destroy everything—and everyone—that Dom loves, forever.",
+        "releaseDate": "2023-05-17",
+        "voteAverage": 6.985,
+        "posterPath": "https://image.tmdb.org/t/p/w500/fiVW06jE7z9YnO4trhaMEdclSiC.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/4XM8DUTQb3lhLemJC51Jx4a2EuA.jpg"
+      },
+      {
+        "id": 385128,
+        "title": "F9",
+        "overview": "Dominic Toretto and his crew battle the most skilled assassin and high-performance driver they've ever encountered: his forsaken brother.",
+        "releaseDate": "2021-05-19",
+        "voteAverage": 7.0,
+        "posterPath": "https://image.tmdb.org/t/p/w500/deEmLILTPejEb6OGsXRJ5MCvyDW.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/xXHZeb1yhJvnSHPzZDqee0zfMb6.jpg"
+      },
+      {
+        "id": 755679,
+        "title": "Fast Forever",
+        "overview": "The eleventh and final installment in The Fast Saga. Plot TBA.",
+        "releaseDate": "2028-03-16",
+        "voteAverage": 0.0,
+        "posterPath": "https://image.tmdb.org/t/p/w500/xaRzhQZ3zK5lN6vEetG8PD17KPF.jpg",
+        "backdropPath": null
+      },
+      {
+        "id": 384018,
+        "title": "Fast & Furious Presents: Hobbs & Shaw",
+        "overview": "Ever since US Diplomatic Security Service Agent Hobbs and lawless outcast Shaw first faced off, they just have traded smack talk and body blows. But when cyber-genetically enhanced anarchist Brixton's ruthless actions threaten the future of humanity, they join forces to defeat him.",
+        "releaseDate": "2019-07-31",
+        "voteAverage": 6.823,
+        "posterPath": "https://image.tmdb.org/t/p/w500/qRyy2UmjC5ur9bDi3kpNNRCc5nc.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/hpgda6P9GutvdkDX5MUJ92QG9aj.jpg"
+      }
+    ]
+  },
+  {
+    "id": 120794,
+    "name": "Batman Collection",
+    "overview": "The Batman Collection directed by Tim Burton and Joel Schumacher follows Bruce Wayne’s crusade against crime in Gotham. With iconic villains and stylized visuals, the series blends action, fantasy, and psychological depth to explore the duality of the masked vigilante.",
+    "posterPath": "https://image.tmdb.org/t/p/w500/31SwN5tZuJNsWTLx6DNNyQSAXdx.jpg",
+    "backdropPath": "https://image.tmdb.org/t/p/original/4UHZWw5lV3ZoadTjXuVOakdH32L.jpg",
+    "parts": [
+      {
+        "id": 268,
+        "title": "Batman",
+        "overview": "Having witnessed his parents' brutal murder as a child, millionaire philanthropist Bruce Wayne fights crime in Gotham City disguised as Batman, a costumed hero who strikes fear into the hearts of villains. But when a deformed madman known as 'The Joker' seizes control of Gotham's criminal underworld, Batman must face his most ruthless nemesis ever while protecting both his identity and his love interest, reporter Vicki Vale.",
+        "releaseDate": "1989-06-21",
+        "voteAverage": 7.233,
+        "posterPath": "https://image.tmdb.org/t/p/w500/cij4dd21v2Rk2YtUQbV5kW69WB2.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/rBN6GPKUDZ6ZKAQiEZegZ0DZb6V.jpg"
+      },
+      {
+        "id": 364,
+        "title": "Batman Returns",
+        "overview": "The monstrous Penguin, who dwells in the sewers beneath Gotham, joins up with corrupt mayoral candidate Max Shreck to topple the Batman once and for all. But when Shreck's timid assistant Selina Kyle finds out, and Shreck tries to kill her, she's transformed into the sexy Catwoman. She teams up with the Penguin and Shreck to destroy Batman, but sparks fly unexpectedly when she confronts the caped crusader.",
+        "releaseDate": "1992-06-19",
+        "voteAverage": 6.949,
+        "posterPath": "https://image.tmdb.org/t/p/w500/jKBjeXM7iBBV9UkUcOXx3m7FSHY.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/7x4SNxO5HWArighxxFeet5sn3il.jpg"
+      },
+      {
+        "id": 414,
+        "title": "Batman Forever",
+        "overview": "Batman faces off against two foes: the schizophrenic, horribly scarred former District Attorney Harvey Dent, aka Two-Face, and the Riddler, a disgruntled ex-Wayne Enterprises inventor seeking revenge against his former employer by unleashing his brain-sucking weapon on Gotham City's residents. As the caped crusader also copes with tortured memories of his parents' murder, he has a new romance, with psychologist Chase Meridian.",
+        "releaseDate": "1995-06-16",
+        "voteAverage": 5.5,
+        "posterPath": "https://image.tmdb.org/t/p/w500/i0fJS8M5UKoETjjJ0zwUiKaR8tr.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/snlu32RmjldF9b068UURJg8sQtn.jpg"
+      },
+      {
+        "id": 415,
+        "title": "Batman & Robin",
+        "overview": "Batman and his sidekick Robin attempt to the foil the sinister schemes of a deranged set of new villains, most notably the melancholy Mr. Freeze, who wants to make Gotham City into an arctic region, and the sultry Poison Ivy, a botanical femme fatale. As the Dynamic Duo contend with these bad guys, a third hero, Batgirl, joins the ranks of the city's crime-fighters.",
+        "releaseDate": "1997-06-20",
+        "voteAverage": 4.393,
+        "posterPath": "https://image.tmdb.org/t/p/w500/i7hEUpDuMN2LOrCEifFyGSHZQSY.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/kEuQWHte2erRpAICrYqkAZaZAAY.jpg"
+      }
+    ]
+  },
+  {
+    "id": 328,
+    "name": "Jurassic Park Collection",
+    "overview": "An American science fiction adventure film series based on the novel of the same name by Michael Crichton. The films center on the fictional Isla Nublar near Costa Rica in the Central American Pacific Coast, where a billionaire philanthropist and a small team of genetic scientists have created an amusement park of cloned dinosaurs.",
+    "posterPath": "https://image.tmdb.org/t/p/w500/qIm2nHXLpBBdMxi8dvfrnDkBUDh.jpg",
+    "backdropPath": "https://image.tmdb.org/t/p/original/njFixYzIxX8jsn6KMSEtAzi4avi.jpg",
+    "parts": [
+      {
+        "id": 329,
+        "title": "Jurassic Park",
+        "overview": "A wealthy entrepreneur secretly creates a theme park featuring living dinosaurs drawn from prehistoric DNA. Before opening day, he invites a team of experts and his two eager grandchildren to experience the park and help calm anxious investors. However, the park is anything but amusing as the security systems go off-line and the dinosaurs escape.",
+        "releaseDate": "1993-06-11",
+        "voteAverage": 7.976,
+        "posterPath": "https://image.tmdb.org/t/p/w500/63viWuPfYQjRYLSZSZNq7dglJP5.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/o7LzVmlOSYc3EspyVMC9bsTTARc.jpg"
+      },
+      {
+        "id": 330,
+        "title": "The Lost World: Jurassic Park",
+        "overview": "Four years after Jurassic Park's genetically bred dinosaurs ran amok, multimillionaire John Hammond shocks chaos theorist Ian Malcolm by revealing that he has been breeding more beasties at a secret location. Malcolm, his paleontologist ladylove and a wildlife videographer join an expedition to document the lethal lizards' natural behavior in this action-packed thriller.",
+        "releaseDate": "1997-05-23",
+        "voteAverage": 6.565,
+        "posterPath": "https://image.tmdb.org/t/p/w500/7st3JW0xpMAkwB3dYfv3iqAwD8Y.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/A4rYaPdzgocCjQ0n9LUSYUxyvpS.jpg"
+      },
+      {
+        "id": 331,
+        "title": "Jurassic Park III",
+        "overview": "In need of funds for research, Dr. Alan Grant accepts a large sum of money to accompany Paul and Amanda Kirby on an aerial tour of the infamous Isla Sorna. It isn't long before all hell breaks loose and the stranded wayfarers must fight for survival as a host of new -- and even more deadly -- dinosaurs try to make snacks of them.",
+        "releaseDate": "2001-07-18",
+        "voteAverage": 6.178,
+        "posterPath": "https://image.tmdb.org/t/p/w500/oQXj4NUfS3r3gHXtDOzcJgj1lLc.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/8v8x4vVbRgrsdU3M4drnD7HQbfe.jpg"
+      },
+      {
+        "id": 135397,
+        "title": "Jurassic World",
+        "overview": "Twenty-two years after the events of Jurassic Park, Isla Nublar now features a fully functioning dinosaur theme park, Jurassic World, as originally envisioned by John Hammond.",
+        "releaseDate": "2015-06-06",
+        "voteAverage": 6.703,
+        "posterPath": "https://image.tmdb.org/t/p/w500/rhr4y79GpxQF9IsfJItRXVaoGs4.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/dF6FjTZzRTENfB4R17HDN20jLT2.jpg"
+      },
+      {
+        "id": 351286,
+        "title": "Jurassic World: Fallen Kingdom",
+        "overview": "Three years after Jurassic World was destroyed, Isla Nublar now sits abandoned. When the island's dormant volcano begins roaring to life, Owen and Claire mount a campaign to rescue the remaining dinosaurs from this extinction-level event.",
+        "releaseDate": "2018-06-06",
+        "voteAverage": 6.526,
+        "posterPath": "https://image.tmdb.org/t/p/w500/x2Us3jR6ToMJjbcPbLimYoxf6xr.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/6WA9stUMbIkEPxn3D5SWlA8FIi7.jpg"
+      },
+      {
+        "id": 507086,
+        "title": "Jurassic World Dominion",
+        "overview": "Four years after Isla Nublar was destroyed, dinosaurs now live—and hunt—alongside humans all over the world. This fragile balance will reshape the future and determine, once and for all, whether human beings are to remain the apex predators on a planet they now share with history's most fearsome creatures.",
+        "releaseDate": "2022-06-01",
+        "voteAverage": 6.596,
+        "posterPath": "https://image.tmdb.org/t/p/w500/jbAvCACjLf1ZG0unB2tdmx5HAf1.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/698FjyzLdpgXmUSr63LaRwblTmx.jpg"
+      },
+      {
+        "id": 1234821,
+        "title": "Jurassic World Rebirth",
+        "overview": "Five years after the events of Jurassic World Dominion, covert operations expert Zora Bennett is contracted to lead a skilled team on a top-secret mission to secure genetic material from the world's three most massive dinosaurs. When Zora's operation intersects with a civilian family whose boating expedition was capsized, they all find themselves stranded on an island where they come face-to-face with a sinister, shocking discovery that's been hidden from the world for decades.",
+        "releaseDate": "2025-06-23",
+        "voteAverage": 6.26,
+        "posterPath": "https://image.tmdb.org/t/p/w500/1RICxzeoNCAO5NpcRMIgg1XT6fm.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/zNriRTr0kWwyaXPzdg1EIxf0BWk.jpg"
+      },
+      {
+        "id": 1714034,
+        "title": "Untitled Jurassic World Rebirth Sequel",
+        "overview": "Eighth installment in the Jurassic franchise, set to shoot in 2027. Plot details TBA.",
+        "releaseDate": "",
+        "voteAverage": 0.0,
+        "posterPath": null,
+        "backdropPath": null
+      }
+    ]
+  },
+  {
+    "id": 87096,
+    "name": "Avatar Collection",
+    "overview": "The Avatar Collection tells the story of the world of Pandora, inhabited by the indigenous humanoids, the Na'vi. The main protagonist, Jake Sully, is sent to Pandora as an avatar—a hybrid of human and Na'vi. During his mission, Jake discovers the beauty and complexity of the Na'vi world and forms a deep connection with the planet's inhabitants. The collection focuses on the conflict between humans and the Na'vi and the struggle to save the world of Pandora.",
+    "posterPath": "https://image.tmdb.org/t/p/w500/3C5brXxnBxfkeKWwA1Fh4xvy4wr.jpg",
+    "backdropPath": "https://image.tmdb.org/t/p/original/4uwX70EzaWVcGUXMtXPoexlNAff.jpg",
+    "parts": [
+      {
+        "id": 83533,
+        "title": "Avatar: Fire and Ash",
+        "overview": "In the wake of the devastating war against the RDA and the loss of their eldest son, Jake Sully and Neytiri face a new threat on Pandora: the Ash People, a violent and power-hungry Na'vi tribe led by the ruthless Varang. Jake's family must fight for their survival and the future of Pandora in a conflict that pushes them to their emotional and physical limits.",
+        "releaseDate": "2025-12-17",
+        "voteAverage": 7.7,
+        "posterPath": "https://image.tmdb.org/t/p/w500/bRBeSHfGHwkEpImlhxPmOcUsaeg.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/sdZSjtGUTSN8B3al5o0f2WoQfQQ.jpg"
+      },
+      {
+        "id": 19995,
+        "title": "Avatar",
+        "overview": "In the 22nd century, a paraplegic Marine is dispatched to the moon Pandora on a unique mission, but becomes torn between following orders and protecting an alien civilization.",
+        "releaseDate": "2009-12-16",
+        "voteAverage": 7.609,
+        "posterPath": "https://image.tmdb.org/t/p/w500/gKY6q7SjCkAU6FqvqWybDYgUKIF.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/vL5LR6WdxWPjLPFRLe133jXWsh5.jpg"
+      },
+      {
+        "id": 76600,
+        "title": "Avatar: The Way of Water",
+        "overview": "Set more than a decade after the events of the first film, learn the story of the Sully family (Jake, Neytiri, and their kids), the trouble that follows them, the lengths they go to keep each other safe, the battles they fight to stay alive, and the tragedies they endure.",
+        "releaseDate": "2022-12-14",
+        "voteAverage": 7.588,
+        "posterPath": "https://image.tmdb.org/t/p/w500/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/kJsPVzdyBrYHLomuNv5SJDXUQ2f.jpg"
+      },
+      {
+        "id": 216527,
+        "title": "Avatar 4",
+        "overview": "The fourth installment of the franchise. Plot TBA.",
+        "releaseDate": "2029-12-19",
+        "voteAverage": 0.0,
+        "posterPath": "https://image.tmdb.org/t/p/w500/qzMYKnT4MG1d0gnhwytr4cKhUvS.jpg",
+        "backdropPath": null
+      },
+      {
+        "id": 393209,
+        "title": "Avatar 5",
+        "overview": "The fifth installment of the franchise. Plot TBA.",
+        "releaseDate": "2031-12-17",
+        "voteAverage": 0.0,
+        "posterPath": "https://image.tmdb.org/t/p/w500/rtmmvqkIC5zDMEd638Es2woxbz8.jpg",
+        "backdropPath": null
+      }
+    ]
+  },
+  {
+    "id": 86066,
+    "name": "Despicable Me Collection",
+    "overview": "The Despicable Me franchise centers on Gru, a super-villain (who later becomes a dad and superhero); his yellow-coloured Minions; and his three orphan girls, Margo, Edith and Agnes.",
+    "posterPath": "https://image.tmdb.org/t/p/w500/xIXhIlZDRmSSfNbpN7kBCm5hg39.jpg",
+    "backdropPath": "https://image.tmdb.org/t/p/original/37xamYKRUGCRux532lKcZdVGYuR.jpg",
+    "parts": [
+      {
+        "id": 20352,
+        "title": "Despicable Me",
+        "overview": "Determined to prove he's the world's greatest supervillain, Gru hatches an audacious plan to steal the Moon. To pull it off, he adopts three orphaned girls—Margo, Edith, and Agnes—intending to use them as pawns in his scheme. But the unexpected bond they form forces him to question the criminal life he's always known.",
+        "releaseDate": "2010-07-08",
+        "voteAverage": 7.26,
+        "posterPath": "https://image.tmdb.org/t/p/w500/b1BT309QWjtFUlJPLmXmrcHOWEL.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/2XSeKDmIa2KxaiJy4J9e8FrIZhk.jpg"
+      },
+      {
+        "id": 93456,
+        "title": "Despicable Me 2",
+        "overview": "Gru is recruited by the Anti-Villain League to help deal with a powerful new super criminal.",
+        "releaseDate": "2013-06-26",
+        "voteAverage": 6.948,
+        "posterPath": "https://image.tmdb.org/t/p/w500/5Fh4NdoEnCjCK9wLjdJ9DJNFl2b.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/uD267eSiACfWLxp47t3gYymOQRj.jpg"
+      },
+      {
+        "id": 324852,
+        "title": "Despicable Me 3",
+        "overview": "Gru and his wife Lucy must stop former '80s child star Balthazar Bratt from achieving world domination.",
+        "releaseDate": "2017-06-15",
+        "voteAverage": 6.469,
+        "posterPath": "https://image.tmdb.org/t/p/w500/e72KCMHNkbZ6USRJmABeqwmaJ5n.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/ftRkFtAGuHngHnLiOxktq0aCVMF.jpg"
+      },
+      {
+        "id": 519182,
+        "title": "Despicable Me 4",
+        "overview": "Gru and Lucy and their girls—Margo, Edith and Agnes—welcome a new member to the Gru family, Gru Jr., who is intent on tormenting his dad. Gru also faces a new nemesis in Maxime Le Mal and his femme fatale girlfriend Valentina, forcing the family to go on the run.",
+        "releaseDate": "2024-06-20",
+        "voteAverage": 6.97,
+        "posterPath": "https://image.tmdb.org/t/p/w500/wWba3TaojhK7NdycRhoQpsG0FaH.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/twsxsfao6ZOVvT8LfudH603MMi6.jpg"
+      }
+    ]
+  },
+  {
+    "id": 8650,
+    "name": "Transformers Collection",
+    "overview": "The Transformers series follows the continuing battle between the Autobots and the Decepticons and ultimately, the triumph of good over evil. This collection includes theatrically released films of the Transformers saga only.",
+    "posterPath": "https://image.tmdb.org/t/p/w500/nnFgBA6nR0pHorxdFaDvdY4nVHL.jpg",
+    "backdropPath": "https://image.tmdb.org/t/p/original/zvZBNNDWd5LcsIBpDhJyCB2MDT7.jpg",
+    "parts": [
+      {
+        "id": 1858,
+        "title": "Transformers",
+        "overview": "Young teenager Sam Witwicky becomes involved in the ancient struggle between two extraterrestrial factions of transforming robots – the heroic Autobots and the evil Decepticons. Sam holds the clue to unimaginable power and the Decepticons will stop at nothing to retrieve it.",
+        "releaseDate": "2007-06-27",
+        "voteAverage": 6.845,
+        "posterPath": "https://image.tmdb.org/t/p/w500/lkZ9gqCEjzX85lKR6Jjd1uGAXNp.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/iCDMBi6WLjUBnt24dNwHqqF81UL.jpg"
+      },
+      {
+        "id": 8373,
+        "title": "Transformers: Revenge of the Fallen",
+        "overview": "Sam Witwicky leaves the Autobots behind for a normal life. But when his mind is filled with cryptic symbols, the Decepticons target him and he is dragged back into the Transformers' war.",
+        "releaseDate": "2009-06-19",
+        "voteAverage": 6.224,
+        "posterPath": "https://image.tmdb.org/t/p/w500/pLBb0whOzVDtJvyD4DPeQyQNOqp.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/bH1bhjn37uA1zOPvyHbzJSvza7v.jpg"
+      },
+      {
+        "id": 38356,
+        "title": "Transformers: Dark of the Moon",
+        "overview": "The Autobots continue to work for NEST, now no longer in secret. But after discovering a strange artifact during a mission in Chernobyl, it becomes apparent to Optimus Prime that the United States government has been less than forthright with them.",
+        "releaseDate": "2011-06-28",
+        "voteAverage": 6.239,
+        "posterPath": "https://image.tmdb.org/t/p/w500/28YlCLrFhONteYSs9hKjD1Km0Cj.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/h3js4rulxzKMOokM2oO5Kr0mBZU.jpg"
+      },
+      {
+        "id": 91314,
+        "title": "Transformers: Age of Extinction",
+        "overview": "As humanity picks up the pieces after the battle of Chicago, a shadowy group reveals itself in an attempt to control the direction of history…while an ancient, powerful new menace sets Earth in its crosshairs. With help from Cade Yeager, Optimus Prime and the Autobots rise to meet their most fearsome challenge yet.",
+        "releaseDate": "2014-06-25",
+        "voteAverage": 5.971,
+        "posterPath": "https://image.tmdb.org/t/p/w500/jyzrfx2WaeY60kYZpPYepSjGz4S.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/wxr4Z6E83h14CogsZOzDm1vuDX3.jpg"
+      },
+      {
+        "id": 335988,
+        "title": "Transformers: The Last Knight",
+        "overview": "Humans and Transformers are at war. Optimus Prime is gone. The key to saving our future lies buried in the secrets of the past, in the hidden history of Transformers on Earth. Saving our world falls upon the shoulders of an unlikely alliance: Cade Yeager; Bumblebee; an English Lord; and an Oxford Professor.",
+        "releaseDate": "2017-06-16",
+        "voteAverage": 6.062,
+        "posterPath": "https://image.tmdb.org/t/p/w500/s5HQf2Gb3lIO2cRcFwNL9sn1o1o.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/1n00NlOGRFZVs8coBxyZLm5l4EC.jpg"
+      }
+    ]
+  },
+  {
+    "id": 87359,
+    "name": "Mission: Impossible Collection",
+    "overview": "Mission: Impossible is a series of a secret agent thriller films based on the popular 1966–73 television series. They chronicle the missions of a team of secret government agents known as the Impossible Missions Force (IMF) under the leadership of agent Ethan Hunt.",
+    "posterPath": "https://image.tmdb.org/t/p/w500/geEjCGfdmRAA1skBPwojcdvnZ8A.jpg",
+    "backdropPath": "https://image.tmdb.org/t/p/original/mroWh717g0Ah2c0rrPGW6f3EWMM.jpg",
+    "parts": [
+      {
+        "id": 954,
+        "title": "Mission: Impossible",
+        "overview": "When Ethan Hunt, the leader of a crack espionage team whose perilous operation has gone awry with no explanation, discovers that a mole has penetrated the CIA, he's surprised to learn that he's the prime suspect. To clear his name, Hunt now must ferret out the real double agent and, in the process, even the score.",
+        "releaseDate": "1996-05-22",
+        "voteAverage": 7.027,
+        "posterPath": "https://image.tmdb.org/t/p/w500/l5uxY5m5OInWpcExIpKG6AR3rgL.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/sra8XnL96OyLHENcglmZJg6HA8z.jpg"
+      },
+      {
+        "id": 955,
+        "title": "Mission: Impossible II",
+        "overview": "With computer genius Luther Stickell at his side and a beautiful thief on his mind, agent Ethan Hunt races across Australia and Spain to stop a former IMF agent from unleashing a genetically engineered biological weapon called Chimera. This mission, should Hunt choose to accept it, plunges him into the center of an international crisis of terrifying magnitude.",
+        "releaseDate": "2000-05-24",
+        "voteAverage": 6.138,
+        "posterPath": "https://image.tmdb.org/t/p/w500/hfnrual76gPeNFduhD4xzHWpfTw.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/24DZfupDlhXeTchmcOkoGRhP5Vg.jpg"
+      },
+      {
+        "id": 956,
+        "title": "Mission: Impossible III",
+        "overview": "Retired from active duty, and training recruits for the Impossible Mission Force, agent Ethan Hunt faces the toughest foe of his career: Owen Davian, an international broker of arms and information, who's as cunning as he is ruthless. Davian emerges to threaten Hunt and all that he holds dear – including the woman Hunt loves.",
+        "releaseDate": "2006-04-25",
+        "voteAverage": 6.767,
+        "posterPath": "https://image.tmdb.org/t/p/w500/vKGYCpmQyV9uHybWDzXuII8Los5.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/bYKeB9uUcPmvikjouEEQ86uvPw9.jpg"
+      },
+      {
+        "id": 56292,
+        "title": "Mission: Impossible - Ghost Protocol",
+        "overview": "Ethan Hunt and his team are racing against time to track down a dangerous terrorist named Hendricks, who has gained access to Russian nuclear launch codes and is planning a strike on the United States. An attempt to stop him ends in an explosion causing severe destruction to the Kremlin and the IMF to be implicated in the bombing, forcing the President to disavow them. No longer being aided by the government, Ethan and his team chase Hendricks around the globe, although they might still be too late to stop a disaster.",
+        "releaseDate": "2011-12-07",
+        "voteAverage": 7.115,
+        "posterPath": "https://image.tmdb.org/t/p/w500/eRZTGx7GsiKqPch96k27LK005ZL.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/ih4lZkUpmSE7AP3maymiO72xJ1z.jpg"
+      },
+      {
+        "id": 177677,
+        "title": "Mission: Impossible - Rogue Nation",
+        "overview": "Ethan and team take on their most impossible mission yet—eradicating 'The Syndicate', an International and highly-skilled rogue organization committed to destroying the IMF.",
+        "releaseDate": "2015-07-28",
+        "voteAverage": 7.224,
+        "posterPath": "https://image.tmdb.org/t/p/w500/fRJLXQBHK2wyznK5yZbO7vmsuVK.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/vYIUN5rrCncHFY8WvcuXQlM4hk5.jpg"
+      },
+      {
+        "id": 353081,
+        "title": "Mission: Impossible - Fallout",
+        "overview": "When an IMF mission ends badly, the world is faced with dire consequences. As Ethan Hunt takes it upon himself to fulfill his original briefing, the CIA begin to question his loyalty and his motives. The IMF team find themselves in a race against time, hunted by assassins while trying to prevent a global catastrophe.",
+        "releaseDate": "2018-07-25",
+        "voteAverage": 7.45,
+        "posterPath": "https://image.tmdb.org/t/p/w500/AkJQpZp9WoNdj7pLYSj1L0RcMMN.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/3IzR3VhZAyhxVnuRRUHFLkfK4hT.jpg"
+      },
+      {
+        "id": 575265,
+        "title": "Mission: Impossible - The Final Reckoning",
+        "overview": "Ethan Hunt and team continue their search for the terrifying AI known as the Entity — which has infiltrated intelligence networks all over the globe — with the world's governments and a mysterious ghost from Hunt's past on their trail. Joined by new allies and armed with the means to shut the Entity down for good, Hunt is in a race against time to prevent the world as we know it from changing forever.",
+        "releaseDate": "2025-05-17",
+        "voteAverage": 7.2,
+        "posterPath": "https://image.tmdb.org/t/p/w500/iKPsC9EFUafRP9SrUznI61getVP.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/538U9snNc2fpnOmYXAPUh3zn31H.jpg"
+      },
+      {
+        "id": 575264,
+        "title": "Mission: Impossible - Dead Reckoning Part One",
+        "overview": "Ethan Hunt and his IMF team embark on their most dangerous mission yet: To track down a terrifying new weapon that threatens all of humanity before it falls into the wrong hands. With control of the future and the world's fate at stake and dark forces from Ethan's past closing in, a deadly race around the globe begins. Confronted by a mysterious, all-powerful enemy, Ethan must consider that nothing can matter more than his mission—not even the lives of those he cares about most.",
+        "releaseDate": "2023-07-08",
+        "voteAverage": 7.502,
+        "posterPath": "https://image.tmdb.org/t/p/w500/NNxYkU70HPurnNCSiCjYAmacwm.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/628Dep6AxEtDxjZoGP78TsOxYbK.jpg"
+      }
+    ]
+  },
+  {
+    "id": 295,
+    "name": "Pirates of the Caribbean Collection",
+    "overview": "A series of fantasy swashbuckler films based on Walt Disney's theme park ride of the same name. The films follow the adventures of Captain Jack Sparrow and take place in a world ruled by the British Empire, the East India Trading Company and the Spanish Empire, with pirates representing freedom from the ruling powers.",
+    "posterPath": "https://image.tmdb.org/t/p/w500/zRBaZxS5YauLvRYjAdL4AUCwlht.jpg",
+    "backdropPath": "https://image.tmdb.org/t/p/original/wxgD3fB5lQ2sGJLog0rvXW049Pf.jpg",
+    "parts": [
+      {
+        "id": 22,
+        "title": "Pirates of the Caribbean: The Curse of the Black Pearl",
+        "overview": "When wily pirate Captain Barbossa seizes Jack Sparrow’s beloved ship, the Black Pearl, and kidnaps the governor’s daughter, Elizabeth Swann, blacksmith Will Turner reluctantly teams up with the unpredictable pirate Jack to rescue her—only to uncover a terrifying curse that turns Barbossa’s crew into the undead.",
+        "releaseDate": "2003-07-09",
+        "voteAverage": 7.834,
+        "posterPath": "https://image.tmdb.org/t/p/w500/poHwCZeWzJCShH7tOjg8RIoyjcw.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/uRNgkJSkNBFbbn9fPsEjDIy8Sh3.jpg"
+      },
+      {
+        "id": 58,
+        "title": "Pirates of the Caribbean: Dead Man's Chest",
+        "overview": "Captain Jack Sparrow’s got a blood debt to pay: he owes his soul to the legendary Davy Jones, ghastly Ruler of the Ocean Depths. To escape eternal servitude aboard the Flying Dutchman, ever-crafty Jack must track down the still-beating heart of Jones. But he won’t do it alone: Will Turner and Elizabeth Swann are drawn back into another one of his perilous quests—assuming they can evade execution for aiding a pirate.",
+        "releaseDate": "2006-07-06",
+        "voteAverage": 7.39,
+        "posterPath": "https://image.tmdb.org/t/p/w500/uXEqmloGyP7UXAiphJUu2v2pcuE.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/vr6n6ZFUZvedvIlhfYcbCWcaKyW.jpg"
+      },
+      {
+        "id": 285,
+        "title": "Pirates of the Caribbean: At World's End",
+        "overview": "After losing Captain Jack Sparrow to the locker of Davy Jones, Will Turner, Elizabeth Swann, and Captain Barbossa journey to the ends of the earth to rescue him. And as the East India Trading Company tightens its grip on the seas under Lord Cutler Beckett—now in control of Davy Jones—the fate of piracy hangs by a thread. Now, they must unite the pirate lords for one final stand. But as loyalties are tested and alliances shift, each must ultimately choose where they stand in the battle for freedom on the high seas.",
+        "releaseDate": "2007-05-19",
+        "voteAverage": 7.278,
+        "posterPath": "https://image.tmdb.org/t/p/w500/jGWpG4YhpQwVmjyHEGkxEkeRf0S.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/1jHxkVXMI5s3vRiyiZooUy1shB5.jpg"
+      },
+      {
+        "id": 1865,
+        "title": "Pirates of the Caribbean: On Stranger Tides",
+        "overview": "When Jack crosses paths with a woman from his past, he's not sure if it's love...or if she's a ruthless con artist using him to find the fabled Fountain of Youth.",
+        "releaseDate": "2011-05-15",
+        "voteAverage": 6.6,
+        "posterPath": "https://image.tmdb.org/t/p/w500/keGfSvCmYj7CvdRx36OdVrAEibE.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/uzIGtyS6bbnJzGsPL93WCF1FWm8.jpg"
+      },
+      {
+        "id": 166426,
+        "title": "Pirates of the Caribbean: Dead Men Tell No Tales",
+        "overview": "Thrust into an all-new adventure, a down-on-his-luck Capt. Jack Sparrow feels the winds of ill-fortune blowing even more strongly when deadly ghost sailors led by his old nemesis, the evil Capt. Salazar, escape from the Devil's Triangle. Jack's only hope of survival lies in seeking out the legendary Trident of Poseidon, but to find it, he must forge an uneasy alliance with a brilliant and beautiful astronomer and a headstrong young man in the British navy.",
+        "releaseDate": "2017-05-23",
+        "voteAverage": 6.664,
+        "posterPath": "https://image.tmdb.org/t/p/w500/6lAPOAFYFWIO3SQRemEY2wInQMC.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/7C921eWK06n12c1miRXnYoEu5Yv.jpg"
+      }
+    ]
+  },
+  {
+    "id": 10194,
+    "name": "Toy Story Collection",
+    "overview": "Toy Story is a CGI animated media franchise created by Pixar and distributed by Walt Disney Pictures. The franchise is based on the anthropomorphic concept that all toys, unknown to humans, are secretly alive, and the films focus on a diverse group of toys that feature a classic cowboy named Sheriff Woody and a modern spaceman named Buzz Lightyear. The group unexpectedly embark on adventures that challenge and change them.  The collection currently includes Toy Story 1-5.",
+    "posterPath": "https://image.tmdb.org/t/p/w500/rki5qLuwb0xnnE9seehxO9TlLhW.jpg",
+    "backdropPath": "https://image.tmdb.org/t/p/original/hApclyB9NEZEQujAVajzi5iWE4a.jpg",
+    "parts": [
+      {
+        "id": 862,
+        "title": "Toy Story",
+        "overview": "Led by Woody, Andy's toys live happily in his room until Andy's birthday brings Buzz Lightyear onto the scene. Afraid of losing his place in Andy's heart, Woody plots against Buzz. But when circumstances separate Buzz and Woody from their owner, the duo eventually learns to put aside their differences.",
+        "releaseDate": "1995-11-22",
+        "voteAverage": 7.987,
+        "posterPath": "https://image.tmdb.org/t/p/w500/uXDfjJbdP4ijW5hWSBrPrlKpxab.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/3Rfvhy1Nl6sSGJwyjb0QiZzZYlB.jpg"
+      },
+      {
+        "id": 863,
+        "title": "Toy Story 2",
+        "overview": "Andy heads off to Cowboy Camp, leaving his toys to their own devices. Things shift into high gear when an obsessive toy collector named Al McWhiggen, owner of Al's Toy Barn kidnaps Woody. Andy's toys mount a daring rescue mission, Buzz Lightyear meets his match and Woody has to decide where he and his heart truly belong.",
+        "releaseDate": "1999-10-30",
+        "voteAverage": 7.619,
+        "posterPath": "https://image.tmdb.org/t/p/w500/4rbcp3ng8n1MKHjpeqW0L7Fnpzz.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/7iUDfakacY1HpajP1DtHrCuDB95.jpg"
+      },
+      {
+        "id": 10193,
+        "title": "Toy Story 3",
+        "overview": "Woody, Buzz, and the rest of Andy's toys haven't been played with in years. With Andy about to go to college, the gang find themselves accidentally left at a nefarious day care center. The toys must band together to escape and return home to Andy.",
+        "releaseDate": "2010-06-16",
+        "voteAverage": 7.816,
+        "posterPath": "https://image.tmdb.org/t/p/w500/AbbXspMOwdvwWZgVN0nabZq03Ec.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/uAfhsySkr1UzQg1zdg3dZQRz9Fd.jpg"
+      },
+      {
+        "id": 301528,
+        "title": "Toy Story 4",
+        "overview": "Woody has always been confident about his place in the world, devoted to taking care of his kid—whether that's Andy or Bonnie. But after Bonnie creates a reluctant new toy called \"Forky\", a road trip adventure alongside old and new friends challenges everything Woody believes about loyalty, purpose, and what it truly means to be a toy.",
+        "releaseDate": "2019-06-19",
+        "voteAverage": 7.464,
+        "posterPath": "https://image.tmdb.org/t/p/w500/w9kR8qbmQ01HwnvK4alvnQ2ca0L.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/q62bpQ67qaXY0u6b2wFEnQYIbPd.jpg"
+      },
+      {
+        "id": 1084244,
+        "title": "Toy Story 5",
+        "overview": "When Bonnie receives a Lilypad tablet as a gift and becomes obsessed, Buzz, Woody, Jessie and the rest of the gang's jobs become exponentially harder when they have to go head to head with the all-new threat to playtime.",
+        "releaseDate": "2026-06-17",
+        "voteAverage": 8.308,
+        "posterPath": "https://image.tmdb.org/t/p/w500/sfQtVlIHljToOwYjhe21KPGzZWK.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/8sSKdEmlmqF4kJUd28SqthXC4yZ.jpg"
+      }
+    ]
+  },
+  {
+    "id": 2150,
+    "name": "Shrek Collection",
+    "overview": "The fairytale story of a large, strong, solitude-loving, intimidating ogre named Shrek, and his friends.",
+    "posterPath": "https://image.tmdb.org/t/p/w500/qNHZMe92A7Pyl46qUH29hVOtbSK.jpg",
+    "backdropPath": "https://image.tmdb.org/t/p/original/lhsd1zCsq5UquvcNalmhuddV3tI.jpg",
+    "parts": [
+      {
+        "id": 808,
+        "title": "Shrek",
+        "overview": "It ain't easy bein' green -- especially if you're a likable (albeit smelly) ogre named Shrek. On a mission to retrieve a gorgeous princess from the clutches of a fire-breathing dragon, Shrek teams up with an unlikely compatriot -- a wisecracking donkey.",
+        "releaseDate": "2001-05-18",
+        "voteAverage": 7.777,
+        "posterPath": "https://image.tmdb.org/t/p/w500/iB64vpL3dIObOtMZgX3RqdVdQDc.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/w0eKUOEog2ImtktCHAMUZws8qif.jpg"
+      },
+      {
+        "id": 809,
+        "title": "Shrek 2",
+        "overview": "Happily ever after never seemed so far far away when a trip to meet the in-laws turns into a hilariously twisted adventure for Shrek and Fiona. With the help of ever-faithful Donkey, Shrek takes on the potion-brewing Fairy Godmother, pompous Prince Charming, and infamous ogre-killer Puss In Boots.",
+        "releaseDate": "2004-05-19",
+        "voteAverage": 7.328,
+        "posterPath": "https://image.tmdb.org/t/p/w500/2yYP0PQjG8zVqturh1BAqu2Tixl.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/8ohobj5lAIbl5XWw11FywS3IRrS.jpg"
+      },
+      {
+        "id": 810,
+        "title": "Shrek the Third",
+        "overview": "After the King of Far Far Away dies, Shrek and Fiona are to succede. However, Shrek wants to return to his cozy swamp and live in peace and quiet, so when he finds out there is another heir to the throne, he and Donkey set off to bring him back to rule the kingdom.",
+        "releaseDate": "2007-05-17",
+        "voteAverage": 6.314,
+        "posterPath": "https://image.tmdb.org/t/p/w500/n4SexGGQzI26E269tfpa80MZaGV.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/wvXxKpFGXvQJRB0nvvfURhRD3C0.jpg"
+      },
+      {
+        "id": 10192,
+        "title": "Shrek Forever After",
+        "overview": "A midlife-crisis burdened Shrek, longing for the days of when he felt like a real ogre, makes a pact with magic deal-maker Rumpelstiltskin. But when he's duped and sent to a twisted version of Far Far Away—where Rumpelstiltskin is king, ogres are hunted, and he and Fiona have never met—he sets out to restore his world and reclaim his true love.",
+        "releaseDate": "2010-05-16",
+        "voteAverage": 6.413,
+        "posterPath": "https://image.tmdb.org/t/p/w500/6HrfPZtKcGmX2tUWW3cnciZTaSD.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/uzzTystB8lL0mRDII5Sfs5HxgkI.jpg"
+      },
+      {
+        "id": 421892,
+        "title": "Shrek 5",
+        "overview": "Shrek and Donkey team up for another whirlwind, big-city adventure, this time in the magical city of Further Further Away.",
+        "releaseDate": "2027-06-30",
+        "voteAverage": 0.0,
+        "posterPath": "https://image.tmdb.org/t/p/w500/zVGvsXptUWd1PgptipLNoIQYytW.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/wHbZr627WHFPMpfskRwX6NBgjxv.jpg"
+      }
+    ]
+  },
+  {
+    "id": 8537,
+    "name": "Superman Collection",
+    "overview": "DC Comics' Superman franchise, based on the character of the same name created by Jerry Siegel and Joe Shuster in June 1938, has seen the release of various films since its inception.",
+    "posterPath": "https://image.tmdb.org/t/p/w500/k1d3n4TJAGTF90x93QhL9jKUaXv.jpg",
+    "backdropPath": "https://image.tmdb.org/t/p/original/la0EhOrgVAiY8sf3ILz3wgoaNXH.jpg",
+    "parts": [
+      {
+        "id": 1924,
+        "title": "Superman",
+        "overview": "Mild-mannered Clark Kent works as a reporter at the Daily Planet alongside his crush, Lois Lane. Clark must summon his superhero alter-ego when the nefarious Lex Luthor launches a plan to take over the world.",
+        "releaseDate": "1978-12-14",
+        "voteAverage": 7.166,
+        "posterPath": "https://image.tmdb.org/t/p/w500/d7px1FQxW4tngdACVRsCSaZq0Xl.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/p2zBTOd4JdmNhkRWHmjKg7hk3s1.jpg"
+      },
+      {
+        "id": 9531,
+        "title": "Superman III",
+        "overview": "Aiming to defeat the Man of Steel, wealthy executive Ross Webster hires bumbling but brilliant Gus Gorman to develop synthetic kryptonite, which yields some unexpected psychological effects. Between rekindling romance with his high school sweetheart and saving himself, Superman must contend with a powerful supercomputer.",
+        "releaseDate": "1983-06-17",
+        "voteAverage": 5.51,
+        "posterPath": "https://image.tmdb.org/t/p/w500/c4oR6qgZW2s5foGkQi2Dd86KuAS.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/ui3oiC5mdwxTPZSLBvqoBqckTQ4.jpg"
+      },
+      {
+        "id": 8536,
+        "title": "Superman II",
+        "overview": "Three Kryptonian criminals led by General Zod team up with Lex Luthor to conquer Earth, forcing a depowered Superman to regain his strength and stop them.",
+        "releaseDate": "1980-12-04",
+        "voteAverage": 6.761,
+        "posterPath": "https://image.tmdb.org/t/p/w500/3xk5cno9BHcnwc97XO9k21aI1Zi.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/e77VeVcrXhxfCdJWD9rameYn7Qn.jpg"
+      },
+      {
+        "id": 11411,
+        "title": "Superman IV: The Quest for Peace",
+        "overview": "With global superpowers engaged in an increasingly hostile arms race, Superman leads a crusade to rid the world of nuclear weapons. But Lex Luthor, recently sprung from jail, is declaring war on the Man of Steel and his quest to save the planet. Using a strand of Superman's hair, Luthor synthesizes a powerful ally known as Nuclear Man and ignites an epic battle spanning Earth and space.",
+        "releaseDate": "1987-07-24",
+        "voteAverage": 4.603,
+        "posterPath": "https://image.tmdb.org/t/p/w500/nJFBeU1oKIaIoLVyQYUeB36DW55.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/pMNlspaO16rf3eBlqrCwaKFOUlz.jpg"
+      }
+    ]
+  },
+  {
+    "id": 33514,
+    "name": "Twilight Collection",
+    "overview": "The Twilight movies are a romantic fantasy vampire series based on the series of novels by Stephenie Meyer.",
+    "posterPath": "https://image.tmdb.org/t/p/w500/3PlBwwizkPDZITeIPUlXQCejeQD.jpg",
+    "backdropPath": "https://image.tmdb.org/t/p/original/3be0BffeZTyMbj4Ndzo6Y877SBQ.jpg",
+    "parts": [
+      {
+        "id": 8966,
+        "title": "Twilight",
+        "overview": "When Bella Swan moves to a small town in the Pacific Northwest, she falls in love with Edward Cullen, a mysterious classmate who reveals himself to be a 108-year-old vampire. Despite Edward's repeated cautions, Bella can't stay away from him, a fatal move that endangers her own life.",
+        "releaseDate": "2008-11-20",
+        "voteAverage": 6.275,
+        "posterPath": "https://image.tmdb.org/t/p/w500/3Gkb6jm6962ADUPaCBqzz9CTbn9.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/weAYfu6FfrNxEDJ3xH1XpgQcqUv.jpg"
+      },
+      {
+        "id": 18239,
+        "title": "The Twilight Saga: New Moon",
+        "overview": "Forks, Washington resident Bella Swan is reeling from the departure of her vampire love, Edward Cullen, and finds comfort in her friendship with Jacob Black, a werewolf. But before she knows it, she's thrust into a centuries-old conflict, and her desire to be with Edward at any cost leads her to take greater and greater risks.",
+        "releaseDate": "2009-11-18",
+        "voteAverage": 5.986,
+        "posterPath": "https://image.tmdb.org/t/p/w500/k2qTooPlHffgNABNWxeJdGMglPK.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/dF2c20sRDgySZLaLS2OUerL07sz.jpg"
+      },
+      {
+        "id": 50619,
+        "title": "The Twilight Saga: Breaking Dawn - Part 1",
+        "overview": "Bella Swan and Edward Cullen's honeymoon phase is abruptly disrupted by betrayals and unforeseen tragedies that endanger their world.",
+        "releaseDate": "2011-11-16",
+        "voteAverage": 6.2,
+        "posterPath": "https://image.tmdb.org/t/p/w500/qs8LsHKYlVRmJbFUiSUhhRAygwj.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/iPqoeXEfByDN399PQQ42IJHV2kN.jpg"
+      },
+      {
+        "id": 50620,
+        "title": "The Twilight Saga: Breaking Dawn - Part 2",
+        "overview": "After the birth of Renesmee, the Cullens gather other vampire clans in order to protect the child from a false allegation that puts the family in front of the Volturi.",
+        "releaseDate": "2012-11-13",
+        "voteAverage": 6.452,
+        "posterPath": "https://image.tmdb.org/t/p/w500/7IGdPaKujv0BjI0Zd0m0a4CzEjJ.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/qkl57wzSFrpi2sRpoc2mZJbMuLP.jpg"
+      },
+      {
+        "id": 24021,
+        "title": "The Twilight Saga: Eclipse",
+        "overview": "Bella once again finds herself surrounded by danger as Seattle is ravaged by a string of mysterious killings and a malicious vampire continues her quest for revenge. In the midst of it all, she is forced to choose between her love for Edward and her friendship with Jacob, knowing that her decision has the potential to ignite the ageless struggle between vampire and werewolf. With her graduation quickly approaching, Bella is confronted with the most important decision of her life.",
+        "releaseDate": "2010-06-23",
+        "voteAverage": 6.187,
+        "posterPath": "https://image.tmdb.org/t/p/w500/dK4Gi1UdMiHzHc7r7CZQG4IQ9Sr.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/yiWfT2Bl1Nul3Xie39Ahs3FqSjA.jpg"
+      }
+    ]
+  },
+  {
+    "id": 94032,
+    "name": "The Lion King Collection",
+    "overview": "The film franchise mainly revolves about a pride of lions who oversee a large swath of African savanna as their «kingdom» known as the Pride Lands, with their leader Simba watching over it as «king». In the original film, Simba was tricked into thinking he killed his father, a guilt ridden lion cub flees into exile and abandons his identity as the future King.",
+    "posterPath": "https://image.tmdb.org/t/p/w500/oG1heUs503GV6xBnFhgyYTGWm05.jpg",
+    "backdropPath": "https://image.tmdb.org/t/p/original/A9IEaj9cPAwEgFnTmteB70oxgJY.jpg",
+    "parts": [
+      {
+        "id": 11430,
+        "title": "The Lion King 1½",
+        "overview": "Timon the meerkat and Pumbaa the warthog are best pals and the unsung heroes of the African savanna. This prequel to the smash Disney animated adventure takes you back -- way back -- before Simba's adventure began. You'll find out all about Timon and Pumbaa and tag along as they search for the perfect home and attempt to raise a rambunctious lion cub.",
+        "releaseDate": "2004-10-28",
+        "voteAverage": 6.586,
+        "posterPath": "https://image.tmdb.org/t/p/w500/u2hN0WT7Dz46HfhQbr6uzSYfVW4.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/3eQnD9CIUerbXbgtFE1zJNvEVVo.jpg"
+      },
+      {
+        "id": 9732,
+        "title": "The Lion King II: Simba's Pride",
+        "overview": "The circle of life continues for Simba, now fully grown and in his rightful place as the king of Pride Rock. Simba and Nala have given birth to a daughter, Kiara who's as rebellious as her father was. But Kiara drives her parents to distraction when she catches the eye of Kovu, the son of the evil lioness, Zira. Will Kovu steal Kiara's heart?",
+        "releaseDate": "1998-10-24",
+        "voteAverage": 6.941,
+        "posterPath": "https://image.tmdb.org/t/p/w500/sWR1x6UCMCGN9xEf8RGhPS934X0.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/vyOFlV1afDHb9MMwJVyON4qXbvC.jpg"
+      },
+      {
+        "id": 8587,
+        "title": "The Lion King",
+        "overview": "Young lion prince Simba, eager to one day become king of the Pride Lands, grows up under the watchful eye of his father Mufasa; all the while his villainous uncle Scar conspires to take the throne for himself. Amid betrayal and tragedy, Simba must confront his past and find his rightful place in the Circle of Life.",
+        "releaseDate": "1994-06-15",
+        "voteAverage": 8.251,
+        "posterPath": "https://image.tmdb.org/t/p/w500/sKCr78MXSLixwmZ8DyJLrpMsd15.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/q00H8EqULYSK74lgevMkhmGGLHn.jpg"
+      }
+    ]
+  },
+  {
+    "id": 131635,
+    "name": "The Hunger Games Collection",
+    "overview": "A science fiction film series based on the novel of the same name by Suzanne Collins. The film series takes place in a dystopian post-apocalyptic future in the nation of Panem.",
+    "posterPath": "https://image.tmdb.org/t/p/w500/cEBNDEMGqvSvU0knEv9Wl3dk5kv.jpg",
+    "backdropPath": "https://image.tmdb.org/t/p/original/Ipp7cegtub4t0mu7xaKLQkYoGc.jpg",
+    "parts": [
+      {
+        "id": 131631,
+        "title": "The Hunger Games: Mockingjay - Part 1",
+        "overview": "After surviving the Quarter Quell, Katniss finds herself in the hidden stronghold of District 13, where the rebellion against the Capitol is gaining momentum. Struggling with the weight of becoming the symbol of resistance, she must navigate fragile alliances while trying to protect those she loves. As propaganda battles rage and Panem moves closer to full-scale war, Katniss is forced to confront the true cost of revolution.",
+        "releaseDate": "2014-11-19",
+        "voteAverage": 6.8,
+        "posterPath": "https://image.tmdb.org/t/p/w500/4FAA18ZIja70d1Tu5hr5cj2q1sB.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/lV1P1Q5gLDXVG1ZYCxZHStkcQC3.jpg"
+      },
+      {
+        "id": 131634,
+        "title": "The Hunger Games: Mockingjay - Part 2",
+        "overview": "As the war between the Capitol and the districts reaches its peak, Katniss Everdeen embarks on a perilous mission to liberate Panem and confront President Snow. Joined by a team of trusted allies, she navigates deadly traps, shifting loyalties, and the heavy cost of rebellion, determined to bring freedom to her people and end the Hunger Games once and for all.",
+        "releaseDate": "2015-11-18",
+        "voteAverage": 6.9,
+        "posterPath": "https://image.tmdb.org/t/p/w500/lImKHDfExAulp16grYm8zD5eONE.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/qVgLMRVNB5bHU0inmRa0ueShacN.jpg"
+      },
+      {
+        "id": 70160,
+        "title": "The Hunger Games",
+        "overview": "In a dystopian society where the Capitol forces each district to send two young tributes to fight to the death in a televised spectacle, a girl volunteers to take her sister’s place, setting the stage for a struggle of survival and defiance.",
+        "releaseDate": "2012-03-12",
+        "voteAverage": 7.2,
+        "posterPath": "https://image.tmdb.org/t/p/w500/apa5G43Hha7kH7wJG0gkkHT7FA9.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/yVBQ65YBYZ9UhzJ4NGdRgeXtyTL.jpg"
+      },
+      {
+        "id": 101299,
+        "title": "The Hunger Games: Catching Fire",
+        "overview": "After surviving the Hunger Games, Katniss and Peeta struggle with the consequences of their victory as unrest spreads across Panem. Forced back into the spotlight, they become symbols of hope and resistance while the Capitol prepares a new and deadly challenge that will change the future of the nation forever.",
+        "releaseDate": "2013-11-15",
+        "voteAverage": 7.426,
+        "posterPath": "https://image.tmdb.org/t/p/w500/vrQHDXjVmbYzadOXQ0UaObunoy2.jpg",
+        "backdropPath": "https://image.tmdb.org/t/p/original/eHaazLxM5LRMh0ySkVy7SK6wUWt.jpg"
+      }
+    ]
+  }
+]

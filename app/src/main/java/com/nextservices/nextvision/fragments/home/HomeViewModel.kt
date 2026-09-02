@@ -239,7 +239,8 @@ class HomeViewModel(database: AppDatabase) : ViewModel() {
                                     is Movie -> it.id
                                     else -> null
                                 }
-                            },
+                            }
+                            .take(10),
                     ),
                     Category(
                         name = Category.TRENDING_MOVIES,

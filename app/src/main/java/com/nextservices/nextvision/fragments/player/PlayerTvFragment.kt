@@ -89,6 +89,8 @@ import com.nextservices.nextvision.utils.setMediaServers
 import com.nextservices.nextvision.utils.toSubtitleMimeType
 import com.nextservices.nextvision.utils.viewModelsFactory
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import okhttp3.OkHttpClient
 import okhttp3.internal.userAgent
 import java.util.Calendar
@@ -131,6 +133,7 @@ class PlayerTvFragment : Fragment() {
     private var _binding: FragmentPlayerTvBinding? = null
     private val binding get() = _binding!!
     private var isSetupDone = false
+    private var chooserReceiverRegistered = false
 
     private val PlayerControlView.binding
         get() = ContentExoControllerTvBinding.bind(this.findViewById(R.id.cl_exo_controller))
@@ -147,6 +150,18 @@ class PlayerTvFragment : Fragment() {
     private lateinit var progressRunnable: Runnable
     private lateinit var gestureHelper: PlayerGestureHelper
     private val serverLoadingHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private val seekFeedbackHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private val hideSeekFeedback = Runnable {
+        _binding?.layoutSeekFeedback?.animate()
+            ?.alpha(0f)
+            ?.setDuration(180L)
+            ?.withEndAction {
+                _binding?.layoutSeekFeedback?.visibility = View.GONE
+                _binding?.ivSeekFeedbackBack?.visibility = View.GONE
+                _binding?.ivSeekFeedbackForward?.visibility = View.GONE
+            }
+            ?.start()
+    }
     private var serverLoadingPercent = 0
     private val serverLoadingRunnable = object : Runnable {
         override fun run() {
@@ -162,6 +177,7 @@ class PlayerTvFragment : Fragment() {
 
     private var currentVideo: Video? = null
     private var currentServer: Video.Server? = null
+    private var focusBeforeSettings: View? = null
     private var waitingForBypass = false
     private var bypassDone = false
     private var activeBypassSession: BypassSession? = null
@@ -171,6 +187,7 @@ class PlayerTvFragment : Fragment() {
     private var nextEpisodePrefetchJob: Job? = null
     private var nextEpisodeOverlayDismissed = false
     private var isForwardingEpisode = false
+    private val episodeNavigationMutex = Mutex()
     private var isEpisodeNavigationPending = false
     private val chooserReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -292,12 +309,15 @@ class PlayerTvFragment : Fragment() {
 
         try {
             val filter = IntentFilter("ACTION_PLAYER_CHOSEN_TV")
-            ContextCompat.registerReceiver(
-                requireContext(),
-                chooserReceiver,
-                filter,
-                ContextCompat.RECEIVER_NOT_EXPORTED
-            )
+            if (!chooserReceiverRegistered) {
+                ContextCompat.registerReceiver(
+                    requireContext(),
+                    chooserReceiver,
+                    filter,
+                    ContextCompat.RECEIVER_NOT_EXPORTED
+                )
+                chooserReceiverRegistered = true
+            }
         } catch (ignored: Exception) {}
     }
 
@@ -432,12 +452,19 @@ class PlayerTvFragment : Fragment() {
                             })
                             .build()
                         binding.settings.setOnServerSelectedListener { server ->
-                            state.servers.find { it.id == server.id }?.let(viewModel::getVideo)
+                            state.servers.find { it.id == server.id }?.let { selectedServer ->
+                                rememberPreferredServer(selectedServer)
+                                viewModel.getVideo(selectedServer)
+                            }
                         }
-                        val preferredServer = state.servers.firstOrNull {
-                            it.name.equals(args.preferredServerName, ignoreCase = true)
+                        val preferredServerName = preferredServerName()
+                        servers = state.servers.sortedByDescending {
+                            it.name.equals(preferredServerName, ignoreCase = true)
                         }
-                        viewModel.getVideo(preferredServer ?: state.servers.first())
+                        val preferredServer = servers.firstOrNull {
+                            it.name.equals(preferredServerName, ignoreCase = true)
+                        }
+                        viewModel.getVideo(preferredServer ?: servers.first())
 
                     }
                         is PlayerViewModel.State.FailedLoadingServers -> {
@@ -579,12 +606,11 @@ class PlayerTvFragment : Fragment() {
                         if (!isAdded || _binding == null || isForwardingEpisode) return@collect
                         isForwardingEpisode = true
                             try {
-                                releasePlayer()
                                 isSetupDone = false
 
                                 val args = Bundle().apply {
                                     putString("id", nextEpisode.id)
-                                    putSerializable("videoType", nextEpisode)
+                                    putParcelable("videoType", nextEpisode)
                                     putString("title", nextEpisode.tvShow.title)
                                     putString(
                                         "subtitle",
@@ -598,14 +624,14 @@ class PlayerTvFragment : Fragment() {
                                     ?: return@collect
                                 val currentDestination = controller.currentDestination
                                 if (currentDestination?.id != R.id.player) return@collect
-                                controller.navigate(
-                                    R.id.player,
-                                    args,
-                                    NavOptions.Builder()
-                                        .setPopUpTo(currentDestination.id, true)
-                                        .setLaunchSingleTop(false)
-                                        .build()
-                                )
+                                runCatching {
+                                    controller.navigate(
+                                        R.id.action_playerTvFragment_self,
+                                        args,
+                                    )
+                                }.onFailure {
+                                    Log.w("Player", "Episode navigation skipped", it)
+                                }
                             } finally {
                                 if (isAdded && _binding != null) isForwardingEpisode = false
                                 isEpisodeNavigationPending = false
@@ -634,12 +660,16 @@ class PlayerTvFragment : Fragment() {
 
         override fun onDestroyView() {
                 stopServerLoading()
+            seekFeedbackHandler.removeCallbacks(hideSeekFeedback)
+            _binding?.pvPlayer?.onSeekFeedback = null
+            _binding?.settings?.onHidden = null
+            focusBeforeSettings = null
             nextEpisodePrefetchJob?.cancel()
             clearBypassSession(dismissDialog = true)
             releasePlayer()
-            try {
-                requireContext().unregisterReceiver(chooserReceiver)
-            } catch (ignored: Exception) {
+            if (chooserReceiverRegistered) {
+                runCatching { requireContext().unregisterReceiver(chooserReceiver) }
+                chooserReceiverRegistered = false
             }
             _binding = null
             isSetupDone = false
@@ -659,6 +689,12 @@ class PlayerTvFragment : Fragment() {
             if (_binding != null) binding.btnPlayerServerLoading.visibility = View.GONE
         }
 
+
+    private fun openSettings(show: () -> Unit) {
+        focusBeforeSettings = binding.pvPlayer.controller.findFocus()
+        binding.pvPlayer.controller.clearFocus()
+        show()
+    }
     fun onBackPressed(): Boolean {
         if (!isAdded || _binding == null || view == null) return false
 
@@ -720,6 +756,7 @@ class PlayerTvFragment : Fragment() {
                             putString("seasonId", season.id)
                             putInt("seasonNumber", season.number)
                             putString("seasonTitle", season.title)
+                            putString("selectedEpisodeId", videoType.id)
                         },
                         NavOptions.Builder()
                             .setPopUpTo(R.id.player, true)
@@ -767,23 +804,27 @@ class PlayerTvFragment : Fragment() {
         }
     }
 
-    private fun playNextEpisodeAcrossSeasons(autoplay: Boolean = false) {
+    private fun playNextEpisodeAcrossSeasons(
+        autoplay: Boolean = false,
+        alreadyPending: Boolean = false,
+    ) {
         val type = args.videoType as? Video.Type.Episode ?: return
-        if (isEpisodeNavigationPending) return
+        if (isEpisodeNavigationPending && !alreadyPending) return
         isEpisodeNavigationPending = true
 
         lifecycleScope.launch {
             try {
-                val hasNextEpisode = withContext(Dispatchers.IO) {
-                    EpisodeManager.ensureNextEpisodeAvailable(type, database)
+                episodeNavigationMutex.withLock {
+                    val hasNextEpisode = withContext(Dispatchers.IO) {
+                        EpisodeManager.ensureNextEpisodeAvailable(type, database)
+                    }
+
+                    if (!hasNextEpisode) return@withLock
+                    if (autoplay && !UserPreferences.autoplay) return@withLock
+
+                    viewModel.playNextEpisode()
                 }
-
                 setupEpisodeNavigationButtons()
-
-                if (!hasNextEpisode) return@launch
-                if (autoplay && !UserPreferences.autoplay) return@launch
-
-                viewModel.playNextEpisode()
             } finally {
                 if (!isForwardingEpisode) isEpisodeNavigationPending = false
             }
@@ -906,6 +947,16 @@ class PlayerTvFragment : Fragment() {
 
             updatePlayerHeader()
 
+            binding.settings.onHidden = {
+                val viewToRestore = focusBeforeSettings
+                focusBeforeSettings = null
+                if (viewToRestore?.isAttachedToWindow == true && viewToRestore.isFocusable) {
+                    viewToRestore.requestFocus()
+                } else {
+                    binding.pvPlayer.controller.requestFocus()
+                }
+            }
+
             binding.pvPlayer.controller.binding.btnExoExternalPlayer.setOnClickListener {
                 Toast.makeText(
                     requireContext(),
@@ -914,8 +965,35 @@ class PlayerTvFragment : Fragment() {
                 ).show()
             }
 
+            binding.pvPlayer.onSeekFeedback = { isForward ->
+                seekFeedbackHandler.removeCallbacks(hideSeekFeedback)
+                binding.ivSeekFeedbackBack.visibility = if (isForward) View.GONE else View.VISIBLE
+                binding.ivSeekFeedbackForward.visibility = if (isForward) View.VISIBLE else View.GONE
+                binding.layoutSeekFeedback.apply {
+                    visibility = View.VISIBLE
+                    alpha = 0f
+                    scaleX = 0.78f
+                    scaleY = 0.78f
+                    animate()
+                        .alpha(1f)
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(180L)
+                        .start()
+                }
+                seekFeedbackHandler.postDelayed(hideSeekFeedback, 700L)
+            }
+
+
             binding.pvPlayer.controller.binding.exoReplay.setOnClickListener {
                 player.seekTo(0)
+            }
+
+            binding.pvPlayer.controller.binding.btnPlayerEpisodes.apply {
+                visibility = if (args.videoType is Video.Type.Episode) View.VISIBLE else View.GONE
+                setOnClickListener {
+                    navigateToDetails()
+                }
             }
 
             binding.pvPlayer.controller.binding.btnPlayerRestart.setOnClickListener {
@@ -924,24 +1002,19 @@ class PlayerTvFragment : Fragment() {
             }
 
             binding.pvPlayer.controller.binding.btnPlayerServer.setOnClickListener {
-                binding.pvPlayer.controller.clearFocus()
-                binding.settings.showServer()
+                openSettings { binding.settings.showServer() }
             }
             binding.pvPlayer.controller.binding.btnPlayerQuality.setOnClickListener {
-                binding.pvPlayer.controller.clearFocus()
-                binding.settings.showQuality()
+                openSettings { binding.settings.showQuality() }
             }
             binding.pvPlayer.controller.binding.btnPlayerAudio.setOnClickListener {
-                binding.pvPlayer.controller.clearFocus()
-                binding.settings.showAudio()
+                openSettings { binding.settings.showAudio() }
             }
             binding.pvPlayer.controller.binding.btnPlayerSubtitle.setOnClickListener {
-                binding.pvPlayer.controller.clearFocus()
-                binding.settings.showSubtitles()
+                openSettings { binding.settings.showSubtitles() }
             }
             binding.pvPlayer.controller.binding.btnPlayerSettings.setOnClickListener {
-                binding.pvPlayer.controller.clearFocus()
-                binding.settings.show()
+                openSettings { binding.settings.show() }
             }
 
             binding.pvPlayer.controller.binding.exoProgress.setKeyTimeIncrement(10_000)
@@ -951,7 +1024,10 @@ class PlayerTvFragment : Fragment() {
                     if (hasFocus) 0xFFE50914.toInt() else 0xFFFFFFFF.toInt()
                 )
                 timeBar.setUnplayedColor(
-                    if (hasFocus) 0xFFFFFFFF.toInt() else 0xB3FFFFFF.toInt()
+                    if (hasFocus) 0xFFFFFFFF.toInt() else 0x66FFFFFF.toInt()
+                )
+                timeBar.setScrubberColor(
+                    if (hasFocus) 0xFFFFFFFF.toInt() else Color.TRANSPARENT
                 )
             }
             binding.pvPlayer.controller.binding.exoProgress.clearFocus()
@@ -970,7 +1046,7 @@ class PlayerTvFragment : Fragment() {
 
             binding.pvPlayer.controller.binding.exoSettings.setOnClickListener {
                 binding.pvPlayer.controllerShowTimeoutMs = binding.pvPlayer.controllerShowTimeoutMs
-                binding.settings.show()
+                openSettings { binding.settings.show() }
             }
 
             binding.btnNextEpisodeAction.setOnClickListener {
@@ -1033,90 +1109,87 @@ class PlayerTvFragment : Fragment() {
 
             fun handleNavigationButton(
                 button: ImageView,
+                hint: TextView,
                 hasEpisode: () -> Boolean,
                 playEpisode: () -> Unit
             ) {
                 if (!hasEpisode()) {
                     button.visibility = View.GONE
+                    hint.visibility = View.GONE
                     return
                 }
 
                 button.visibility = View.VISIBLE
+                hint.visibility = if (button.hasFocus()) View.VISIBLE else View.GONE
+                button.setOnFocusChangeListener { _, hasFocus ->
+                    hint.visibility = if (hasFocus) View.VISIBLE else View.GONE
+                }
                 button.setOnClickListener {
-                    if (!hasEpisode()) return@setOnClickListener
+                    if (!hasEpisode() || isEpisodeNavigationPending || !::player.isInitialized) {
+                        return@setOnClickListener
+                    }
 
+                    isEpisodeNavigationPending = true
                     val videoType = args.videoType
-                    val watchItem: WatchItem? = when (videoType) {
-                        is Video.Type.Movie -> database.movieDao().getById(videoType.id)
-                        is Video.Type.Episode -> database.episodeDao().getById(videoType.id)
-                    }
-
-                    watchItem?.apply {
-                        isWatched = false
-                        watchedDate = null
-                        watchHistory = WatchItem.WatchHistory(
-                            lastEngagementTimeUtcMillis = System.currentTimeMillis(),
-                            lastPlaybackPositionMillis = player.currentPosition,
-                            durationMillis = player.duration
-                        )
-                    }
-
-                    when (videoType) {
-                        is Video.Type.Movie -> {
-                            val provider = UserPreferences.currentProvider ?: return@setOnClickListener
-                            (watchItem as? Movie)?.let { database.movieDao().update(it) }
-                            (watchItem as? Movie)?.let { UserDataCache.addMovieToContinueWatching(requireContext(), provider, it) }
-                        }
-
-                        is Video.Type.Episode -> {
-                            val provider = UserPreferences.currentProvider ?: return@setOnClickListener
-                            (watchItem as? Episode)?.let { episode ->
-                                if (player.hasFinished()) {
-                                    episode.isWatched = true
-                                    episode.watchedDate = Calendar.getInstance()
-                                    episode.watchHistory = null
-                                    database.episodeDao().resetProgressionFromEpisode(videoType.id)
-                                    UserDataCache.removeEpisodeFromContinueWatching(requireContext(), provider, episode.id)
-                                }
-
-                                database.episodeDao().update(episode)
-                                if (!player.hasFinished()) {
-                                    (watchItem as? Episode)?.let { UserDataCache.addEpisodeToContinueWatching(requireContext(), provider, it) }
-                                }
-
-                                episode.tvShow?.let { tvShow ->
-                                    database.tvShowDao().getById(tvShow.id)
-                                }?.let { tvShow ->
-
-                                    val isWatchingValue = if (player.hasFinished()) {
-                                        database.episodeDao().hasAnyWatchHistoryForTvShow(tvShow.id)
-                                    } else {
-                                        true
+                    val currentPosition = runCatching { player.currentPosition }.getOrDefault(0L)
+                    val duration = runCatching { player.duration }.getOrDefault(0L)
+                    val hasFinished = runCatching { player.hasFinished() }.getOrDefault(false)
+                    viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                        runCatching {
+                            val watchItem: WatchItem? = when (videoType) {
+                                is Video.Type.Movie -> database.movieDao().getById(videoType.id)
+                                is Video.Type.Episode -> database.episodeDao().getById(videoType.id)
+                            }
+                            watchItem?.apply {
+                                isWatched = false
+                                watchedDate = null
+                                watchHistory = WatchItem.WatchHistory(
+                                    lastEngagementTimeUtcMillis = System.currentTimeMillis(),
+                                    lastPlaybackPositionMillis = currentPosition,
+                                    durationMillis = duration,
+                                )
+                            }
+                            val provider = UserPreferences.currentProvider ?: return@runCatching
+                            when (videoType) {
+                                is Video.Type.Movie -> {
+                                    (watchItem as? Movie)?.let {
+                                        database.movieDao().update(it)
+                                        UserDataCache.addMovieToContinueWatching(requireContext(), provider, it)
                                     }
-
-                                    val updatedTvShow = tvShow.copy().apply {
-                                        merge(tvShow)
-                                        isWatching = isWatchingValue
+                                }
+                                is Video.Type.Episode -> (watchItem as? Episode)?.let { episode ->
+                                    if (hasFinished) {
+                                        episode.isWatched = true
+                                        episode.watchedDate = Calendar.getInstance()
+                                        episode.watchHistory = null
+                                        database.episodeDao().resetProgressionFromEpisode(videoType.id)
+                                        UserDataCache.removeEpisodeFromContinueWatching(requireContext(), provider, episode.id)
                                     }
-                                    database.tvShowDao().update(updatedTvShow)
+                                    database.episodeDao().update(episode)
+                                    if (!hasFinished) UserDataCache.addEpisodeToContinueWatching(requireContext(), provider, episode)
                                 }
                             }
-                        }
+                        }.onFailure { Log.w("Player", "Watch history update failed", it) }
                     }
-
-                    playEpisode()
+                    runCatching { playEpisode() }
+                        .onFailure {
+                            isEpisodeNavigationPending = false
+                            Log.w("Player", "Episode navigation failed", it)
+                        }
                 }
             }
 
             handleNavigationButton(
                 btnPrevious,
+                binding.pvPlayer.controller.binding.tvPreviousEpisodeHint,
                 EpisodeManager::hasPreviousEpisode,
                 viewModel::playPreviousEpisode
             )
             handleNavigationButton(
                 btnNext,
+                binding.pvPlayer.controller.binding.tvNextEpisodeHint,
                 EpisodeManager::hasNextEpisode,
-                ::playNextEpisodeAcrossSeasons
+                { playNextEpisodeAcrossSeasons(alreadyPending = true) }
             )
         }
 
@@ -1148,6 +1221,25 @@ class PlayerTvFragment : Fragment() {
             }
         }
 
+        private fun preferredServerName(): String? {
+            val providerName = UserPreferences.currentProvider?.name ?: return args.preferredServerName
+            val mediaId = when (val videoType = args.videoType) {
+                is Video.Type.Movie -> videoType.id
+                is Video.Type.Episode -> videoType.tvShow.id
+            }
+            return UserPreferences.getPreferredServer(providerName, mediaId)
+                ?: args.preferredServerName
+        }
+
+        private fun rememberPreferredServer(server: Video.Server) {
+            val providerName = UserPreferences.currentProvider?.name ?: return
+            val mediaId = when (val videoType = args.videoType) {
+                is Video.Type.Movie -> videoType.id
+                is Video.Type.Episode -> videoType.tvShow.id
+            }
+            UserPreferences.setPreferredServer(providerName, mediaId, server.name)
+        }
+
         private fun displayVideo(
             video: Video,
             server: Video.Server,
@@ -1157,6 +1249,7 @@ class PlayerTvFragment : Fragment() {
             stopServerLoading()
             currentVideo = video
             currentServer = server
+            rememberPreferredServer(server)
             updatePlayerHeader()
             val extraBuffering = PlayerSettingsView.Settings.ExtraBuffering.isEnabled
             val softwareDecoder = PlayerSettingsView.Settings.SoftwareDecoder.isEnabled
@@ -1501,6 +1594,7 @@ class PlayerTvFragment : Fragment() {
                 }
             }
         }
+
 
 
         private fun ExoPlayer.hasStarted(): Boolean {
@@ -1886,6 +1980,7 @@ class PlayerTvFragment : Fragment() {
                     }
 
                     mediaSession = MediaSession.Builder(requireContext(), player)
+                        .setId("nextvision-tv-${UUID.randomUUID()}")
                         .build()
                 }
 
@@ -1899,15 +1994,16 @@ class PlayerTvFragment : Fragment() {
 
         private fun releasePlayer() {
             stopProgressHandler()
-            if (_binding == null) return
-            binding.pvPlayer.player = null
-            binding.settings.player = null
-            binding.settings.subtitleView = null
-            if (::player.isInitialized) {
-                player.release()
+            _binding?.let { playerBinding ->
+                playerBinding.pvPlayer.player = null
+                playerBinding.settings.player = null
+                playerBinding.settings.subtitleView = null
             }
             if (::mediaSession.isInitialized) {
                 mediaSession.release()
+            }
+            if (::player.isInitialized) {
+                player.release()
             }
         }
 

@@ -10,6 +10,8 @@
         android:layout_width="1dp"
         android:layout_height="1dp"
         android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ContentDescription"
         tools:layout_constraintDimensionRatio="2:3"
         tools:layout_height="0dp"
@@ -257,21 +259,23 @@
         app:layout_constraintStart_toEndOf="@id/btn_movie_watch_now"
         app:layout_constraintTop_toBottomOf="@id/tv_movie_overview" />
 
-    <ImageView
+    <TextView
         android:id="@+id/btn_movie_favorite"
         style="@style/AppTheme.Widget.Tv.Button"
-        android:layout_width="68dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="30dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:padding="12dp"
-        android:background="@drawable/bg_detail_favorite_tv"
-        android:src="@drawable/ic_favorite_disable"
-        android:tint="@drawable/color_button_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="24dp"
+        android:contentDescription="@string/option_show_favorite"
+        android:drawableStart="@drawable/ic_favorite_state"
+        android:drawableTint="@color/favorite_icon_tint"
+        android:paddingStart="22dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="22dp"
+        android:paddingBottom="10dp"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/btn_movie_trailer"
-        app:layout_constraintTop_toBottomOf="@id/tv_movie_overview"
-        tools:ignore="ContentDescription,UseAppTint" />
+        app:layout_constraintTop_toBottomOf="@id/tv_movie_overview" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

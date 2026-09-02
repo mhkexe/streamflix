@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
+import java.util.concurrent.ConcurrentHashMap
 
 class TvShowViewModel(
     id: String,
@@ -53,6 +54,7 @@ class TvShowViewModel(
     }
 
     private val _state = MutableStateFlow<State>(State.Loading)
+    private val loadingSeasonIds = ConcurrentHashMap.newKeySet<String>()
     @OptIn(ExperimentalCoroutinesApi::class)
     val state: Flow<State> = combine(
         _state.transformLatest { state ->
@@ -264,6 +266,8 @@ class TvShowViewModel(
     }
 
     private fun getSeason(tvShow: TvShow, season: Season) = viewModelScope.launch(Dispatchers.IO) {
+        if (!loadingSeasonIds.add(season.id)) return@launch
+
         _seasonState.emit(SeasonState.Loading)
 
         try {
@@ -290,6 +294,8 @@ class TvShowViewModel(
         } catch (e: Exception) {
             Log.e("TvShowViewModel", "getSeason: ", e)
             _seasonState.emit(SeasonState.FailedLoading(e))
+        } finally {
+            loadingSeasonIds.remove(season.id)
         }
     }
 }

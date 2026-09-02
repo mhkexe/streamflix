@@ -57,6 +57,15 @@
             app:destination="@id/tv_show" />
     </fragment>
     <fragment
+        android:id="@+id/collection"
+        android:name="com.nextservices.nextvision.fragments.collection.CollectionFragment"
+        android:label="fragment_collection"
+        tools:layout="@layout/fragment_collection">
+        <argument
+            android:name="id"
+            app:argType="integer" />
+    </fragment>
+    <fragment
         android:id="@+id/movies"
         android:name="com.nextservices.nextvision.fragments.movies.MoviesMobileFragment"
         android:label="fragment_movies_mobile"

@@ -647,6 +647,7 @@ class AppAdapter(
         if (header != null && position == 0) return Long.MIN_VALUE
 
         val adjustedPosition = dataPosition(position)
+        if (isLooping && items.isNotEmpty()) return position.toLong()
         if (adjustedPosition in itemStableIds.indices) {
             return itemStableIds[adjustedPosition]
         }
@@ -739,7 +740,10 @@ class AppAdapter(
                 return
             }
 
-            val appendedIdentityState = appendedItems.buildIdentityState(itemIdentityCounts)
+            val appendedIdentityState = appendedItems.buildIdentityState(
+                startingCounts = itemIdentityCounts,
+                startingStableIds = itemStableIds.toSet(),
+            )
 
             items.addAll(appendedItems)
             itemIdentities = itemIdentities + appendedIdentityState.identities
@@ -920,11 +924,13 @@ class AppAdapter(
     )
 
     private fun List<Item>.buildIdentityState(
-        startingCounts: Map<String, Int> = emptyMap()
+        startingCounts: Map<String, Int> = emptyMap(),
+        startingStableIds: Set<Long> = emptySet(),
     ): IdentityState {
         val occurrenceCounts = startingCounts.toMutableMap()
         val identities = ArrayList<String>(size)
         val stableIds = LongArray(size)
+        val usedStableIds = startingStableIds.toMutableSet()
 
         forEachIndexed { index, item ->
             val baseKey = item.baseIdentityKey()
@@ -934,9 +940,11 @@ class AppAdapter(
 
             val identity = "$key:$occurrenceIndex"
             identities.add(identity)
-            stableIds[index] = identity.fold(1125899906842597L) { acc, char ->
+            var stableId = identity.fold(1125899906842597L) { acc, char ->
                 31L * acc + char.code
             }
+            while (!usedStableIds.add(stableId)) stableId++
+            stableIds[index] = stableId
         }
 
         return IdentityState(

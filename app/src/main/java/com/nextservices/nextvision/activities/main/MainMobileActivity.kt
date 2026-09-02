@@ -15,7 +15,6 @@ import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -37,7 +36,6 @@ import com.nextservices.nextvision.fragments.player.PlayerMobileFragment
 import com.nextservices.nextvision.providers.IptvProvider
 import com.nextservices.nextvision.providers.Provider
 import com.nextservices.nextvision.providers.TmdbProvider
-import com.nextservices.nextvision.ui.UpdateAppMobileDialog
 import com.nextservices.nextvision.utils.AppLanguageManager
 import com.nextservices.nextvision.utils.ProviderChangeNotifier
 import com.nextservices.nextvision.utils.StartupState
@@ -75,7 +73,6 @@ class MainMobileActivity : FragmentActivity() {
     private var _binding: ActivityMainMobileBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel by viewModels<MainViewModel>()
     private val resolverWebSocketClient by lazy { OkHttpClient() }
     private val bypassWebViewLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -98,8 +95,6 @@ class MainMobileActivity : FragmentActivity() {
 
     private var pendingWs: String? = null
     private var pendingToken: String? = null
-
-    private var updateAppDialog: UpdateAppMobileDialog? = null
 
     private var isStartupCompleted = false
     private var startupLoadingShown = false
@@ -174,7 +169,6 @@ class MainMobileActivity : FragmentActivity() {
         setupStartupOverlay(savedInstanceState != null)
         StartupTrace.mark("MainMobileActivity.startup_overlay_setup.end")
 
-        viewModel.checkUpdate()
         StartupTrace.mark("MainMobileActivity.onCreate.end")
 
         binding.bnvMain.setupWithNavController(navController)
@@ -193,34 +187,6 @@ class MainMobileActivity : FragmentActivity() {
                 .collect {
                     updateNavigationVisibility(navController.currentDestination?.id)
                 }
-        }
-
-        lifecycleScope.launch {
-            viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { state ->
-                when (state) {
-                    is MainViewModel.State.SuccessCheckingUpdate -> {
-                        showUpdateDialog(state)
-                    }
-
-                    MainViewModel.State.DownloadingUpdate -> updateAppDialog?.isLoading = true
-                    is MainViewModel.State.SuccessDownloadingUpdate -> {
-                        viewModel.installUpdate(this@MainMobileActivity, state.apk)
-                        dismissUpdateDialog()
-                    }
-
-                    MainViewModel.State.InstallingUpdate -> updateAppDialog?.isLoading = true
-                    is MainViewModel.State.FailedUpdate -> {
-                        updateAppDialog?.isLoading = false
-                        Toast.makeText(
-                            this@MainMobileActivity,
-                            state.error.message ?: "Update failed",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-
-                    else -> {}
-                }
-            }
         }
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -305,7 +271,6 @@ class MainMobileActivity : FragmentActivity() {
     }
 
     override fun onDestroy() {
-        dismissUpdateDialog()
         _binding = null
         super.onDestroy()
     }
@@ -313,25 +278,6 @@ class MainMobileActivity : FragmentActivity() {
     private fun clearResolverState() {
         pendingWs = null
         pendingToken = null
-    }
-
-    private fun showUpdateDialog(state: MainViewModel.State.SuccessCheckingUpdate) {
-        if (isFinishing || isDestroyed) return
-
-        dismissUpdateDialog()
-        updateAppDialog = UpdateAppMobileDialog(this, state.newReleases).also { dialog ->
-            dialog.setOnUpdateClickListener {
-                if (!dialog.isLoading) {
-                    viewModel.downloadUpdate(this@MainMobileActivity, state.asset)
-                }
-            }
-            dialog.show()
-        }
-    }
-
-    private fun dismissUpdateDialog() {
-        updateAppDialog?.takeIf { it.isShowing }?.dismiss()
-        updateAppDialog = null
     }
 
     private fun updateBottomNavigationVisibility(destinationId: Int?) {

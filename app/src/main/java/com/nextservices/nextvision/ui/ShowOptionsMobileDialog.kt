@@ -2,12 +2,12 @@ package com.nextservices.nextvision.ui
 
 import android.content.Context
 import android.graphics.Color
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
-import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.nextservices.nextvision.R
 import com.nextservices.nextvision.adapters.AppAdapter
@@ -18,6 +18,7 @@ import com.nextservices.nextvision.fragments.home.HomeMobileFragmentDirections
 import com.nextservices.nextvision.models.Episode
 import com.nextservices.nextvision.models.Movie
 import com.nextservices.nextvision.models.TvShow
+import com.nextservices.nextvision.models.Video
 import com.nextservices.nextvision.providers.Provider
 import com.nextservices.nextvision.utils.*
 import kotlinx.coroutines.Dispatchers
@@ -59,6 +60,38 @@ class ShowOptionsMobileDialog(
         action()
     }
 
+    private fun navController() = (context.toActivity()?.supportFragmentManager
+        ?.findFragmentById(R.id.nav_main_fragment) as? NavHostFragment)?.navController
+
+    private fun openDetails(show: AppAdapter.Item) {
+        val controller = navController() ?: return
+        when (show) {
+            is Movie -> controller.navigate(R.id.movie, Bundle().apply { putString("id", show.id) })
+            is TvShow -> controller.navigate(R.id.tv_show, Bundle().apply {
+                putString("id", show.id)
+                putString("poster", show.poster)
+                putString("banner", show.banner)
+            })
+        }
+        hide()
+    }
+
+    private fun playMovie(movie: Movie) {
+        navController()?.navigate(R.id.action_global_player, Bundle().apply {
+            putString("id", movie.id)
+            putString("title", movie.title)
+            putString("subtitle", movie.released?.format("yyyy") ?: "")
+            putSerializable("videoType", Video.Type.Movie(
+                id = movie.id,
+                title = movie.title,
+                releaseDate = movie.released?.format("yyyy-MM-dd") ?: "",
+                poster = movie.poster ?: movie.banner ?: "",
+                imdbId = movie.imdbId,
+            ))
+        })
+        hide()
+    }
+
     init {
         setContentView(binding.root)
 
@@ -71,6 +104,10 @@ class ShowOptionsMobileDialog(
             is TvShow -> displayTvShow(show)
         }
 
+            binding.btnOptionShowWatched.visibility = View.GONE
+            binding.btnOptionEpisodeMarkAllPreviousWatched.visibility = View.GONE
+            binding.btnOptionProgramClear.visibility = View.GONE
+
         binding.btnOptionCancel.setOnClickListener {
             hide()
         }
@@ -78,13 +115,6 @@ class ShowOptionsMobileDialog(
 
 
     private fun displayEpisode(episode: Episode) {
-        val provider = UserPreferences.currentProvider
-
-        Glide.with(context)
-            .load(episode.poster ?: episode.tvShow?.poster)
-            .fitCenter()
-            .into(binding.ivOptionsShowPoster)
-
         binding.tvOptionsShowTitle.text = episode.tvShow?.title ?: ""
 
         binding.tvShowSubtitle.text = episode.season?.takeIf { it.number != 0 }?.let { season ->
@@ -274,16 +304,25 @@ class ShowOptionsMobileDialog(
     }
 
     private fun displayMovie(movie: Movie) {
-        binding.ivOptionsShowPoster.loadMoviePoster(movie) {
-            fitCenter()
-        }
-
         binding.tvOptionsShowTitle.text = movie.title
 
         binding.tvShowSubtitle.text = movie.released?.format("yyyy")
 
+        binding.btnOptionPlay.apply {
+            text = if (movie.watchHistory != null) context.getString(R.string.movie_resume)
+            else context.getString(R.string.movie_watch_now)
+            setOnClickListener { playMovie(movie) }
+            visibility = View.VISIBLE
+        }
+        binding.btnOptionViewDetails.apply {
+            setOnClickListener { openDetails(movie) }
+            visibility = View.VISIBLE
+        }
 
         binding.btnOptionEpisodeOpenTvShow.visibility = View.GONE
+        binding.btnOptionShowFavorite.visibility = View.GONE
+        binding.btnOptionShowWatched.visibility = View.GONE
+        binding.btnOptionProgramClear.visibility = View.GONE
 
         val freshMovie = database.movieDao().getById(movie.id) ?: movie
 
@@ -371,16 +410,20 @@ class ShowOptionsMobileDialog(
     }
 
     private fun displayTvShow(tvShow: TvShow) {
-        binding.ivOptionsShowPoster.loadTvShowPoster(tvShow) {
-            fitCenter()
-        }
-
         binding.tvOptionsShowTitle.text = tvShow.title
 
         binding.tvShowSubtitle.text = tvShow.released?.format("yyyy")
 
+        binding.btnOptionPlay.visibility = View.GONE
+        binding.btnOptionViewDetails.apply {
+            setOnClickListener { openDetails(tvShow) }
+            visibility = View.VISIBLE
+        }
 
         binding.btnOptionEpisodeOpenTvShow.visibility = View.GONE
+        binding.btnOptionShowFavorite.visibility = View.GONE
+        binding.btnOptionShowWatched.visibility = View.GONE
+        binding.btnOptionProgramClear.visibility = View.GONE
 
         val freshTvShow = database.tvShowDao().getById(tvShow.id) ?: tvShow
 
