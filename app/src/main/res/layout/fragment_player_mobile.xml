@@ -16,13 +16,28 @@
         app:layout_constraintEnd_toStartOf="@id/settings"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:resize_mode="fit"
+        app:resize_mode="zoom"
         app:show_buffering="always"
         app:show_next_button="false"
         app:show_previous_button="false"
         app:show_subtitle_button="true"
         app:show_timeout="2000"
         app:surface_type="texture_view" />
+
+    <ImageView
+        android:id="@+id/iv_player_logo"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginEnd="18dp"
+        android:alpha="0.5"
+        android:contentDescription="@string/app_name"
+        android:importantForAccessibility="no"
+        android:scaleType="centerInside"
+        android:src="@drawable/logo_transparent"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.nextservices.nextvision.fragments.player.settings.PlayerSettingsMobileView
         android:id="@+id/settings"

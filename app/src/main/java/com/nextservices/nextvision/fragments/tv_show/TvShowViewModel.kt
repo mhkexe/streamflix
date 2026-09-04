@@ -259,11 +259,16 @@ class TvShowViewModel(
 
             database.tvShowDao().insert(orderedTvShow)
             database.seasonDao().insertAll(orderedTvShow.seasons)
+            orderedTvShow.seasons.forEach { season ->
+                getSeason(orderedTvShow, season)
+            }
         } catch (e: Exception) {
             Log.e("TvShowViewModel", "getTvShow: ", e)
             _state.emit(State.FailedLoading(e))
         }
     }
+
+    fun loadSeason(tvShow: TvShow, season: Season) = getSeason(tvShow, season)
 
     private fun getSeason(tvShow: TvShow, season: Season) = viewModelScope.launch(Dispatchers.IO) {
         if (!loadingSeasonIds.add(season.id)) return@launch

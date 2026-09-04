@@ -24,6 +24,7 @@ import com.nextservices.nextvision.models.Category
 import com.nextservices.nextvision.ui.SpacingItemDecoration
 import com.nextservices.nextvision.utils.UserPreferences
 import com.nextservices.nextvision.utils.dp
+import com.nextservices.nextvision.utils.navigateMobileDetail
 import com.nextservices.nextvision.utils.viewModelsFactory
 import com.nextservices.nextvision.utils.UniverseRepository
 import com.nextservices.nextvision.utils.UniverseCollection
@@ -135,7 +136,7 @@ class FavoritesMobileFragment : Fragment() {
         } else {
             appAdapter.onMovieClickListener = { movie ->
                 if (movie.id.startsWith(COLLECTION_ID_PREFIX)) {
-                    findNavController().navigate(
+                    findNavController().navigateMobileDetail(
                         R.id.collection,
                         Bundle().apply { putInt("id", movie.id.removePrefix(COLLECTION_ID_PREFIX).toInt()) },
                     )

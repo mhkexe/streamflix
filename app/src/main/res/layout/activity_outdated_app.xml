@@ -39,7 +39,7 @@
         android:layout_marginTop="20dp"
         android:gravity="center"
         android:text="@string/outdated_app_support"
-        android:textColor="#FF6B6B"
+        android:textColor="#D2D5DA"
         android:textSize="15sp"
         android:textStyle="bold" />
 

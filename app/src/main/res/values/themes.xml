@@ -1,5 +1,11 @@
 <resources>
 
+    <style name="AppTheme.Mobile.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/app_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.Mobile</item>
+    </style>
+
     <style name="AppTheme.Mobile" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

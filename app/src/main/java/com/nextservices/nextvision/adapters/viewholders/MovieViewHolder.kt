@@ -5,12 +5,18 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.view.animation.AnimationUtils
 import android.widget.Toast
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -36,6 +42,7 @@ import com.nextservices.nextvision.databinding.ItemCategorySwiperMobileBinding
 import com.nextservices.nextvision.databinding.ItemMovieGridMobileBinding
 import com.nextservices.nextvision.databinding.ItemMovieGridTvBinding
 import com.nextservices.nextvision.databinding.ItemMovieMobileBinding
+import com.nextservices.nextvision.databinding.ItemMoviePosterMobileBinding
 import com.nextservices.nextvision.databinding.ItemMovieTvBinding
 import com.nextservices.nextvision.databinding.ItemMovieContinueWatchingTvBinding
 import com.nextservices.nextvision.databinding.ItemMovieContinueWatchingMobileBinding
@@ -51,6 +58,7 @@ import com.nextservices.nextvision.fragments.home.HomeMobileFragment
 import com.nextservices.nextvision.fragments.home.HomeMobileFragmentDirections
 import com.nextservices.nextvision.fragments.home.HomeTvFragment
 import com.nextservices.nextvision.fragments.home.HomeTvFragmentDirections
+import com.nextservices.nextvision.fragments.search.SearchMobileFragment
 import com.nextservices.nextvision.fragments.movie.MovieMobileFragment
 import com.nextservices.nextvision.fragments.movie.MovieMobileFragmentDirections
 import com.nextservices.nextvision.fragments.movie.MovieTvFragment
@@ -167,6 +175,7 @@ class MovieViewHolder(
 
         when (_binding) {
             is ItemMovieMobileBinding -> displayMobileItem(_binding)
+            is ItemMoviePosterMobileBinding -> displayPosterMobileItem(_binding)
             is ItemMovieContinueWatchingMobileBinding -> displayContinueWatchingMobileItem(_binding)
             is ItemMovieTvBinding -> displayTvItem(_binding)
             is ItemMovieContinueWatchingTvBinding -> displayContinueWatchingTvItem(_binding)
@@ -383,6 +392,18 @@ class MovieViewHolder(
             }
         }
 
+        binding.ivMoviePoster.setOnClickListener { binding.root.performClick() }
+        binding.ivMoviePoster.setOnLongClickListener { binding.root.performLongClick() }
+        binding.ivMoviePoster.apply {
+            if (movie.id.startsWith("collection:")) {
+                setBackgroundResource(R.drawable.bg_genre_poster_mobile)
+                clipToOutline = true
+                outlineProvider = ViewOutlineProvider.BACKGROUND
+            } else {
+                background = null
+                clipToOutline = false
+            }
+        }
         binding.ivMoviePoster.loadMoviePoster(movie) {
             centerCrop()
             transition(DrawableTransitionOptions.withCrossFade())
@@ -396,9 +417,6 @@ class MovieViewHolder(
                 else -> View.VISIBLE
             }
         }
-
-        binding.tvMovieReleasedYear.text = movie.released?.format("yyyy")
-            ?: context.getString(R.string.movie_item_type)
 
         binding.pbMovieProgress.apply {
             val watchHistory = movie.watchHistory
@@ -414,6 +432,29 @@ class MovieViewHolder(
         }
 
         binding.tvMovieTitle.text = movie.title
+    }
+
+    private fun displayPosterMobileItem(binding: ItemMoviePosterMobileBinding) {
+        binding.root.setOnClickListener {
+            onMovieClick?.invoke(movie)
+                ?: binding.root.findNavController().navigate(
+                    HomeMobileFragmentDirections.actionHomeToMovie(id = movie.id)
+                )
+        }
+        binding.root.setOnLongClickListener {
+            onMovieLongClick?.invoke(movie) ?: ShowOptionsMobileDialog(context, movie).show()
+            true
+        }
+        binding.ivMoviePoster.setOnClickListener { binding.root.performClick() }
+        binding.ivMoviePoster.setOnLongClickListener { binding.root.performLongClick() }
+        binding.ivMoviePoster.loadMoviePoster(movie) {
+            centerCrop()
+            transition(DrawableTransitionOptions.withCrossFade())
+        }
+        binding.tvMoviePosterRating.apply {
+            text = movie.rating?.let { "★ ${String.format(Locale.ROOT, "%.1f", it)}" } ?: ""
+            visibility = if (text.isNullOrEmpty()) View.GONE else View.VISIBLE
+        }
     }
 
     private fun displayTvItem(binding: ItemMovieTvBinding) {
@@ -492,6 +533,8 @@ class MovieViewHolder(
             }
         }
 
+        binding.ivMoviePoster.setOnLongClickListener { binding.root.performLongClick() }
+        binding.ivMoviePoster.setOnClickListener { binding.root.performClick() }
         binding.ivMoviePoster.loadMoviePoster(movie) {
             fallback(R.drawable.glide_fallback_cover)
             centerCrop()
@@ -588,6 +631,7 @@ class MovieViewHolder(
             ShowOptionsMobileDialog(context, movie).show()
             true
         }
+        binding.ivMoviePoster.setOnLongClickListener { binding.root.performLongClick() }
         binding.ivMoviePoster.loadMoviePoster(movie) {
             centerCrop()
             transition(DrawableTransitionOptions.withCrossFade())
@@ -610,6 +654,7 @@ class MovieViewHolder(
     }
 
     private fun displayGridMobileItem(binding: ItemMovieGridMobileBinding) {
+        val isSearchResult = context.toActivity()?.getCurrentFragment() is SearchMobileFragment
         binding.root.apply {
             alpha = 1f
             isActivated = itemSelected
@@ -639,6 +684,8 @@ class MovieViewHolder(
             }
         }
 
+        binding.ivMoviePoster.setOnClickListener { binding.root.performClick() }
+        binding.ivMoviePoster.setOnLongClickListener { binding.root.performLongClick() }
         binding.ivMoviePoster.loadMoviePoster(movie) {
             centerCrop()
             transition(DrawableTransitionOptions.withCrossFade())
@@ -655,6 +702,7 @@ class MovieViewHolder(
 
         binding.tvMovieReleasedYear.text = movie.released?.format("yyyy")
             ?: context.getString(R.string.movie_item_type)
+        binding.tvMovieReleasedYear.visibility = View.GONE
 
         binding.pbMovieProgress.apply {
             val watchHistory = movie.watchHistory
@@ -669,7 +717,13 @@ class MovieViewHolder(
             }
         }
 
-        binding.tvMovieTitle.text = movie.title
+        binding.tvMovieRating.apply {
+            text = if (isSearchResult) movie.released?.format("yyyy") ?: "" else {
+                movie.rating?.let { String.format(Locale.ROOT, "%.1f", it) } ?: ""
+            }
+            visibility = if (text.isNullOrEmpty()) View.GONE else View.VISIBLE
+        }
+        binding.ivMovieTypeOverlay.visibility = if (isSearchResult) View.VISIBLE else View.GONE
     }
 
     private fun displayGridTvItem(binding: ItemMovieGridTvBinding) {
@@ -716,6 +770,7 @@ class MovieViewHolder(
                 }
             }
         }
+        binding.ivMoviePoster.setOnLongClickListener { binding.root.performLongClick() }
         binding.ivMoviePoster.loadMoviePoster(movie) {
             fallback(R.drawable.glide_fallback_cover)
             centerCrop()
@@ -777,88 +832,62 @@ class MovieViewHolder(
 
     private fun displaySwiperMobileItem(binding: ItemCategorySwiperMobileBinding) {
         binding.ivSwiperBackground.loadMovieBanner(movie) {
-            centerCrop()
             transition(DrawableTransitionOptions.withCrossFade())
         }
 
-        binding.tvSwiperTitle.text = movie.title
+        binding.ivSwiperLogo.apply {
+            visibility = View.VISIBLE
+            Glide.with(this).clear(this)
+            Glide.with(this)
+                .load(movie.logo)
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>,
+                        isFirstResource: Boolean,
+                    ): Boolean {
+                        visibility = View.GONE
+                        return false
+                    }
 
-        binding.tvSwiperTvShowLastEpisode.text = context.getString(R.string.movie_item_type)
-
-        binding.tvSwiperQuality.apply {
-            text = movie.quality
-            visibility = when {
-                text.isNullOrEmpty() -> View.GONE
-                else -> View.VISIBLE
-            }
+                    override fun onResourceReady(
+                        resource: Drawable,
+                        model: Any,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource,
+                        isFirstResource: Boolean,
+                    ): Boolean {
+                        visibility = View.VISIBLE
+                        return false
+                    }
+                })
+                .into(this)
         }
-
-        binding.tvSwiperReleased.apply {
-            text = movie.released?.format("yyyy")
-            visibility = when {
-                text.isNullOrEmpty() -> View.GONE
-                else -> View.VISIBLE
-            }
-        }
-
-        binding.tvSwiperRating.apply {
-            text = movie.rating?.let { String.format(Locale.ROOT, "%.1f", it) } ?: "N/A"
-            visibility = when {
-                text.isNullOrEmpty() -> View.GONE
-                else -> View.VISIBLE
-            }
-        }
-
-        binding.ivSwiperRatingIcon.visibility = binding.tvSwiperRating.visibility
-
-        binding.tvSwiperOverview.apply {
-            setOnClickListener {
-                maxLines = when (maxLines) {
-                    2 -> Int.MAX_VALUE
-                    else -> 2
-                }
-            }
-
-            text = movie.overview
-        }
-
-        binding.btnSwiperWatchNow.apply {
-            setOnClickListener {
-                findNavController().navigate(
-                    HomeMobileFragmentDirections.actionHomeToMovie(
-                        id = movie.id,
-                    )
-                )
-            }
-        }
-
-        binding.pbSwiperProgress.apply {
-            val watchHistory = movie.watchHistory
-
-            progress = when {
-                watchHistory != null -> (watchHistory.lastPlaybackPositionMillis * 100 / watchHistory.durationMillis.toDouble()).toInt()
-                else -> 0
-            }
-            visibility = when {
-                watchHistory != null -> View.VISIBLE
-                else -> View.GONE
-            }
+            binding.tvSwiperRating.text = movie.rating?.let { String.format(Locale.ROOT, "%.1f", it) }.orEmpty()
+            binding.tvSwiperRating.visibility = if (movie.rating == null) View.GONE else View.VISIBLE
+        binding.root.setOnClickListener {
+            binding.root.findNavController().navigate(HomeMobileFragmentDirections.actionHomeToMovie(id = movie.id))
         }
     }
 
 
     private fun displayMovieMobile(binding: ContentMovieMobileBinding) {
         binding.ivMoviePoster.run {
-            loadMoviePoster(movie) {
+            loadMovieBanner(movie) {
                 transition(DrawableTransitionOptions.withCrossFade())
             }
-            visibility = when {
-                movie.poster.isNullOrEmpty() -> View.GONE
-                else -> View.VISIBLE
-            }
+            visibility = if (movie.banner.isNullOrEmpty()) View.GONE else View.VISIBLE
         }
 
-        binding.tvMovieTitle.text = movie.title
+        binding.ivMovieLogo.apply {
+            visibility = if (movie.logo.isNullOrBlank()) View.GONE else View.VISIBLE
+            if (visibility == View.VISIBLE) Glide.with(this).load(movie.logo).into(this)
+        }
+        binding.tvMovieTitle.apply {
+            text = movie.title
+            visibility = if (movie.logo.isNullOrBlank()) View.VISIBLE else View.GONE
+        }
 
         binding.tvMovieRating.text = movie.rating?.let { String.format(Locale.ROOT, "%.1f", it) } ?: "N/A"
 
@@ -941,14 +970,9 @@ class MovieViewHolder(
             }
         }
 
-        binding.btnMovieTrailer.apply {
-            val trailer = movie.trailer
-            setOnClickListener {
-                if (trailer != null) handleTrailerClick(trailer, "MovieMobile")
-            }
-            visibility = if (trailer != null) View.VISIBLE else View.GONE
+        binding.btnMovieDetails.setOnClickListener {
+            binding.tvMovieOverview.maxLines = if (binding.tvMovieOverview.maxLines == 3) Int.MAX_VALUE else 3
         }
-
         binding.btnMovieFavorite.apply {
             setOnClickListener {
                 checkProviderAndRun {
@@ -1087,6 +1111,11 @@ class MovieViewHolder(
 
     private fun displayCastMobile(binding: ContentMovieCastMobileBinding) {
         binding.rvMovieCast.apply {
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
+                context,
+                androidx.recyclerview.widget.RecyclerView.HORIZONTAL,
+                false,
+            )
             adapter = AppAdapter().apply {
                 submitList(movie.cast.onEach {
                     it.itemType = AppAdapter.Type.PEOPLE_MOBILE_ITEM

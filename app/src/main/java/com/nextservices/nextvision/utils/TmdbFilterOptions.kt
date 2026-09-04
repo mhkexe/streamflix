@@ -5,11 +5,13 @@ data class TmdbFilterOptions(
     val genres: Set<Int> = emptySet(),
     val sortBy: String = "popularity.desc",
     val year: Int? = null,
+    val keywords: Set<Int> = emptySet(),
 ) {
     fun toQuery(isTv: Boolean, page: Int): Map<String, String> = buildMap {
         put("page", page.toString())
         put("sort_by", sortBy)
         if (genres.isNotEmpty()) put("with_genres", genres.joinToString(","))
+        if (keywords.isNotEmpty()) put("with_keywords", keywords.joinToString("|"))
         year?.let { put(if (isTv) "first_air_date_year" else "primary_release_year", it.toString()) }
     }
 }

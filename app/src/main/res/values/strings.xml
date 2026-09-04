@@ -37,6 +37,7 @@
     <string name="main_menu_settings">Settings</string>
     <string name="main_menu_favorites">Explore</string>
     <string name="main_menu_premium">Premium</string>
+    <string name="premium_payment_app_missing">No app can open this payment link</string>
     <string name="premium_scan_qr">Scan the QR Code to learn more</string>
     <string name="premium_description">Enjoy a complete entertainment experience with NextVIPTV — live TV, sports, movies and shows in 4K, plus multiple connections, smooth streaming and personalized support.</string>
     <string name="premium_point_full_hd">Full HD, 4K &amp; HDR10 Streaming</string>
@@ -73,6 +74,9 @@
     <string name="outdated_app_title">Your app needs an update</string>
     <string name="outdated_app_message">A newer version of NextVision is available. Please update the app to continue watching.</string>
     <string name="outdated_app_support">Contact NextVision Support for help</string>
+    <string name="version_check_error_icon_description">NextVision app icon</string>
+    <string name="version_check_error_title">Unable to check app version</string>
+    <string name="version_check_error_message">Connect to the internet and try again.</string>
     <string name="home_continue_watching_movies">Movies</string>
     <string name="home_continue_watching_episode">S%1$d E%2$d</string>
     <string name="home_continue_watching_episode_only">E%d</string>
@@ -123,6 +127,7 @@
     <string name="option_show_unwatched">Mark as unwatched</string>
     <string name="option_clear_program">Remove from Continue Watching</string>
     <string name="option_cancel">Cancel</string>
+    <string name="back">Back</string>
 
     <string name="episode_item_info">S%d E%d • %s</string>
     <string name="episode_item_info_episode_only">E%d • %s</string>
@@ -148,11 +153,14 @@
     <string name="movie_watch_now">Watch Now</string>
     <string name="movie_resume">Resume</string>
     <string name="movie_trailer">Trailer</string>
+    <string name="play_on_tv">Play on TV</string>
+    <string name="details">Details</string>
     <string name="movie_cast">Cast</string>
     <string name="movie_directors">Director</string>
     <string name="movie_you_may_also_like">You may also like</string>
 
     <string name="season_number">Season %d</string>
+    <string name="specials">Specials</string>
     <string name="episode_number">Episode %d</string>
 
     <string name="people_birthday">Birthday</string>

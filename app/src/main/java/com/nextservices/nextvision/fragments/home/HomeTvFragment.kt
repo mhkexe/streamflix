@@ -178,6 +178,9 @@ class HomeTvFragment : Fragment() {
     }
 
     private fun displayHome(categories: List<Category>) {
+        val orderedCategories = categories.filterNot { it.name.contains("anime", ignoreCase = true) } +
+            categories.filter { it.name.contains("anime", ignoreCase = true) }
+
         categories
             .find { it.name == Category.FEATURED }
             ?.also {
@@ -222,11 +225,13 @@ class HomeTvFragment : Fragment() {
             }
 
         appAdapter.submitList(
-            categories
+            orderedCategories
                 .filter {
                     it.list.isNotEmpty() &&
                         it.name != Category.FAVORITE_MOVIES &&
-                        it.name != Category.FAVORITE_TV_SHOWS
+                            it.name != Category.FAVORITE_TV_SHOWS &&
+                            (!it.name.contains("popular", ignoreCase = true) ||
+                                it.name.contains("anime", ignoreCase = true))
                 }
                 .onEach { category ->
                     if (category.name != getString(R.string.home_continue_watching)) {

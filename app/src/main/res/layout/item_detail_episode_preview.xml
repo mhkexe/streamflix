@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="112dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <FrameLayout
+        android:layout_width="156dp"
+        android:layout_height="100dp">
+
+        <ImageView
+            android:id="@+id/iv_detail_episode_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_detail_recommendation_poster"
+            android:clipToOutline="true"
+            android:contentDescription="Episode preview"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/detail_preview_episode" />
+
+        <ImageButton
+            android:id="@+id/btn_detail_episode_play"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_detail_episode_play_glass"
+            android:contentDescription="Play episode"
+            android:padding="8dp"
+            android:src="@drawable/exo_styled_controls_play"
+            android:tint="#FFFFFFFF" />
+
+        <View
+            android:id="@+id/view_detail_episode_progress"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:layout_gravity="bottom"
+            android:background="#EA1D24"
+            android:visibility="gone"
+            tools:visibility="visible" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_gravity="top"
+        android:layout_marginTop="4dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_detail_episode_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:lines="1"
+            tools:text="Ep-2 Sorry about all the dead" />
+
+        <TextView
+            android:id="@+id/tv_detail_episode_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:ellipsize="end"
+            android:maxLines="3"
+            android:lines="3"
+            android:textColor="#AEB5C0"
+            android:textSize="13sp"
+            tools:text="Growing up in a remote forest cabin with his dad, Gus lears." />
+
+        <TextView
+            android:id="@+id/tv_detail_episode_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="1h 20min"
+            android:textColor="#87909D"
+            android:textSize="12sp" />
+    </LinearLayout>
+</LinearLayout>

@@ -66,7 +66,10 @@
             android:background="@drawable/bg_item_option"
             android:gravity="center_vertical"
             android:padding="12dp"
-            android:textColor="@color/option_text" />
+            android:textColor="@color/option_text"
+            android:textSize="16sp"
+            android:drawableStart="@android:drawable/ic_media_play"
+            android:drawablePadding="12dp" />
 
         <TextView
             android:id="@+id/btn_option_view_details"
@@ -77,7 +80,10 @@
             android:gravity="center_vertical"
             android:padding="12dp"
             android:text="@string/option_view_details"
-            android:textColor="@color/option_text" />
+            android:textColor="@color/option_text"
+            android:textSize="16sp"
+            android:drawableStart="@android:drawable/ic_menu_info_details"
+            android:drawablePadding="12dp" />
 
         <TextView
             android:id="@+id/btn_option_episode_open_tv_show"
@@ -88,7 +94,10 @@
             android:gravity="center_vertical"
             android:padding="12dp"
             android:text="@string/option_episode_open_tv_show"
-            android:textColor="@color/option_text" />
+            android:textColor="@color/option_text"
+            android:textSize="16sp"
+            android:drawableStart="@android:drawable/ic_menu_myplaces"
+            android:drawablePadding="12dp" />
 
         <TextView
             android:id="@+id/btn_option_show_favorite"
@@ -99,7 +108,10 @@
             android:gravity="center_vertical"
             android:padding="12dp"
             android:text="@string/option_show_favorite"
-            android:textColor="@color/option_text" />
+            android:textColor="@color/option_text"
+            android:textSize="16sp"
+            android:drawableStart="@android:drawable/ic_menu_add"
+            android:drawablePadding="12dp" />
 
         <TextView
             android:id="@+id/btn_option_show_watched"
@@ -110,12 +122,17 @@
             android:gravity="center_vertical"
             android:padding="12dp"
             android:text="@string/option_show_watched"
-            android:textColor="@color/option_text" />
+            android:textColor="@color/option_text"
+            android:textSize="16sp"
+            android:drawableStart="@android:drawable/ic_menu_view"
+            android:drawablePadding="12dp" />
+
         <TextView
             android:id="@+id/btn_option_episode_mark_all_previous_watched"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:visibility="gone"
             android:background="@drawable/bg_item_option"
             android:gravity="center_vertical"
             android:padding="12dp"
@@ -131,7 +148,10 @@
             android:gravity="center_vertical"
             android:padding="12dp"
             android:text="@string/option_clear_program"
-            android:textColor="@color/option_text" />
+            android:textColor="@color/option_text"
+            android:textSize="16sp"
+            android:drawableStart="@android:drawable/ic_menu_delete"
+            android:drawablePadding="12dp" />
 
         <TextView
             android:id="@+id/btn_option_cancel"
@@ -142,7 +162,10 @@
             android:gravity="center_vertical"
             android:padding="12dp"
             android:text="@string/option_cancel"
-            android:textColor="@color/option_text" />
+            android:textColor="@color/option_text"
+            android:textSize="16sp"
+            android:drawableStart="@android:drawable/ic_menu_close_clear_cancel"
+            android:drawablePadding="12dp" />
 
     </LinearLayout>
 

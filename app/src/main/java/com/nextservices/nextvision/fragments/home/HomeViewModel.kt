@@ -2,6 +2,7 @@ package com.nextservices.nextvision.fragments.home
 
 import android.util.Log
 import com.nextservices.nextvision.NextVisionApp
+import com.nextservices.nextvision.BuildConfig
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nextservices.nextvision.adapters.AppAdapter
@@ -11,6 +12,7 @@ import com.nextservices.nextvision.models.Episode
 import com.nextservices.nextvision.models.Movie
 import com.nextservices.nextvision.models.TvShow
 import com.nextservices.nextvision.providers.Provider
+import com.nextservices.nextvision.providers.TmdbProvider
 import com.nextservices.nextvision.ui.UserDataNotifier
 import com.nextservices.nextvision.utils.HomeCacheStore
 import com.nextservices.nextvision.utils.ParentalControlUtils
@@ -20,6 +22,7 @@ import com.nextservices.nextvision.utils.UserDataCache.toCached
 import com.nextservices.nextvision.utils.UserDataCache.toEpisode
 import com.nextservices.nextvision.utils.UserDataCache.toMovie
 import com.nextservices.nextvision.utils.UserPreferences
+import com.nextservices.nextvision.utils.TmdbFilterOptions
 import com.nextservices.nextvision.utils.StartupPreloadStore
 import com.nextservices.nextvision.utils.combine
 import kotlinx.coroutines.Dispatchers
@@ -35,9 +38,12 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import java.util.concurrent.ConcurrentHashMap
 
 class HomeViewModel(database: AppDatabase) : ViewModel() {
+
+    private val isMobileLayout = BuildConfig.APP_LAYOUT == "mobile" || BuildConfig.APP_LAYOUT == "null"
 
     private data class HomeHistory(
         val continueWatching: List<AppAdapter.Item>
@@ -215,8 +221,23 @@ class HomeViewModel(database: AppDatabase) : ViewModel() {
 
                 val trendingMovies = trendingItems.filterIsInstance<Movie>().take(10)
                 val trendingTvShows = trendingItems.filterIsInstance<TvShow>().take(10)
+                val featured = state.categories
+                    .firstOrNull { it.name == Category.FEATURED }
+                    ?.let { category ->
+                        category.copy(list = category.list.map(::mergeItem))
+                    }
+                val otherCategories = state.categories
+                    .filter { category ->
+                        category.name != Category.FEATURED &&
+                            category.name != Category.CONTINUE_WATCHING &&
+                            !category.name.contains("trending", ignoreCase = true)
+                    }
+                    .map { category ->
+                        category.copy(list = category.list.map(::mergeItem))
+                    }
 
                 val categories = ParentalControlUtils.filterCategories(listOfNotNull(
+                    featured,
                     Category(
                         name = Category.CONTINUE_WATCHING,
                         list = history.continueWatching
@@ -250,7 +271,7 @@ class HomeViewModel(database: AppDatabase) : ViewModel() {
                         name = Category.TRENDING_TV_SHOWS,
                         list = trendingTvShows,
                     ),
-                ))
+                ) + otherCategories)
 
                 State.SuccessLoading(categories)
             }
@@ -350,7 +371,12 @@ class HomeViewModel(database: AppDatabase) : ViewModel() {
         val appContext = NextVisionApp.instance.applicationContext
         val cachedCategories = HomeCacheStore.read(appContext, provider)
         if (!cachedCategories.isNullOrEmpty()) {
-            _state.emit(State.SuccessLoading(cachedCategories))
+            val cachedWithArtwork = if (isMobileLayout && provider is TmdbProvider) {
+                addMobileGenreSections(enrichMobileFeatured(cachedCategories, provider), provider)
+            } else {
+                cachedCategories
+            }
+            _state.emit(State.SuccessLoading(cachedWithArtwork))
         } else {
             _state.emit(State.Loading)
         }
@@ -358,12 +384,23 @@ class HomeViewModel(database: AppDatabase) : ViewModel() {
         loadUserDataCache(provider)
 
         StartupPreloadStore.get(provider)?.home?.let { preloadedCategories ->
-            _state.emit(State.SuccessLoading(preloadedCategories))
+            val categoriesWithMobileSections = if (isMobileLayout && provider is TmdbProvider) {
+                addMobileGenreSections(enrichMobileFeatured(preloadedCategories, provider), provider)
+            } else {
+                preloadedCategories
+            }
+            _state.emit(State.SuccessLoading(categoriesWithMobileSections))
             return@launch
         }
 
         try {
-            val categories = provider.getHome()
+            val categories = provider.getHome().toMutableList()
+            if (isMobileLayout && provider is TmdbProvider) {
+                for (index in categories.indices) {
+                    categories[index] = enrichMobileFeatured(listOf(categories[index]), provider).first()
+                }
+                categories.addAll(addMobileGenreSections(emptyList(), provider))
+            }
             HomeCacheStore.write(appContext, provider, categories)
             _state.emit(State.SuccessLoading(categories))
         } catch (e: Exception) {
@@ -371,9 +408,60 @@ class HomeViewModel(database: AppDatabase) : ViewModel() {
             if (cachedCategories.isNullOrEmpty()) {
                 _state.emit(State.FailedLoading(e))
             } else {
-                _state.emit(State.SuccessLoading(cachedCategories))
+                val cachedWithMobileSections = if (isMobileLayout && provider is TmdbProvider) {
+                    addMobileGenreSections(enrichMobileFeatured(cachedCategories, provider), provider)
+                } else {
+                    cachedCategories
+                }
+                _state.emit(State.SuccessLoading(cachedWithMobileSections))
             }
         }
+    }
+
+    private suspend fun enrichMobileFeatured(
+        categories: List<Category>,
+        provider: TmdbProvider,
+    ): List<Category> = supervisorScope {
+        val index = categories.indexOfFirst {
+            it.name.contains("popular", ignoreCase = true) ||
+                it.name.contains("trending", ignoreCase = true)
+        }
+        if (index < 0) return@supervisorScope categories
+
+        val category = categories[index]
+        val enrichedItems = category.list.take(5).map { item ->
+            async {
+                when (item) {
+                    is Movie -> runCatching { provider.getMovie(item.id) }.getOrDefault(item)
+                    is TvShow -> runCatching { provider.getTvShow(item.id) }.getOrDefault(item)
+                    else -> item
+                }
+            }
+        }.awaitAll()
+        categories.toMutableList().also { it[index] = category.copy(list = enrichedItems) }
+    }
+
+    private suspend fun addMobileGenreSections(
+        categories: List<Category>,
+        provider: TmdbProvider,
+    ): List<Category> = coroutineScope {
+        val genreSections = listOf(
+            "Action & Adventure" to setOf(28, 12),
+            "Sci-Fi & Fantasy" to setOf(878, 14),
+            "Mystery & Thriller" to setOf(9648, 53),
+            "Comedy & Romance" to setOf(35, 10749),
+            "Drama & Romance" to setOf(18, 10749),
+        )
+        categories + genreSections.map { (name, genres) ->
+            async {
+                Category(
+                    name = name,
+                    list = runCatching {
+                        provider.getFilteredMovies(TmdbFilterOptions(genres = genres)).take(10)
+                    }.getOrDefault(emptyList()),
+                )
+            }
+        }.awaitAll()
     }
 
     private fun loadUserDataCache(provider: Provider) {

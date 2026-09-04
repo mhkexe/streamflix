@@ -12,22 +12,56 @@
         tools:layout="@layout/fragment_providers_mobile">
         <action
             android:id="@+id/action_providers_to_home"
-            app:destination="@id/home" />
+            app:destination="@id/home"
+            app:enterAnim="@anim/detail_enter"
+            app:exitAnim="@anim/detail_exit"
+            app:popEnterAnim="@anim/detail_pop_enter"
+            app:popExitAnim="@anim/detail_pop_exit" />
     </fragment>
 
     <!-- Global Actions -->
     <action
         android:id="@+id/action_global_providers"
-        app:destination="@id/providers" />
+        app:destination="@id/providers"
+        app:enterAnim="@anim/detail_enter"
+        app:exitAnim="@anim/detail_exit"
+        app:popEnterAnim="@anim/detail_pop_enter"
+        app:popExitAnim="@anim/detail_pop_exit" />
     <action
         android:id="@+id/action_global_player"
-        app:destination="@id/player" />
+        app:destination="@id/player"
+        app:enterAnim="@anim/detail_enter"
+        app:exitAnim="@anim/detail_exit"
+        app:popEnterAnim="@anim/detail_pop_enter"
+        app:popExitAnim="@anim/detail_pop_exit" />
     <action
         android:id="@+id/action_global_tv_show"
-        app:destination="@id/tv_show" />
+        app:destination="@id/tv_show"
+        app:enterAnim="@anim/detail_enter"
+        app:exitAnim="@anim/detail_exit"
+        app:popEnterAnim="@anim/detail_pop_enter"
+        app:popExitAnim="@anim/detail_pop_exit" />
     <action
         android:id="@+id/action_global_movie"
-        app:destination="@id/movie" />
+        app:destination="@id/movie"
+        app:enterAnim="@anim/detail_enter"
+        app:exitAnim="@anim/detail_exit"
+        app:popEnterAnim="@anim/detail_pop_enter"
+        app:popExitAnim="@anim/detail_pop_exit" />
+    <action
+        android:id="@+id/action_global_search_mobile"
+        app:destination="@id/search_mobile"
+        app:enterAnim="@anim/detail_enter"
+        app:exitAnim="@anim/detail_exit"
+        app:popEnterAnim="@anim/detail_pop_enter"
+        app:popExitAnim="@anim/detail_pop_exit" />
+    <action
+        android:id="@+id/action_global_guest_user"
+        app:destination="@id/guest_user"
+        app:enterAnim="@anim/detail_enter"
+        app:exitAnim="@anim/detail_exit"
+        app:popEnterAnim="@anim/detail_pop_enter"
+        app:popExitAnim="@anim/detail_pop_exit" />
 
     <fragment
         android:id="@+id/home"
@@ -36,13 +70,25 @@
         tools:layout="@layout/fragment_home_mobile">
         <action
             android:id="@+id/action_home_to_movie"
-            app:destination="@id/movie" />
+            app:destination="@id/movie"
+            app:enterAnim="@anim/detail_enter"
+            app:exitAnim="@anim/detail_exit"
+            app:popEnterAnim="@anim/detail_pop_enter"
+            app:popExitAnim="@anim/detail_pop_exit" />
         <action
             android:id="@+id/action_home_to_tv_show"
-            app:destination="@id/tv_show" />
+            app:destination="@id/tv_show"
+            app:enterAnim="@anim/detail_enter"
+            app:exitAnim="@anim/detail_exit"
+            app:popEnterAnim="@anim/detail_pop_enter"
+            app:popExitAnim="@anim/detail_pop_exit" />
         <action
             android:id="@+id/action_home_to_player"
-            app:destination="@id/player" />
+            app:destination="@id/player"
+            app:enterAnim="@anim/detail_enter"
+            app:exitAnim="@anim/detail_exit"
+            app:popEnterAnim="@anim/detail_pop_enter"
+            app:popExitAnim="@anim/detail_pop_exit" />
     </fragment>
     <fragment
         android:id="@+id/favorites"
@@ -51,16 +97,39 @@
         tools:layout="@layout/fragment_favorites_mobile">
         <action
             android:id="@+id/action_favorites_to_movie"
-            app:destination="@id/movie" />
+            app:destination="@id/movie"
+            app:enterAnim="@anim/detail_enter"
+            app:exitAnim="@anim/detail_exit"
+            app:popEnterAnim="@anim/detail_pop_enter"
+            app:popExitAnim="@anim/detail_pop_exit" />
         <action
             android:id="@+id/action_favorites_to_tv_show"
-            app:destination="@id/tv_show" />
+            app:destination="@id/tv_show"
+            app:enterAnim="@anim/detail_enter"
+            app:exitAnim="@anim/detail_exit"
+            app:popEnterAnim="@anim/detail_pop_enter"
+            app:popExitAnim="@anim/detail_pop_exit" />
     </fragment>
     <fragment
+        android:id="@+id/premium"
+        android:name="com.nextservices.nextvision.fragments.premium.PremiumMobileFragment"
+        android:label="fragment_premium_mobile"
+        tools:layout="@layout/fragment_premium_mobile" />
+    <fragment
+        android:id="@+id/search_mobile"
+        android:name="com.nextservices.nextvision.fragments.search.SearchMobileFragment"
+        android:label="search_mobile"
+        tools:layout="@layout/fragment_search_mobile" />
+    <fragment
+        android:id="@+id/guest_user"
+        android:name="com.nextservices.nextvision.fragments.profile.GuestUserFragment"
+        android:label="guest_user"
+        tools:layout="@layout/fragment_guest_user" />
+    <fragment
         android:id="@+id/collection"
-        android:name="com.nextservices.nextvision.fragments.collection.CollectionFragment"
-        android:label="fragment_collection"
-        tools:layout="@layout/fragment_collection">
+        android:name="com.nextservices.nextvision.fragments.collection.CollectionMobileFragment"
+        android:label="fragment_collection_mobile"
+        tools:layout="@layout/fragment_collection_mobile">
         <argument
             android:name="id"
             app:argType="integer" />
@@ -72,7 +141,11 @@
         tools:layout="@layout/fragment_movies_mobile">
         <action
             android:id="@+id/action_movies_to_movie"
-            app:destination="@id/movie" />
+            app:destination="@id/movie"
+            app:enterAnim="@anim/detail_enter"
+            app:exitAnim="@anim/detail_exit"
+            app:popEnterAnim="@anim/detail_pop_enter"
+            app:popExitAnim="@anim/detail_pop_exit" />
     </fragment>
     <fragment
         android:id="@+id/tv_shows"
@@ -81,7 +154,11 @@
         tools:layout="@layout/fragment_tv_shows_mobile">
         <action
             android:id="@+id/action_tv_shows_to_tv_show"
-            app:destination="@id/tv_show" />
+            app:destination="@id/tv_show"
+            app:enterAnim="@anim/detail_enter"
+            app:exitAnim="@anim/detail_exit"
+            app:popEnterAnim="@anim/detail_pop_enter"
+            app:popExitAnim="@anim/detail_pop_exit" />
     </fragment>
     <fragment
         android:id="@+id/movie"
@@ -93,16 +170,32 @@
             app:argType="string" />
         <action
             android:id="@+id/action_movie_to_player"
-            app:destination="@id/player" />
+            app:destination="@id/player"
+            app:enterAnim="@anim/detail_enter"
+            app:exitAnim="@anim/detail_exit"
+            app:popEnterAnim="@anim/detail_pop_enter"
+            app:popExitAnim="@anim/detail_pop_exit" />
         <action
             android:id="@+id/action_movie_to_people"
-            app:destination="@id/people" />
+            app:destination="@id/people"
+            app:enterAnim="@anim/detail_enter"
+            app:exitAnim="@anim/detail_exit"
+            app:popEnterAnim="@anim/detail_pop_enter"
+            app:popExitAnim="@anim/detail_pop_exit" />
         <action
             android:id="@+id/action_movie_to_movie"
-            app:destination="@id/movie" />
+            app:destination="@id/movie"
+            app:enterAnim="@anim/detail_enter"
+            app:exitAnim="@anim/detail_exit"
+            app:popEnterAnim="@anim/detail_pop_enter"
+            app:popExitAnim="@anim/detail_pop_exit" />
         <action
             android:id="@+id/action_movie_to_tv_show"
-            app:destination="@id/tv_show" />
+            app:destination="@id/tv_show"
+            app:enterAnim="@anim/detail_enter"
+            app:exitAnim="@anim/detail_exit"
+            app:popEnterAnim="@anim/detail_pop_enter"
+            app:popExitAnim="@anim/detail_pop_exit" />
     </fragment>
     <fragment
         android:id="@+id/tv_show"
@@ -122,19 +215,39 @@
             app:nullable="true" />
         <action
             android:id="@+id/action_tv_show_to_season"
-            app:destination="@id/season" />
+            app:destination="@id/season"
+            app:enterAnim="@anim/detail_enter"
+            app:exitAnim="@anim/detail_exit"
+            app:popEnterAnim="@anim/detail_pop_enter"
+            app:popExitAnim="@anim/detail_pop_exit" />
         <action
             android:id="@+id/action_tv_show_to_people"
-            app:destination="@id/people" />
+            app:destination="@id/people"
+            app:enterAnim="@anim/detail_enter"
+            app:exitAnim="@anim/detail_exit"
+            app:popEnterAnim="@anim/detail_pop_enter"
+            app:popExitAnim="@anim/detail_pop_exit" />
         <action
             android:id="@+id/action_tv_show_to_movie"
-            app:destination="@id/movie" />
+            app:destination="@id/movie"
+            app:enterAnim="@anim/detail_enter"
+            app:exitAnim="@anim/detail_exit"
+            app:popEnterAnim="@anim/detail_pop_enter"
+            app:popExitAnim="@anim/detail_pop_exit" />
         <action
             android:id="@+id/action_tv_show_to_tv_show"
-            app:destination="@id/tv_show" />
+            app:destination="@id/tv_show"
+            app:enterAnim="@anim/detail_enter"
+            app:exitAnim="@anim/detail_exit"
+            app:popEnterAnim="@anim/detail_pop_enter"
+            app:popExitAnim="@anim/detail_pop_exit" />
         <action
             android:id="@+id/action_tv_show_to_player"
-            app:destination="@id/player" />
+            app:destination="@id/player"
+            app:enterAnim="@anim/detail_enter"
+            app:exitAnim="@anim/detail_exit"
+            app:popEnterAnim="@anim/detail_pop_enter"
+            app:popExitAnim="@anim/detail_pop_exit" />
     </fragment>
     <fragment
         android:id="@+id/season"
@@ -143,7 +256,11 @@
         tools:layout="@layout/fragment_season_mobile">
         <action
             android:id="@+id/action_season_to_player"
-            app:destination="@id/player" />
+            app:destination="@id/player"
+            app:enterAnim="@anim/detail_enter"
+            app:exitAnim="@anim/detail_exit"
+            app:popEnterAnim="@anim/detail_pop_enter"
+            app:popExitAnim="@anim/detail_pop_exit" />
         <argument
             android:name="tvShowId"
             app:argType="string" />
@@ -182,10 +299,18 @@
             app:argType="string" />
         <action
             android:id="@+id/action_genre_to_movie"
-            app:destination="@id/movie" />
+            app:destination="@id/movie"
+            app:enterAnim="@anim/detail_enter"
+            app:exitAnim="@anim/detail_exit"
+            app:popEnterAnim="@anim/detail_pop_enter"
+            app:popExitAnim="@anim/detail_pop_exit" />
         <action
             android:id="@+id/action_genre_to_tv_show"
-            app:destination="@id/tv_show" />
+            app:destination="@id/tv_show"
+            app:enterAnim="@anim/detail_enter"
+            app:exitAnim="@anim/detail_exit"
+            app:popEnterAnim="@anim/detail_pop_enter"
+            app:popExitAnim="@anim/detail_pop_exit" />
     </fragment>
     <fragment
         android:id="@+id/people"
@@ -197,10 +322,18 @@
             app:argType="string" />
         <action
             android:id="@+id/action_people_to_movie"
-            app:destination="@id/movie" />
+            app:destination="@id/movie"
+            app:enterAnim="@anim/detail_enter"
+            app:exitAnim="@anim/detail_exit"
+            app:popEnterAnim="@anim/detail_pop_enter"
+            app:popExitAnim="@anim/detail_pop_exit" />
         <action
             android:id="@+id/action_people_to_tv_show"
-            app:destination="@id/tv_show" />
+            app:destination="@id/tv_show"
+            app:enterAnim="@anim/detail_enter"
+            app:exitAnim="@anim/detail_exit"
+            app:popEnterAnim="@anim/detail_pop_enter"
+            app:popExitAnim="@anim/detail_pop_exit" />
         <argument
             android:name="name"
             app:argType="string" />

@@ -106,7 +106,11 @@ class SeasonViewHolder(
     }
 
     private fun Season.displayTitle(): String {
-        return title ?: context.getString(R.string.season_number, number)
+        return if (number == 0) {
+            context.getString(R.string.specials)
+        } else {
+            title ?: context.getString(R.string.season_number, number)
+        }
     }
 
     private fun Season.isFullyWatched(): Boolean {

@@ -38,10 +38,11 @@ class EpisodeViewHolder(
         if (runtime == null || runtime <= 0) return "--"
         val hours = runtime / 60
         val minutes = runtime % 60
-        return if (hours > 0) {
+        return when {
+            hours > 0 && minutes > 0 ->
             context.getString(R.string.tv_show_runtime_hours_minutes, hours, minutes)
-        } else {
-            context.getString(R.string.tv_show_runtime_minutes, minutes)
+            hours > 0 -> "${hours} h"
+            else -> context.getString(R.string.tv_show_runtime_minutes, minutes)
         }
     }
 
@@ -291,6 +292,7 @@ class EpisodeViewHolder(
     private fun displayContinueWatchingMobileItem(binding: ItemEpisodeContinueWatchingMobileBinding) {
         binding.root.apply {
             setOnClickListener {
+                if (episode.id.isBlank()) return@setOnClickListener
                 findNavController().navigate(
                     HomeMobileFragmentDirections.actionHomeToPlayer(
                         id = episode.id,
@@ -351,7 +353,9 @@ class EpisodeViewHolder(
             val watchHistory = episode.watchHistory
 
             progress = when {
-                watchHistory != null -> (watchHistory.lastPlaybackPositionMillis * 100 / watchHistory.durationMillis.toDouble()).toInt()
+                watchHistory != null && watchHistory.durationMillis > 0 ->
+                    (watchHistory.lastPlaybackPositionMillis * 100 / watchHistory.durationMillis.toDouble())
+                        .toInt()
                 else -> 0
             }
             visibility = when {
@@ -365,6 +369,13 @@ class EpisodeViewHolder(
         binding.tvEpisodeInfo.text = episode.season?.takeIf { it.number != 0 }?.let { season ->
             context.getString(R.string.home_continue_watching_episode, season.number, episode.number)
         } ?: context.getString(R.string.home_continue_watching_episode_only, episode.number)
+
+        binding.tvEpisodeWatched.apply {
+            episode.watchHistory?.let {
+                text = formatWatchedTime(it.lastPlaybackPositionMillis, it.durationMillis)
+                visibility = View.VISIBLE
+            } ?: run { visibility = View.GONE }
+        }
     }
 
     private fun displayContinueWatchingTvItem(binding: ItemEpisodeContinueWatchingTvBinding) {

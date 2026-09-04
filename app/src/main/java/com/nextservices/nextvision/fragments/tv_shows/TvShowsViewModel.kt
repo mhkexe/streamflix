@@ -21,7 +21,10 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 
-class TvShowsViewModel(database: AppDatabase) : ViewModel() {
+class TvShowsViewModel(
+    database: AppDatabase,
+    initialFilters: TmdbFilterOptions = TmdbFilterOptions(),
+) : ViewModel() {
 
     private val _state = MutableStateFlow<State>(State.Loading)
     
@@ -68,7 +71,7 @@ class TvShowsViewModel(database: AppDatabase) : ViewModel() {
     }.flowOn(Dispatchers.IO)
 
     private var page = 1
-    private var filterOptions = TmdbFilterOptions()
+    private var filterOptions = initialFilters
     val currentFilters: TmdbFilterOptions get() = filterOptions
 
     sealed class State {

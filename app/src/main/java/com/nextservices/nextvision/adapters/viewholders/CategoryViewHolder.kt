@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import androidx.core.os.postDelayed
 import androidx.core.view.children
 import androidx.navigation.findNavController
+import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import androidx.viewpager2.widget.ViewPager2
@@ -33,6 +34,7 @@ import java.util.Locale
 import com.nextservices.nextvision.utils.UserPreferences
 import com.nextservices.nextvision.providers.Provider
 import com.nextservices.nextvision.database.AppDatabase
+import com.nextservices.nextvision.utils.TMDb3
 
 class CategoryViewHolder(
     private val _binding: ViewBinding
@@ -80,6 +82,29 @@ class CategoryViewHolder(
         onTvShowLongClick: ((TvShow) -> Unit)?,
     ) {
         binding.tvCategoryTitle.text = category.name
+        val genreIds = mobileMovieGenreIds[category.name]
+        binding.tvCategorySeeMore.apply {
+            val isAnime = category.name.contains("anime", ignoreCase = true)
+            visibility = if (genreIds != null || isAnime) View.VISIBLE else View.GONE
+            setOnClickListener {
+                if (isAnime) {
+                    findNavController().navigate(
+                        R.id.tv_shows,
+                        bundleOf(
+                            "tv_keywords" to intArrayOf(
+                                TMDb3.Keyword.KeywordId.ANIME.id,
+                                TMDb3.Keyword.KeywordId.BASED_ON_ANIME.id,
+                            ),
+                        ),
+                    )
+                } else {
+                    findNavController().navigate(
+                        R.id.movies,
+                        bundleOf("movie_genres" to genreIds),
+                    )
+                }
+            }
+        }
 
         binding.rvCategory.apply {
             val categoryAdapter = (adapter as? AppAdapter) ?: AppAdapter().also { adapter = it }
@@ -97,6 +122,15 @@ class CategoryViewHolder(
             }
         }
     }
+
+    private val mobileMovieGenreIds: Map<String, IntArray>
+        get() = mapOf(
+            "Action & Adventure" to intArrayOf(28, 12),
+            "Sci-Fi & Fantasy" to intArrayOf(878, 14),
+            "Mystery & Thriller" to intArrayOf(9648, 53),
+            "Comedy & Romance" to intArrayOf(35, 10749),
+            "Drama & Romance" to intArrayOf(18, 10749),
+        )
 
     private fun displayTvItem(
         binding: ItemCategoryTvBinding,
@@ -145,6 +179,7 @@ class CategoryViewHolder(
         onMovieLongClick: ((Movie) -> Unit)?,
         onTvShowLongClick: ((TvShow) -> Unit)?,
     ) {
+        binding.tvCategoryTitle.visibility = View.GONE
         binding.tvCategoryTitle.text = category.name
 
         // Reuse or create handler
@@ -159,6 +194,13 @@ class CategoryViewHolder(
         }
         
         scheduleNext()
+
+        category.list.forEach { item ->
+            when (item) {
+                is Movie -> item.itemType = AppAdapter.Type.MOVIE_SWIPER_MOBILE_ITEM
+                is TvShow -> item.itemType = AppAdapter.Type.TV_SHOW_SWIPER_MOBILE_ITEM
+            }
+        }
 
         val items = listOf(
             listOfNotNull(category.list.lastOrNull()),

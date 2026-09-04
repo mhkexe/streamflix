@@ -70,6 +70,8 @@ class SeasonTvFragment : Fragment() {
                         gIsLoadingRetry.visibility = View.GONE
                     }
 
+                    SeasonViewModel.State.LoadingMoreEpisodes -> Unit
+
                     is SeasonViewModel.State.SuccessLoadingEpisodes -> {
                         displaySeason(state.episodes)
                         binding.isLoading.root.visibility = View.GONE

@@ -36,7 +36,8 @@ class SeasonMobileFragment : Fragment() {
         SeasonViewModel(
             args.seasonId,
             args.tvShowId,
-            database
+            database,
+            mobilePaging = true,
         )
     }
 
@@ -64,8 +65,13 @@ class SeasonMobileFragment : Fragment() {
                         pbIsLoading.visibility = View.VISIBLE
                         gIsLoadingRetry.visibility = View.GONE
                     }
+                    SeasonViewModel.State.LoadingMoreEpisodes -> {
+                        appAdapter.isLoading = true
+                    }
                     is SeasonViewModel.State.SuccessLoadingEpisodes -> {
-                        displaySeason(state.episodes)
+                        displaySeason(state.episodes, state.hasMore)
+                        appAdapter.loadMoreEnabled = false
+                        appAdapter.isLoading = false
                         binding.isLoading.root.visibility = View.GONE
                     }
                     is SeasonViewModel.State.FailedLoadingEpisodes -> {
@@ -114,14 +120,24 @@ class SeasonMobileFragment : Fragment() {
         binding.rvEpisodes.apply {
             adapter = appAdapter.apply {
                 stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+                loadMoreEnabled = false
             }
             addItemDecoration(
                 SpacingItemDecoration(20.dp(requireContext()))
             )
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    if (dy > 0) appAdapter.loadMoreEnabled = true
+                }
+            })
+            appAdapter.setOnLoadMoreListener {
+                appAdapter.loadMoreEnabled = false
+                viewModel.loadMoreEpisodes()
+            }
         }
     }
 
-    private fun displaySeason(episodes: List<Episode>) {
+    private fun displaySeason(episodes: List<Episode>, hasMore: Boolean) {
         appAdapter.submitList(episodes.onEach { episode ->
             episode.itemType = AppAdapter.Type.EPISODE_MOBILE_ITEM
         })
@@ -141,5 +157,7 @@ class SeasonMobileFragment : Fragment() {
                 binding.rvEpisodes.height / 2 - 100.dp(requireContext())
             )
         }
+
+        if (!hasMore) appAdapter.setOnLoadMoreListener(null)
     }
 }

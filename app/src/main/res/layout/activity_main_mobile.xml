@@ -5,7 +5,7 @@
     android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/app_background_color"
+    android:background="@drawable/bg_black_red_glow"
     tools:context=".activities.main.MainMobileActivity">
 
     <androidx.fragment.app.FragmentContainerView
@@ -20,20 +20,33 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:navGraph="@navigation/nav_main_graph_mobile" />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bnv_main"
+    <FrameLayout
+        android:id="@+id/nav_container"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:theme="@style/Theme.AppCompat"
-        app:itemIconTint="@color/nav_item_app"
-        app:itemTextColor="@color/nav_item_app"
-        app:itemTextAppearanceActive="@style/BottomNavLabelStyle"
-        app:itemTextAppearanceInactive="@style/BottomNavLabelStyle"
-        app:labelVisibilityMode="labeled"
+        android:layout_height="64dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/bg_glass_nav"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/menu_main_activity_mobile" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bnv_main"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:theme="@style/Theme.AppCompat"
+            app:itemBackground="@android:color/transparent"
+            app:itemIconTint="@color/nav_item_app"
+            app:itemTextColor="@color/nav_item_app"
+            app:itemTextAppearanceActive="@style/BottomNavLabelStyle"
+            app:itemTextAppearanceInactive="@style/BottomNavLabelStyle"
+            app:itemIconSize="26dp"
+            app:labelVisibilityMode="unlabeled"
+            app:menu="@menu/menu_main_activity_mobile" />
+    </FrameLayout>
 
     <FrameLayout
         android:id="@+id/startup_overlay"

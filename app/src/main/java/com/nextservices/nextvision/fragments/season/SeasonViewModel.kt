@@ -22,7 +22,11 @@ class SeasonViewModel(
     seasonId: String,
     private val tvShowId: String,
     private val database: AppDatabase,
+    private val mobilePaging: Boolean = false,
 ) : ViewModel() {
+    private val pageSize = 20
+    private var allEpisodes: List<Episode> = emptyList()
+    private var loadedEpisodeCount = 0
     var seasonNumber = 0
     var tvShowTitle = ""
     private val _state = MutableStateFlow<State>(State.LoadingEpisodes)
@@ -66,7 +70,11 @@ class SeasonViewModel(
 
     sealed class State {
         data object LoadingEpisodes : State()
-        data class SuccessLoadingEpisodes(val episodes: List<Episode>) : State()
+        data class SuccessLoadingEpisodes(
+            val episodes: List<Episode>,
+            val hasMore: Boolean = false,
+        ) : State()
+        data object LoadingMoreEpisodes : State()
         data class FailedLoadingEpisodes(val error: Exception) : State()
     }
 
@@ -82,8 +90,11 @@ class SeasonViewModel(
             val episodes = UserPreferences.currentProvider!!
                 .getEpisodesBySeason(seasonId)
                 .sortedBy { it.number }
-            val ids = episodes.map { it.id }
-            val episodeMap = episodes.associateBy { it.id }
+            allEpisodes = episodes
+            val visibleEpisodes = if (mobilePaging) episodes.take(pageSize) else episodes
+            loadedEpisodeCount = visibleEpisodes.size
+            val ids = visibleEpisodes.map { it.id }
+            val episodeMap = visibleEpisodes.associateBy { it.id }
 
             ids.chunked(400).forEach { chunk ->
                 database.episodeDao()
@@ -94,27 +105,62 @@ class SeasonViewModel(
             }
 
             val storedTvShow = database.tvShowDao().getById(tvShowId)
-            val tvShow = if (storedTvShow?.runtime != null) {
-                storedTvShow
-            } else {
+            val hasValidMobileRuntime = storedTvShow?.runtime != null && storedTvShow.runtime!! > 0
+            val tvShow = if (mobilePaging && !hasValidMobileRuntime) {
                 runCatching {
                     UserPreferences.currentProvider!!.getTvShow(tvShowId)
                 }.getOrNull()?.also(database.tvShowDao()::insert)
                     ?: storedTvShow
                     ?: TvShow(tvShowId)
+            } else {
+                storedTvShow ?: TvShow(tvShowId)
             }
             val season = Season(seasonId)
-            episodes.forEach { episode ->
+            visibleEpisodes.forEach { episode ->
                 episode.tvShow = tvShow
                 episode.season = season
+                if (mobilePaging && (episode.runtime == null || episode.runtime!! <= 0)) {
+                    episode.runtime = tvShow.runtime?.takeIf { runtime -> runtime > 0 }
+                }
             }
 
-            database.episodeDao().insertAll(episodes)
+            database.episodeDao().insertAll(visibleEpisodes)
 
-            EpisodeManager.addEpisodes(EpisodeManager.convertToVideoTypeEpisodes(episodes, database, seasonNumber))
-            _state.emit(State.SuccessLoadingEpisodes(episodes))
+            EpisodeManager.addEpisodes(EpisodeManager.convertToVideoTypeEpisodes(visibleEpisodes, database, seasonNumber))
+            _state.emit(
+                State.SuccessLoadingEpisodes(
+                    visibleEpisodes,
+                    hasMore = mobilePaging && loadedEpisodeCount < allEpisodes.size,
+                )
+            )
         } catch (e: Exception) {
             Log.e("SeasonViewModel", "getSeasonEpisodes: ", e)
+            _state.emit(State.FailedLoadingEpisodes(e))
+        }
+    }
+
+    fun loadMoreEpisodes() = viewModelScope.launch(Dispatchers.IO) {
+        if (!mobilePaging || loadedEpisodeCount >= allEpisodes.size) return@launch
+
+        _state.emit(State.LoadingMoreEpisodes)
+        try {
+            val nextEpisodes = allEpisodes
+                .drop(loadedEpisodeCount)
+                .take(pageSize)
+            loadedEpisodeCount += nextEpisodes.size
+
+            database.episodeDao().insertAll(nextEpisodes)
+            EpisodeManager.addEpisodes(
+                EpisodeManager.convertToVideoTypeEpisodes(nextEpisodes, database, seasonNumber)
+            )
+            _state.emit(
+                State.SuccessLoadingEpisodes(
+                    episodes = allEpisodes.take(loadedEpisodeCount),
+                    hasMore = loadedEpisodeCount < allEpisodes.size,
+                )
+            )
+        } catch (e: Exception) {
+            Log.e("SeasonViewModel", "loadMoreEpisodes: ", e)
             _state.emit(State.FailedLoadingEpisodes(e))
         }
     }

@@ -26,11 +26,20 @@ class StartupSplashActivity : FragmentActivity() {
         StartupTrace.mark("StartupSplashActivity.super.onCreate.end")
         lifecycleScope.launch {
             val latestVersion = withContext(Dispatchers.IO) { fetchLatestVersion() }
-            if (latestVersion != null && latestVersion != BuildConfig.VERSION_NAME) {
-                setContentView(R.layout.activity_outdated_app)
-                StartupTrace.mark("StartupSplashActivity.outdated version=${BuildConfig.VERSION_NAME} latest=$latestVersion")
-            } else {
-                openMainActivity()
+            when {
+                latestVersion == null -> {
+                    setContentView(R.layout.activity_version_check_error)
+                    StartupTrace.mark("StartupSplashActivity.version_check_failed")
+                }
+
+                latestVersion != BuildConfig.VERSION_NAME -> {
+                    setContentView(R.layout.activity_outdated_app)
+                    StartupTrace.mark("StartupSplashActivity.outdated version=${BuildConfig.VERSION_NAME} latest=$latestVersion")
+                }
+
+                else -> {
+                    openMainActivity()
+                }
             }
         }
     }

@@ -2,6 +2,7 @@ package com.nextservices.nextvision.ui
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -23,6 +24,7 @@ import com.nextservices.nextvision.providers.Provider
 import com.nextservices.nextvision.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class ShowOptionsMobileDialog(
@@ -42,6 +44,13 @@ class ShowOptionsMobileDialog(
                 if (error is WindowManager.BadTokenException || error is IllegalStateException) return@onFailure
                 throw error
             }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+            ?.setBackgroundColor(Color.TRANSPARENT)
     }
 
     private fun checkProviderAndRun(show: AppAdapter.Item, action: () -> Unit) {
@@ -66,8 +75,8 @@ class ShowOptionsMobileDialog(
     private fun openDetails(show: AppAdapter.Item) {
         val controller = navController() ?: return
         when (show) {
-            is Movie -> controller.navigate(R.id.movie, Bundle().apply { putString("id", show.id) })
-            is TvShow -> controller.navigate(R.id.tv_show, Bundle().apply {
+            is Movie -> controller.navigateMobileDetail(R.id.movie, Bundle().apply { putString("id", show.id) })
+            is TvShow -> controller.navigateMobileDetail(R.id.tv_show, Bundle().apply {
                 putString("id", show.id)
                 putString("poster", show.poster)
                 putString("banner", show.banner)
@@ -269,27 +278,27 @@ class ShowOptionsMobileDialog(
 
         binding.btnOptionProgramClear.apply {
             setOnClickListener {
-                checkProviderAndRun(episode) {
-                    val provider = UserPreferences.currentProvider ?: return@checkProviderAndRun
-                    val updatedEpisode = episode.copy().apply {
-                        merge(episode)
-                        watchHistory = null
-                    }
-                    AppDatabase.getInstance(context).episodeDao().save(updatedEpisode)
-                    UserDataCache.syncEpisodeToCache(context, provider, updatedEpisode)
-                    
-                    episode.tvShow?.let { tvShow ->
-                        // Rimuoviamo isWatching solo se NON ci sono altri episodi in corso
-                        val episodeDao = AppDatabase.getInstance(context).episodeDao()
-                        if (!episodeDao.hasAnyWatchHistoryForTvShow(tvShow.id)) {
-                            AppDatabase.getInstance(context).tvShowDao().save(tvShow.copy().apply {
-                                merge(tvShow)
-                                isWatching = false
-                            })
-                            UserDataCache.removeEpisodeFromContinueWatching(context, provider, episode.id)
+                context.toActivity()?.lifecycleScope?.launch(Dispatchers.IO) {
+                    checkProviderAndRun(episode) {
+                        val provider = UserPreferences.currentProvider ?: return@checkProviderAndRun
+                        val updatedEpisode = episode.copy().apply {
+                            merge(episode)
+                            watchHistory = null
                         }
+                        AppDatabase.getInstance(context).episodeDao().save(updatedEpisode)
+                        UserDataCache.syncEpisodeToCache(context, provider, updatedEpisode)
+
+                        episode.tvShow?.let { tvShow ->
+                            val episodeDao = AppDatabase.getInstance(context).episodeDao()
+                            if (!episodeDao.hasAnyWatchHistoryForTvShow(tvShow.id)) {
+                                AppDatabase.getInstance(context).tvShowDao().save(tvShow.copy().apply {
+                                    merge(tvShow)
+                                    isWatching = false
+                                })
+                            }
+                        }
+                        UserDataCache.removeEpisodeFromContinueWatching(context, provider, episode.id)
                     }
-                    UserDataCache.removeEpisodeFromContinueWatching(context, provider, episode.id)
                 }
 
                 hide()
@@ -304,6 +313,11 @@ class ShowOptionsMobileDialog(
     }
 
     private fun displayMovie(movie: Movie) {
+        if (movie.id.startsWith("collection:")) {
+            displayCollection(movie)
+            return
+        }
+
         binding.tvOptionsShowTitle.text = movie.title
 
         binding.tvShowSubtitle.text = movie.released?.format("yyyy")
@@ -324,9 +338,12 @@ class ShowOptionsMobileDialog(
         binding.btnOptionShowWatched.visibility = View.GONE
         binding.btnOptionProgramClear.visibility = View.GONE
 
-        val freshMovie = database.movieDao().getById(movie.id) ?: movie
+        context.toActivity()?.lifecycleScope?.launch {
+            val freshMovie = withContext(Dispatchers.IO) {
+                database.movieDao().getById(movie.id) ?: movie
+            }
 
-        binding.btnOptionShowFavorite.apply {
+            binding.btnOptionShowFavorite.apply {
             setOnClickListener {
                 checkProviderAndRun(freshMovie) {
                     val provider = UserPreferences.currentProvider ?: return@checkProviderAndRun
@@ -354,24 +371,17 @@ class ShowOptionsMobileDialog(
             visibility = View.VISIBLE
         }
 
-        binding.btnOptionShowWatched.apply {
+            binding.btnOptionProgramClear.apply {
             setOnClickListener {
-                checkProviderAndRun(freshMovie) {
-                    val provider = UserPreferences.currentProvider ?: return@checkProviderAndRun
-                    val updatedMovie = freshMovie.copy().apply {
-                        merge(freshMovie)
-                        isWatched = !isWatched
-                        if (isWatched) {
-                            watchedDate = Calendar.getInstance()
+                context.toActivity()?.lifecycleScope?.launch(Dispatchers.IO) {
+                    checkProviderAndRun(freshMovie) {
+                        val provider = UserPreferences.currentProvider ?: return@checkProviderAndRun
+                        val updatedMovie = freshMovie.copy().apply {
+                            merge(freshMovie)
                             watchHistory = null
-                        } else {
-                            watchedDate = null
                         }
-                    }
-                    AppDatabase.getInstance(context).movieDao().save(updatedMovie)
-                    UserDataCache.syncMovieToCache(context, provider, updatedMovie)
-                    
-                    if (updatedMovie.isWatched) {
+                        AppDatabase.getInstance(context).movieDao().save(updatedMovie)
+                        UserDataCache.syncMovieToCache(context, provider, updatedMovie)
                         UserDataCache.removeMovieFromContinueWatching(context, provider, freshMovie.id)
                     }
                 }
@@ -379,32 +389,33 @@ class ShowOptionsMobileDialog(
                 hide()
             }
 
-            text = when {
-                freshMovie.isWatched -> context.getString(R.string.option_show_unwatched)
-                else -> context.getString(R.string.option_show_watched)
-            }
-            visibility = View.VISIBLE
-        }
-
-        binding.btnOptionProgramClear.apply {
-            setOnClickListener {
-                checkProviderAndRun(freshMovie) {
-                    val provider = UserPreferences.currentProvider ?: return@checkProviderAndRun
-                    val updatedMovie = freshMovie.copy().apply {
-                        merge(freshMovie)
-                        watchHistory = null
-                    }
-                    AppDatabase.getInstance(context).movieDao().save(updatedMovie)
-                    UserDataCache.syncMovieToCache(context, provider, updatedMovie)
-                    UserDataCache.removeMovieFromContinueWatching(context, provider, freshMovie.id)
+                visibility = when {
+                    freshMovie.watchHistory != null -> View.VISIBLE
+                    else -> View.GONE
                 }
-
-                hide()
             }
+        }
+    }
 
-            visibility = when {
-                freshMovie.watchHistory != null -> View.VISIBLE
-                else -> View.GONE
+    private fun displayCollection(collection: Movie) {
+        binding.tvOptionsShowTitle.text = collection.title
+        binding.tvShowSubtitle.visibility = View.GONE
+        binding.btnOptionPlay.visibility = View.GONE
+        binding.btnOptionEpisodeOpenTvShow.visibility = View.GONE
+        binding.btnOptionShowFavorite.visibility = View.GONE
+        binding.btnOptionShowWatched.visibility = View.GONE
+        binding.btnOptionProgramClear.visibility = View.GONE
+        binding.btnOptionViewDetails.apply {
+            text = context.getString(R.string.collection_open)
+            visibility = View.VISIBLE
+            setOnClickListener {
+                val collectionId = collection.id.removePrefix("collection:").toIntOrNull()
+                if (collectionId != null) {
+                    navController()?.navigateMobileDetail(R.id.collection, Bundle().apply {
+                        putInt("id", collectionId)
+                    })
+                }
+                hide()
             }
         }
     }
@@ -425,9 +436,12 @@ class ShowOptionsMobileDialog(
         binding.btnOptionShowWatched.visibility = View.GONE
         binding.btnOptionProgramClear.visibility = View.GONE
 
-        val freshTvShow = database.tvShowDao().getById(tvShow.id) ?: tvShow
+        context.toActivity()?.lifecycleScope?.launch {
+            val freshTvShow = withContext(Dispatchers.IO) {
+                database.tvShowDao().getById(tvShow.id) ?: tvShow
+            }
 
-        binding.btnOptionShowFavorite.apply {
+            binding.btnOptionShowFavorite.apply {
             setOnClickListener {
                 checkProviderAndRun(freshTvShow) {
                     val provider = UserPreferences.currentProvider ?: return@checkProviderAndRun
@@ -458,6 +472,7 @@ class ShowOptionsMobileDialog(
                 context.getString(R.string.option_show_favorite)
             }
             visibility = View.VISIBLE
+            }
         }
     }
 }

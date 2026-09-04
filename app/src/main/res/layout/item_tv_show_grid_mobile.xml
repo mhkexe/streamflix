@@ -9,6 +9,9 @@
         android:id="@+id/iv_tv_show_poster"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:background="@drawable/bg_search_poster"
+        android:clipToOutline="true"
+        android:outlineProvider="background"
         android:scaleType="centerCrop"
         android:importantForAccessibility="no"
         app:layout_constraintDimensionRatio="2:3"
@@ -87,18 +90,35 @@
         tools:progress="80" />
 
     <TextView
-        android:id="@+id/tv_tv_show_title"
-        android:layout_width="0dp"
+        android:id="@+id/tv_tv_show_rating"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:ellipsize="end"
-        android:gravity="center_horizontal"
-        android:lines="2"
+        android:layout_marginStart="6dp"
+        android:layout_marginBottom="6dp"
+        android:background="@drawable/bg_catalog_glass"
+        android:paddingStart="7dp"
+        android:paddingTop="3dp"
+        android:paddingEnd="7dp"
+        android:paddingBottom="3dp"
         android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/iv_tv_show_poster"
-        tools:text="Title" />
+        android:textSize="11sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/iv_tv_show_poster"
+        app:layout_constraintStart_toStartOf="@id/iv_tv_show_poster"
+        tools:text="2024" />
+
+    <ImageView
+        android:id="@+id/iv_tv_show_type_overlay"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="6dp"
+        android:background="@drawable/bg_catalog_glass"
+        android:padding="6dp"
+        android:src="@drawable/ic_menu_tv"
+        android:tint="@android:color/white"
+        app:layout_constraintEnd_toEndOf="@id/iv_tv_show_poster"
+        app:layout_constraintTop_toTopOf="@id/iv_tv_show_poster"
+        tools:ignore="ContentDescription" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

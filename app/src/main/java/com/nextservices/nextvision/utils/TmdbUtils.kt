@@ -531,7 +531,7 @@ object TmdbUtils {
         return value.takeUnless { it == UNKNOWN_AGE_RATING }
     }
 
-    private fun extractMovieAgeRating(details: TMDb3.Movie.Detail, language: String?): Int? {
+    fun extractMovieAgeRating(details: TMDb3.Movie.Detail, language: String?): Int? {
         val releaseDates = details.releaseDates?.results.orEmpty()
         val preferredCountries = buildPreferredCertificationCountries(language)
 
@@ -551,7 +551,7 @@ object TmdbUtils {
             .maxOrNull()
     }
 
-    private fun extractTvShowAgeRating(details: TMDb3.Tv.Detail, language: String?): Int? {
+    fun extractTvShowAgeRating(details: TMDb3.Tv.Detail, language: String?): Int? {
         val contentRatings = details.contentRatings?.results.orEmpty()
         val preferredCountries = buildPreferredCertificationCountries(language)
 
@@ -566,6 +566,29 @@ object TmdbUtils {
         return contentRatings
             .mapNotNull { parseAgeRating(it.rating) }
             .maxOrNull()
+    }
+
+    fun formatMovieAgeRating(ageRating: Int?): String? {
+        return when (ageRating) {
+            18 -> "NC-17"
+            17 -> "R"
+            13 -> "PG-13"
+            10 -> "PG"
+            0 -> "G"
+            else -> ageRating?.toString()
+        }
+    }
+
+    fun formatTvShowAgeRating(ageRating: Int?): String? {
+        return when (ageRating) {
+            18 -> "TV-MA"
+            17 -> "TV-MA"
+            14 -> "TV-14"
+            10 -> "TV-PG"
+            7 -> "TV-Y7"
+            0 -> "TV-G"
+            else -> ageRating?.toString()
+        }
     }
 
     private fun buildPreferredCertificationCountries(language: String?): List<String> {

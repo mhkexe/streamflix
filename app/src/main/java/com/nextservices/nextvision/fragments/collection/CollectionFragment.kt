@@ -88,10 +88,10 @@ class CollectionFragment : Fragment() {
         binding.ivCollectionPoster.load(detail.posterPath?.w500)
         binding.tvCollectionBackdrop.load(detail.backdropPath?.original)
 
-        val today = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
         val isTv = resources.configuration.uiMode and
             android.content.res.Configuration.UI_MODE_TYPE_MASK ==
             android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
         val movies = detail.parts
             .filter { !it.releaseDate.isNullOrBlank() && it.releaseDate!! <= today && it.posterPath != null }
             .sortedByDescending { it.releaseDate }

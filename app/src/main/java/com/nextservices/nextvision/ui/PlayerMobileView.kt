@@ -1,12 +1,14 @@
 package com.nextservices.nextvision.ui
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import android.widget.ProgressBar
 import androidx.media3.ui.PlayerControlView
 import androidx.media3.ui.PlayerView
 import com.nextservices.nextvision.R
@@ -18,6 +20,15 @@ class PlayerMobileView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyle: Int = 0
 ) : PlayerView(context, attrs, defStyle) {
+
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+        post {
+            val bufferingId = resources.getIdentifier("exo_buffering", "id", context.packageName)
+            (findViewById<ProgressBar>(bufferingId) ?: return@post).indeterminateTintList =
+                ColorStateList.valueOf(0xFFE50914.toInt())
+        }
+    }
 
     val controller: PlayerControlView
         get() = PlayerView::class.java.getDeclaredField("controller").let {

@@ -1,5 +1,7 @@
 package com.nextservices.nextvision.fragments.home
 
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +12,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import com.nextservices.nextvision.R
 import com.nextservices.nextvision.adapters.AppAdapter
 import com.nextservices.nextvision.database.AppDatabase
@@ -29,8 +30,11 @@ import kotlinx.coroutines.launch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
+import com.nextservices.nextvision.utils.VoiceRecognitionHelper
+import androidx.core.os.bundleOf
 
 class HomeMobileFragment : Fragment() {
+    private var skeletonAnimator: ObjectAnimator? = null
 
     private var hasAutoCleared409: Boolean = false
 
@@ -49,6 +53,24 @@ class HomeMobileFragment : Fragment() {
     }
 
     private val appAdapter = AppAdapter()
+    private lateinit var voiceHelper: VoiceRecognitionHelper
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        voiceHelper = VoiceRecognitionHelper(
+            this,
+            onResult = { query ->
+                if (isAdded) findNavController().navigate(
+                    R.id.action_global_search_mobile,
+                    bundleOf("query" to query),
+                )
+            },
+            onError = { message ->
+                if (isAdded) Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+            },
+            onListeningStateChanged = {},
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,16 +85,48 @@ class HomeMobileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initializeHome()
+        binding.homeSearchBar.setOnClickListener {
+            binding.homeSearchBar.animate()
+                .scaleX(0.96f)
+                .scaleY(0.96f)
+                .alpha(0.7f)
+                .setDuration(120L)
+                .withEndAction {
+                    findNavController().navigate(R.id.action_global_search_mobile)
+                    binding.homeSearchBar.scaleX = 1f
+                    binding.homeSearchBar.scaleY = 1f
+                    binding.homeSearchBar.alpha = 1f
+                }
+                .start()
+        }
+        binding.btnHomeMic.setOnClickListener {
+            findNavController().navigate(
+                R.id.action_global_search_mobile,
+                bundleOf("start_voice" to true),
+            )
+        }
+        binding.btnHomeUser.setOnClickListener {
+            findNavController().navigate(R.id.action_global_guest_user)
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { state ->
                 when (state) {
                     HomeViewModel.State.Loading -> binding.isLoading.apply {
                         root.visibility = View.VISIBLE
-                        pbIsLoading.visibility = View.VISIBLE
+                        pbIsLoading.visibility = View.GONE
+                        loadingSkeleton.visibility = View.VISIBLE
+                        skeletonAnimator?.cancel()
+                        skeletonAnimator = ObjectAnimator.ofFloat(loadingSkeleton, View.ALPHA, 1f, 0.52f).apply {
+                            duration = 650L
+                            repeatMode = ValueAnimator.REVERSE
+                            repeatCount = ValueAnimator.INFINITE
+                            start()
+                        }
                         gIsLoadingRetry.visibility = View.GONE
                     }
                     is HomeViewModel.State.SuccessLoading -> {
+                        skeletonAnimator?.cancel()
                         displayHome(state.categories)
                         binding.isLoading.root.visibility = View.GONE
                         StartupState.markHomeContentReady()
@@ -93,6 +147,8 @@ class HomeMobileFragment : Fragment() {
                             Toast.LENGTH_SHORT
                         ).show()
                         binding.isLoading.apply {
+                            skeletonAnimator?.cancel()
+                            loadingSkeleton.visibility = View.GONE
                             pbIsLoading.visibility = View.GONE
                             gIsLoadingRetry.visibility = View.VISIBLE
                             val doRetry = { viewModel.getHome() }
@@ -114,8 +170,15 @@ class HomeMobileFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        skeletonAnimator?.cancel()
+        skeletonAnimator = null
         appAdapter.onSaveInstanceState(binding.rvHome)
         _binding = null
+    }
+
+    override fun onDestroy() {
+        if (::voiceHelper.isInitialized) voiceHelper.stopRecognition()
+        super.onDestroy()
     }
 
 
@@ -129,34 +192,45 @@ class HomeMobileFragment : Fragment() {
             )
         }
 
-        binding.ivProviderLogo.apply {
-            Glide.with(context)
-                .load(UserPreferences.currentProvider?.logo?.takeIf { it.isNotEmpty() }
-                    ?: R.drawable.ic_provider_default_logo)
-                .error(R.drawable.ic_provider_default_logo)
-                .fitCenter()
-                .into(this)
-
-            setOnClickListener {
-                findNavController().navigate(R.id.providers)
-            }
-        }
-        
         // Ensure background image is hidden on mobile to show theme color
         binding.ivHomeBackground.visibility = View.GONE
     }
 
     private fun displayHome(categories: List<Category>) {
-        categories
-            .find { it.name == Category.FEATURED }
-            ?.also {
-                it.list.forEach { show ->
-                    when (show) {
-                        is Movie -> show.itemType = AppAdapter.Type.MOVIE_SWIPER_MOBILE_ITEM
-                        is TvShow -> show.itemType = AppAdapter.Type.TV_SHOW_SWIPER_MOBILE_ITEM
-                    }
+        val orderedCategories = categories.filterNot { it.name.contains("anime", ignoreCase = true) } +
+            categories.filter { it.name.contains("anime", ignoreCase = true) }
+        val mobileGenreSectionNames = setOf(
+            "Action & Adventure",
+            "Sci-Fi & Fantasy",
+            "Mystery & Thriller",
+            "Comedy & Romance",
+            "Drama & Romance",
+        )
+        val featuredItems = categories
+            .filter {
+                it.name.contains("popular", ignoreCase = true) ||
+                    it.name.contains("trending", ignoreCase = true)
+            }
+            .filterNot { it.name.contains("anime", ignoreCase = true) }
+            .flatMap { it.list }
+            .filter { it is Movie || it is TvShow }
+            .distinctBy {
+                when (it) {
+                    is Movie -> "movie:${it.id}"
+                    is TvShow -> "tv:${it.id}"
+                    else -> it.hashCode().toString()
                 }
             }
+            .take(6)
+        val featuredMovies = Category(Category.FEATURED, featuredItems).also { featured ->
+            featured.itemType = AppAdapter.Type.CATEGORY_MOBILE_SWIPER
+            featured.list.forEach { show ->
+                when (show) {
+                    is Movie -> show.itemType = AppAdapter.Type.MOVIE_SWIPER_MOBILE_ITEM
+                    is TvShow -> show.itemType = AppAdapter.Type.TV_SHOW_SWIPER_MOBILE_ITEM
+                }
+            }
+        }
 
         categories
             .find { it.name == Category.CONTINUE_WATCHING }
@@ -176,20 +250,38 @@ class HomeMobileFragment : Fragment() {
                 it.name = getString(R.string.home_recently_watched)
             }
 
+        categories.forEach { category ->
+            category.itemType = AppAdapter.Type.CATEGORY_MOBILE_ITEM
+        }
+
         appAdapter.submitList(
-            categories
+            listOf(featuredMovies) + orderedCategories
+                .filter { it.name != Category.FEATURED }
                 .filter {
-                    it.list.isNotEmpty() &&
+                    (it.list.isNotEmpty() || it.name in mobileGenreSectionNames) &&
                         it.name != Category.FAVORITE_MOVIES &&
-                        it.name != Category.FAVORITE_TV_SHOWS
+                        it.name != Category.FAVORITE_TV_SHOWS &&
+                        (!it.name.contains("popular", ignoreCase = true) ||
+                            it.name.contains("anime", ignoreCase = true)) &&
+                        !it.name.contains("trending", ignoreCase = true)
                 }
                 .onEach { category ->
                     if (category.name != Category.FEATURED && category.name != getString(R.string.home_continue_watching)) {
                         category.list.onEach { show ->
                             when (show) {
                                 is Episode -> show.itemType = AppAdapter.Type.EPISODE_MOBILE_ITEM
-                                is Movie -> show.itemType = AppAdapter.Type.MOVIE_MOBILE_ITEM
-                                is TvShow -> show.itemType = AppAdapter.Type.TV_SHOW_MOBILE_ITEM
+                                is Movie -> show.itemType = if (
+                                    category.name.contains("trending", ignoreCase = true) ||
+                                    category.name.contains("collection", ignoreCase = true) ||
+                                    category.name.contains("anime", ignoreCase = true) ||
+                                    category.name in mobileGenreSectionNames
+                                ) AppAdapter.Type.MOVIE_POSTER_MOBILE_ITEM else AppAdapter.Type.MOVIE_MOBILE_ITEM
+                                is TvShow -> show.itemType = if (
+                                    category.name.contains("trending", ignoreCase = true) ||
+                                    category.name.contains("collection", ignoreCase = true) ||
+                                    category.name.contains("anime", ignoreCase = true) ||
+                                    category.name in mobileGenreSectionNames
+                                ) AppAdapter.Type.TV_SHOW_POSTER_MOBILE_ITEM else AppAdapter.Type.TV_SHOW_MOBILE_ITEM
                             }
                         }
                     }

@@ -1,8 +1,11 @@
 package com.nextservices.nextvision.adapters
 
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.KeyEvent
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -49,6 +52,7 @@ import com.nextservices.nextvision.databinding.ItemLoadingBinding
 import com.nextservices.nextvision.databinding.ItemMovieGridMobileBinding
 import com.nextservices.nextvision.databinding.ItemMovieGridTvBinding
 import com.nextservices.nextvision.databinding.ItemMovieMobileBinding
+import com.nextservices.nextvision.databinding.ItemMoviePosterMobileBinding
 import com.nextservices.nextvision.databinding.ItemMovieContinueWatchingTvBinding
 import com.nextservices.nextvision.databinding.ItemMovieContinueWatchingMobileBinding
 import com.nextservices.nextvision.databinding.ItemMovieTvBinding
@@ -61,6 +65,7 @@ import com.nextservices.nextvision.databinding.ItemSeasonTvBinding
 import com.nextservices.nextvision.databinding.ItemTvShowGridBinding
 import com.nextservices.nextvision.databinding.ItemTvShowGridMobileBinding
 import com.nextservices.nextvision.databinding.ItemTvShowMobileBinding
+import com.nextservices.nextvision.databinding.ItemTvShowPosterMobileBinding
 import com.nextservices.nextvision.databinding.ItemTvShowTvBinding
 import com.nextservices.nextvision.models.Category
 import com.nextservices.nextvision.models.Episode
@@ -128,6 +133,7 @@ class AppAdapter(
         LOADING_ITEM,
 
         MOVIE_MOBILE_ITEM,
+        MOVIE_POSTER_MOBILE_ITEM,
         MOVIE_TV_ITEM,
         MOVIE_CONTINUE_WATCHING_MOBILE_ITEM,
         MOVIE_CONTINUE_WATCHING_TV_ITEM,
@@ -154,6 +160,7 @@ class AppAdapter(
         SEASON_TV_ITEM,
 
         TV_SHOW_MOBILE_ITEM,
+        TV_SHOW_POSTER_MOBILE_ITEM,
         TV_SHOW_TV_ITEM,
         TV_SHOW_GRID_MOBILE_ITEM,
         TV_SHOW_GRID_TV_ITEM,
@@ -178,6 +185,7 @@ class AppAdapter(
 
     var isLoading = false
     private var header: Header<ViewBinding>? = null
+    var loadMoreEnabled = true
     private var onLoadMoreListener: (() -> Unit)? = null
     private var footer: Footer<ViewBinding>? = null
 
@@ -287,6 +295,9 @@ class AppAdapter(
                     false,
                 )
             )
+            Type.MOVIE_POSTER_MOBILE_ITEM -> MovieViewHolder(
+                ItemMoviePosterMobileBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            )
             Type.MOVIE_CONTINUE_WATCHING_MOBILE_ITEM -> MovieViewHolder(
                 ItemMovieContinueWatchingMobileBinding.inflate(
                     LayoutInflater.from(parent.context),
@@ -327,7 +338,12 @@ class AppAdapter(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
-                )
+                ).apply {
+                    root.layoutParams = RecyclerView.LayoutParams(
+                        RecyclerView.LayoutParams.MATCH_PARENT,
+                        RecyclerView.LayoutParams.MATCH_PARENT,
+                    )
+                }
             )
 
             Type.MOVIE_MOBILE -> MovieViewHolder(
@@ -439,6 +455,9 @@ class AppAdapter(
                     false
                 )
             )
+            Type.TV_SHOW_POSTER_MOBILE_ITEM -> TvShowViewHolder(
+                ItemTvShowPosterMobileBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            )
             Type.TV_SHOW_TV_ITEM -> TvShowViewHolder(
                 ItemTvShowTvBinding.inflate(
                     LayoutInflater.from(parent.context),
@@ -465,7 +484,12 @@ class AppAdapter(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
-                )
+                ).apply {
+                    root.layoutParams = RecyclerView.LayoutParams(
+                        RecyclerView.LayoutParams.MATCH_PARENT,
+                        RecyclerView.LayoutParams.MATCH_PARENT,
+                    )
+                }
             )
 
             Type.TV_SHOW_MOBILE -> TvShowViewHolder(
@@ -541,7 +565,7 @@ class AppAdapter(
         }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (position >= itemCount - 5 && !isLoading) {
+        if (loadMoreEnabled && position >= itemCount - 5 && !isLoading) {
             onLoadMoreListener?.invoke()
             isLoading = true
         }
@@ -688,6 +712,10 @@ class AppAdapter(
 
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
         super.onViewRecycled(holder)
+
+        if (holder is LoadingViewHolder) {
+            holder.stopPulse()
+        }
 
         if (holder is CategoryViewHolder) {
             holder.cleanup()
@@ -861,6 +889,7 @@ class AppAdapter(
     }
 
     fun setOnLoadMoreListener(onLoadMoreListener: (() -> Unit)?) {
+        isLoading = false
         if (this.onLoadMoreListener != null && onLoadMoreListener == null) {
             this.onLoadMoreListener = null
             notifyItemRemoved(items.size)
@@ -904,7 +933,22 @@ class AppAdapter(
         binding: ViewBinding
     ) : RecyclerView.ViewHolder(
         binding.root
-    )
+    ) {
+        private val pulse = ObjectAnimator.ofFloat(itemView, View.ALPHA, 1f, 0.55f).apply {
+            duration = 650L
+            repeatMode = ValueAnimator.REVERSE
+            repeatCount = ValueAnimator.INFINITE
+        }
+
+        init {
+            pulse.start()
+        }
+
+        fun stopPulse() {
+            pulse.cancel()
+            itemView.alpha = 1f
+        }
+    }
 
     private class FooterViewHolder(
         val binding: ViewBinding

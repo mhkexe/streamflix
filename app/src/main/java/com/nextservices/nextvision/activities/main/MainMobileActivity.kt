@@ -20,13 +20,13 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.navOptions
-import androidx.navigation.ui.setupWithNavController
 import com.nextservices.nextvision.BuildConfig
 import com.nextservices.nextvision.R
 import com.nextservices.nextvision.NextVisionApp
@@ -47,8 +47,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -107,6 +107,7 @@ class MainMobileActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         StartupTrace.mark("MainMobileActivity.onCreate.begin")
+        installSplashScreen()
         setTheme(ThemeManager.mobileThemeRes(UserPreferences.selectedTheme))
 
         super.onCreate(savedInstanceState)
@@ -114,7 +115,7 @@ class MainMobileActivity : FragmentActivity() {
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
         val palette = ThemeManager.palette(UserPreferences.selectedTheme)
-        window.statusBarColor = palette.systemBar
+        window.statusBarColor = android.graphics.Color.BLACK
         window.navigationBarColor = palette.systemBar
 
         _binding = ActivityMainMobileBinding.inflate(layoutInflater)
@@ -128,12 +129,14 @@ class MainMobileActivity : FragmentActivity() {
             val currentFragment = navHostFragment?.childFragmentManager?.primaryNavigationFragment
 
             val isPlayer = currentFragment is PlayerMobileFragment
-            val isBottomNavVisible = binding.bnvMain.visibility == View.VISIBLE
+            val isBottomNavVisible = binding.navContainer.visibility == View.VISIBLE
 
-            val bottomPadding = if (isPlayer || isBottomNavVisible) 0 else insets.bottom
-            val topPadding = if (isPlayer) 0 else insets.top
-
-            view.setPadding(insets.left, topPadding, insets.right, bottomPadding)
+            if (isPlayer) {
+                view.setPadding(0, 0, 0, 0)
+            } else {
+                val bottomPadding = if (isBottomNavVisible) 0 else insets.bottom
+                view.setPadding(insets.left, insets.top, insets.right, bottomPadding)
+            }
             windowInsets
         }
 
@@ -166,12 +169,12 @@ class MainMobileActivity : FragmentActivity() {
             }
             StartupTrace.mark("MainMobileActivity.graph_setup.end")
 
-        setupStartupOverlay(savedInstanceState != null)
-        StartupTrace.mark("MainMobileActivity.startup_overlay_setup.end")
+            setupStartupOverlay(savedInstanceState != null)
+            StartupTrace.mark("MainMobileActivity.startup_overlay_setup.end")
 
         StartupTrace.mark("MainMobileActivity.onCreate.end")
 
-        binding.bnvMain.setupWithNavController(navController)
+            setupBottomNavigation(navController)
         updateNavigationVisibility()
         updateBottomNavigationVisibility(navController.currentDestination?.id)
 
@@ -202,16 +205,7 @@ class MainMobileActivity : FragmentActivity() {
                     return
                 }
 
-                if (UserPreferences.currentProvider != null &&
-                    isTopLevelProviderDestination(currentDestinationId)
-                ) {
-                    navigateToProviderHome(navController)
-                    return
-                }
-
-                if (UserPreferences.currentProvider != null) {
-                    navigateToProviderHome(navController)
-                } else if (!navController.navigateUp()) {
+                if (!navController.navigateUp()) {
                     finish()
                 }
             }
@@ -231,20 +225,17 @@ class MainMobileActivity : FragmentActivity() {
         }
 
         binding.startupOverlay.visibility = View.VISIBLE
-
         showStartupLoading()
     }
 
     private fun showStartupLoading() {
         if (startupLoadingShown || isStartupCompleted) return
         startupLoadingShown = true
-        binding.startupProgress.alpha = 0f
-        binding.startupProgress.visibility = View.VISIBLE
-        binding.startupProgress.animate().alpha(1f).setDuration(250).start()
-
         lifecycleScope.launch {
-            NextVisionApp.preloadReady.await()
-            StartupState.homeContentReady.first { it }
+            withTimeoutOrNull(8_000L) {
+                NextVisionApp.preloadReady.await()
+                StartupState.homeContentReady.first { it }
+            }
             binding.startupOverlay.animate()
                 .alpha(0f)
                 .setDuration(300)
@@ -281,11 +272,22 @@ class MainMobileActivity : FragmentActivity() {
     }
 
     private fun updateBottomNavigationVisibility(destinationId: Int?) {
+        if (destinationId != null && destinationId in setOf(
+                R.id.home,
+                R.id.movies,
+                R.id.tv_shows,
+                R.id.favorites,
+                R.id.premium,
+            ) && binding.bnvMain.selectedItemId != destinationId
+        ) {
+            binding.bnvMain.selectedItemId = destinationId
+        }
+
         val showBottomNav =
             isStartupCompleted &&
                 UserPreferences.currentProvider != null &&
                 isTopLevelProviderDestination(destinationId)
-        binding.bnvMain.visibility = if (showBottomNav) View.VISIBLE else View.GONE
+        binding.navContainer.visibility = if (showBottomNav) View.VISIBLE else View.GONE
     }
 
     private fun updateNavigationVisibility(currentDestinationId: Int? = null) {
@@ -315,6 +317,30 @@ class MainMobileActivity : FragmentActivity() {
                 navController.navigate(R.id.home)
             }
         }
+    }
+
+    private fun setupBottomNavigation(navController: androidx.navigation.NavController) {
+        binding.bnvMain.setOnItemSelectedListener { item ->
+            if (navController.currentDestination?.id == item.itemId) {
+                true
+            } else {
+                navController.navigate(item.itemId, null, navOptions {
+                    launchSingleTop = true
+                    restoreState = true
+                    anim {
+                        enter = R.anim.detail_enter
+                        exit = R.anim.detail_exit
+                        popEnter = R.anim.detail_pop_enter
+                        popExit = R.anim.detail_pop_exit
+                    }
+                    popUpTo(navController.graph.startDestinationId) {
+                        saveState = true
+                    }
+                })
+                true
+            }
+        }
+        binding.bnvMain.setOnItemReselectedListener { }
     }
 
     private fun isTopLevelProviderDestination(destinationId: Int?): Boolean {
@@ -572,16 +598,16 @@ class MainMobileActivity : FragmentActivity() {
                 intArrayOf(),
             ),
             intArrayOf(
-                palette.mobileNavActive,
+                android.graphics.Color.WHITE,
                 palette.mobileNavInactive,
             )
         )
 
-        binding.bnvMain.setBackgroundColor(palette.mobileNavBackground)
+        binding.bnvMain.setBackgroundResource(R.drawable.bg_glass_nav)
         binding.bnvMain.itemIconTintList = navColors
         binding.bnvMain.itemTextColor = navColors
 
-        window.statusBarColor = palette.systemBar
+        window.statusBarColor = android.graphics.Color.BLACK
         window.navigationBarColor = palette.systemBar
 
         WindowInsetsControllerCompat(window, window.decorView).apply {
@@ -589,4 +615,5 @@ class MainMobileActivity : FragmentActivity() {
             isAppearanceLightNavigationBars = false
         }
     }
+
 }

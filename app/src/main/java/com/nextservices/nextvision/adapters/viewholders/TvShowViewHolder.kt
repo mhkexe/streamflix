@@ -51,6 +51,7 @@ import com.nextservices.nextvision.fragments.genre.GenreTvFragmentDirections
 import com.nextservices.nextvision.fragments.people.PeopleMobileFragmentDirections
 import com.nextservices.nextvision.fragments.people.PeopleTvFragmentDirections
 import com.nextservices.nextvision.fragments.home.HomeMobileFragmentDirections
+import com.nextservices.nextvision.fragments.search.SearchMobileFragment
 import com.nextservices.nextvision.models.Episode
 import com.nextservices.nextvision.models.Movie
 import com.nextservices.nextvision.models.Season
@@ -64,6 +65,7 @@ import com.nextservices.nextvision.utils.format
 import com.nextservices.nextvision.utils.toActivity
 import com.nextservices.nextvision.utils.getCurrentFragment
 import com.nextservices.nextvision.utils.dp
+import com.nextservices.nextvision.utils.navigateMobileDetail
 import com.nextservices.nextvision.utils.loadTvShowBanner
 import com.nextservices.nextvision.utils.loadTvShowPoster
 import com.nextservices.nextvision.utils.ArtworkRepair
@@ -112,6 +114,7 @@ class TvShowViewHolder(
 
         when (_binding) {
             is ItemTvShowMobileBinding -> displayMobileItem(_binding)
+            is ItemTvShowPosterMobileBinding -> displayPosterMobileItem(_binding)
             is ItemTvShowTvBinding -> displayTvItem(_binding)
             is ItemTvShowGridMobileBinding -> displayGridMobileItem(_binding)
             is ItemTvShowGridBinding -> displayGridTvItem(_binding)
@@ -238,7 +241,7 @@ class TvShowViewHolder(
                 if (isIptvProvider()) {
                     handleDirectPlay(binding.root.findNavController())
                 } else {
-                    binding.root.findNavController().navigate(R.id.tv_show, tvShowArgs())
+                    binding.root.findNavController().navigateMobileDetail(R.id.tv_show, tvShowArgs())
                 }
             }
         }
@@ -250,6 +253,8 @@ class TvShowViewHolder(
             ShowOptionsMobileDialog(context, tvShow).show()
             true
         }
+        binding.ivTvShowPoster.setOnClickListener { binding.root.performClick() }
+        binding.ivTvShowPoster.setOnLongClickListener { binding.root.performLongClick() }
         setPoster(binding.ivTvShowPoster)
         bindRibbons(binding.ivTvShowWatchedRibbon)
         binding.pbTvShowProgress.apply {
@@ -260,6 +265,24 @@ class TvShowViewHolder(
                 else -> 0
             }
             isVisible = watchHistory != null
+        }
+    }
+
+    private fun displayPosterMobileItem(binding: ItemTvShowPosterMobileBinding) {
+        binding.root.setOnClickListener {
+            onTvShowClick?.invoke(tvShow)
+                ?: binding.root.findNavController().navigateMobileDetail(R.id.tv_show, tvShowArgs())
+        }
+        binding.root.setOnLongClickListener {
+            onTvShowLongClick?.invoke(tvShow) ?: ShowOptionsMobileDialog(context, tvShow).show()
+            true
+        }
+        binding.ivTvShowPoster.setOnClickListener { binding.root.performClick() }
+        binding.ivTvShowPoster.setOnLongClickListener { binding.root.performLongClick() }
+        setPoster(binding.ivTvShowPoster)
+        binding.tvTvShowPosterRating.apply {
+            text = tvShow.rating?.let { "★ ${String.format(Locale.ROOT, "%.1f", it)}" } ?: ""
+            visibility = if (text.isNullOrEmpty()) View.GONE else View.VISIBLE
         }
     }
 
@@ -299,6 +322,7 @@ class TvShowViewHolder(
                 }
             }
         }
+        binding.ivTvShowPoster.setOnLongClickListener { binding.root.performLongClick() }
         setPoster(binding.ivTvShowPoster)
         bindRibbons(binding.ivTvShowWatchedRibbon)
         binding.pbTvShowProgress.apply {
@@ -313,6 +337,7 @@ class TvShowViewHolder(
     }
 
     private fun displayGridMobileItem(binding: ItemTvShowGridMobileBinding) {
+        val isSearchResult = context.toActivity()?.getCurrentFragment() is SearchMobileFragment
         binding.root.alpha = 1f
         binding.root.isActivated = itemSelected
         applyMobileSelection(binding.root)
@@ -326,7 +351,7 @@ class TvShowViewHolder(
                 if (isIptvProvider()) {
                     handleDirectPlay(binding.root.findNavController())
                 } else {
-                    binding.root.findNavController().navigate(R.id.tv_show, tvShowArgs())
+                    binding.root.findNavController().navigateMobileDetail(R.id.tv_show, tvShowArgs())
                 }
             }
         }
@@ -338,6 +363,8 @@ class TvShowViewHolder(
             ShowOptionsMobileDialog(context, tvShow).show()
             true
         }
+        binding.ivTvShowPoster.setOnClickListener { binding.root.performClick() }
+        binding.ivTvShowPoster.setOnLongClickListener { binding.root.performLongClick() }
         setPoster(binding.ivTvShowPoster)
         bindRibbons(binding.ivTvShowWatchedRibbon)
         binding.pbTvShowProgress.apply {
@@ -349,6 +376,13 @@ class TvShowViewHolder(
             }
             isVisible = watchHistory != null
         }
+        binding.tvTvShowRating.apply {
+            text = if (isSearchResult) tvShow.released?.format("yyyy") ?: "" else {
+                tvShow.rating?.let { String.format(Locale.ROOT, "%.1f", it) } ?: ""
+            }
+            visibility = if (text.isNullOrEmpty()) View.GONE else View.VISIBLE
+        }
+        binding.ivTvShowTypeOverlay.visibility = if (isSearchResult) View.VISIBLE else View.GONE
     }
 
     private fun displayGridTvItem(binding: ItemTvShowGridBinding) {
@@ -387,6 +421,7 @@ class TvShowViewHolder(
                 }
             }
         }
+        binding.ivTvShowPoster.setOnLongClickListener { binding.root.performLongClick() }
         setPoster(binding.ivTvShowPoster)
         binding.tvTvShowYearOverlay.apply {
             text = tvShow.released?.format("yyyy") ?: ""
@@ -542,34 +577,18 @@ class TvShowViewHolder(
 
     private fun displaySwiperMobileItem(binding: ItemCategorySwiperMobileBinding) {
         binding.ivSwiperBackground.loadTvShowBanner(tvShow) {
-            centerCrop().transition(DrawableTransitionOptions.withCrossFade())
-        }
-        binding.tvSwiperTitle.text = tvShow.title
-        binding.tvSwiperTvShowLastEpisode.text = if (isIptvProvider()) "" else tvShow.seasons.lastOrNull()?.episodes?.lastOrNull()?.let { "E${it.number}" } ?: context.getString(R.string.tv_show_item_type)
-        
-        binding.tvSwiperQuality.apply {
-            text = tvShow.quality
-            isVisible = !text.isNullOrEmpty()
+            transition(DrawableTransitionOptions.withCrossFade())
         }
 
-        binding.tvSwiperReleased.apply {
-            text = tvShow.released?.format("yyyy")
-            isVisible = !text.isNullOrEmpty()
+        binding.ivSwiperLogo.apply {
+            isVisible = true
+            Glide.with(this).clear(this)
+            Glide.with(this).load(tvShow.logo).into(this)
         }
-
-        binding.tvSwiperRating.apply {
-            text = tvShow.rating?.let { String.format(Locale.ROOT, "%.1f", it) }
-            isVisible = !text.isNullOrEmpty()
-        }
-        binding.ivSwiperRatingIcon.isVisible = binding.tvSwiperRating.isVisible
-
-        binding.tvSwiperOverview.text = tvShow.overview
-        binding.btnSwiperWatchNow.setOnClickListener {
-            if (isIptvProvider()) {
-                handleDirectPlay(binding.root.findNavController())
-            } else {
-                binding.root.findNavController().navigate(R.id.tv_show, tvShowArgs())
-            }
+        binding.tvSwiperRating.text = tvShow.rating?.let { String.format(Locale.ROOT, "%.1f", it) }.orEmpty()
+        binding.tvSwiperRating.visibility = if (tvShow.rating == null) View.GONE else View.VISIBLE
+        binding.root.setOnClickListener {
+            binding.root.findNavController().navigateMobileDetail(R.id.tv_show, tvShowArgs())
         }
     }
 
@@ -598,13 +617,20 @@ class TvShowViewHolder(
 
     private fun displayTvShowMobile(binding: ContentTvShowMobileBinding) {
         binding.ivTvShowPoster.run {
-            loadTvShowPoster(tvShow) {
+            loadTvShowBanner(tvShow) {
                 fallback(R.drawable.glide_fallback_cover)
                 transition(DrawableTransitionOptions.withCrossFade())
             }
-            visibility = if (tvShow.poster.isNullOrEmpty()) View.GONE else View.VISIBLE
+            visibility = if (tvShow.banner.isNullOrEmpty()) View.GONE else View.VISIBLE
         }
-        binding.tvTvShowTitle.text = tvShow.title
+        binding.ivTvShowLogo.apply {
+            visibility = if (tvShow.logo.isNullOrBlank()) View.GONE else View.VISIBLE
+            if (visibility == View.VISIBLE) Glide.with(this).load(tvShow.logo).into(this)
+        }
+        binding.tvTvShowTitle.apply {
+            text = tvShow.title
+            visibility = if (tvShow.logo.isNullOrBlank()) View.VISIBLE else View.GONE
+        }
 
         binding.tvTvShowRating.apply {
             text = tvShow.rating?.let { String.format(Locale.ROOT, "%.1f", it) } ?: "N/A"
@@ -704,14 +730,9 @@ class TvShowViewHolder(
             isVisible = watchHistory != null
         }
 
-        binding.btnTvShowTrailer.apply {
-            val trailer = tvShow.trailer
-            setOnClickListener {
-                if (trailer != null) handleTrailerClick(trailer)
-            }
-            isVisible = trailer != null
+        binding.btnTvShowDetails.setOnClickListener {
+            binding.tvTvShowOverview.maxLines = if (binding.tvTvShowOverview.maxLines == 3) Int.MAX_VALUE else 3
         }
-
         binding.btnTvShowFavorite.apply {
             setOnClickListener {
                 checkProviderAndRun {
@@ -892,6 +913,11 @@ class TvShowViewHolder(
     private fun displayDirectorsTv(binding: ContentTvShowDirectorsTvBinding) { binding.hgvTvShowDirectors.text = tvShow.directors.joinToString(", ") { it.name } }
     private fun displayCastMobile(binding: ContentTvShowCastMobileBinding) {
         binding.rvTvShowCast.apply {
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
+                context,
+                androidx.recyclerview.widget.RecyclerView.HORIZONTAL,
+                false,
+            )
             adapter = AppAdapter().apply {
                 submitList(tvShow.cast.onEach {
                     it.itemType = AppAdapter.Type.PEOPLE_MOBILE_ITEM
