@@ -19,6 +19,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
@@ -113,10 +114,9 @@ class MainMobileActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         StartupTrace.mark("MainMobileActivity.super.onCreate.end")
 
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        val palette = ThemeManager.palette(UserPreferences.selectedTheme)
-        window.statusBarColor = android.graphics.Color.BLACK
-        window.navigationBarColor = palette.systemBar
+        WindowCompat.enableEdgeToEdge(window)
+        window.statusBarColor = android.graphics.Color.TRANSPARENT
+        window.navigationBarColor = android.graphics.Color.TRANSPARENT
 
         _binding = ActivityMainMobileBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -125,19 +125,33 @@ class MainMobileActivity : FragmentActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.mainContent) { view, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val gestureInsets = windowInsets.getInsets(WindowInsetsCompat.Type.systemGestures())
             val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_main_fragment) as? NavHostFragment
             val currentFragment = navHostFragment?.childFragmentManager?.primaryNavigationFragment
 
             val isPlayer = currentFragment is PlayerMobileFragment
-            val isBottomNavVisible = binding.navContainer.visibility == View.VISIBLE
 
             if (isPlayer) {
                 view.setPadding(0, 0, 0, 0)
+                binding.navMainFragment.setPadding(0, 0, 0, 0)
             } else {
-                val bottomPadding = if (isBottomNavVisible) 0 else insets.bottom
-                view.setPadding(insets.left, insets.top, insets.right, bottomPadding)
+                view.setPadding(insets.left, insets.top, insets.right, 0)
+
+                val navBottomInset = maxOf(insets.bottom, gestureInsets.bottom)
+                val navBarHeight = binding.navContainer.resources.displayMetrics.density * 64f
+                val navBarMargin = binding.navContainer.resources.displayMetrics.density * 12f
+                binding.navContainer.updateLayoutParams<android.view.ViewGroup.MarginLayoutParams> {
+                    bottomMargin = navBarMargin.toInt() + navBottomInset
+                }
+                val contentBottomPadding = if (binding.navContainer.visibility == View.VISIBLE) {
+                    navBarHeight.toInt() + navBarMargin.toInt() + navBottomInset
+                } else {
+                    navBottomInset
+                }
+                binding.navMainFragment.setPadding(0, 0, 0, contentBottomPadding)
             }
-            windowInsets
+            // Consume so Material's own auto-inset padding on BottomNavigationView doesn't stack with our margin.
+            WindowInsetsCompat.CONSUMED
         }
 
 
@@ -287,7 +301,11 @@ class MainMobileActivity : FragmentActivity() {
             isStartupCompleted &&
                 UserPreferences.currentProvider != null &&
                 isTopLevelProviderDestination(destinationId)
-        binding.navContainer.visibility = if (showBottomNav) View.VISIBLE else View.GONE
+        val newVisibility = if (showBottomNav) View.VISIBLE else View.GONE
+        if (binding.navContainer.visibility != newVisibility) {
+            binding.navContainer.visibility = newVisibility
+            binding.mainContent.requestApplyInsets()
+        }
     }
 
     private fun updateNavigationVisibility(currentDestinationId: Int? = null) {
@@ -603,12 +621,16 @@ class MainMobileActivity : FragmentActivity() {
             )
         )
 
-        binding.bnvMain.setBackgroundResource(R.drawable.bg_glass_nav)
+        binding.navContainer.setBackgroundResource(R.drawable.bg_glass_nav)
+        binding.bnvMain.setBackgroundColor(android.graphics.Color.TRANSPARENT)
         binding.bnvMain.itemIconTintList = navColors
         binding.bnvMain.itemTextColor = navColors
 
-        window.statusBarColor = android.graphics.Color.BLACK
-        window.navigationBarColor = palette.systemBar
+        window.statusBarColor = android.graphics.Color.TRANSPARENT
+        window.navigationBarColor = android.graphics.Color.TRANSPARENT
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
+        }
 
         WindowInsetsControllerCompat(window, window.decorView).apply {
             isAppearanceLightStatusBars = false

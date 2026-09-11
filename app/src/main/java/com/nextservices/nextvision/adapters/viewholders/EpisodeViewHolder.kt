@@ -346,6 +346,8 @@ class EpisodeViewHolder(
 
         binding.ivEpisodeTvShowPoster.apply {
             clipToOutline = true
+            setOnClickListener { binding.root.performClick() }
+            setOnLongClickListener { binding.root.performLongClick() }
             loadContinueWatchingArtwork()
         }
 
@@ -444,6 +446,8 @@ class EpisodeViewHolder(
 
         binding.ivEpisodeTvShowPoster.apply {
             clipToOutline = true
+            setOnClickListener { binding.root.performClick() }
+            setOnLongClickListener { binding.root.performLongClick() }
             loadContinueWatchingArtwork(withFallback = true)
         }
 

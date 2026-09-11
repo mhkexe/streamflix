@@ -42,9 +42,17 @@ class TvShowMobileFragment : Fragment() {
 
     private var hasAutoCleared409: Boolean = false
     private var selectedSeasonId: String? = null
+    private var currentTvShow: TvShow? = null
+    private var episodeSeasonId: String? = null
+    private var renderedEpisodeCount = 0
+    private var episodeLoadMoreSentinel: View? = null
 
     private var _binding: FragmentTvShowMobileBinding? = null
     private val binding get() = _binding!!
+
+    private companion object {
+        private const val EPISODE_PAGE_SIZE = 10
+    }
 
     private val args by navArgs<TvShowMobileFragmentArgs>()
     private val database by lazy { AppDatabase.getInstance(requireContext()) }
@@ -70,6 +78,9 @@ class TvShowMobileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.btnTvShowBack.setOnClickListener { findNavController().navigateUp() }
+        binding.tvShowScrollView.viewTreeObserver.addOnScrollChangedListener {
+            loadMoreEpisodesIfSentinelVisible()
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { state ->
@@ -126,7 +137,110 @@ class TvShowMobileFragment : Fragment() {
         _binding = null
     }
 
+    private fun openEpisode(selectedEpisode: com.nextservices.nextvision.models.Episode, selectedSeason: com.nextservices.nextvision.models.Season) {
+        val tvShow = currentTvShow ?: return
+        findNavController().navigate(TvShowMobileFragmentDirections.actionTvShowToPlayer(
+            id = selectedEpisode.id,
+            title = tvShow.title,
+            subtitle = "S${selectedSeason.number} E${selectedEpisode.number}  •  ${selectedEpisode.title}",
+            videoType = com.nextservices.nextvision.models.Video.Type.Episode(
+                id = selectedEpisode.id,
+                number = selectedEpisode.number,
+                title = selectedEpisode.title,
+                poster = selectedEpisode.poster,
+                overview = selectedEpisode.overview,
+                tvShow = com.nextservices.nextvision.models.Video.Type.Episode.TvShow(
+                    id = tvShow.id,
+                    title = tvShow.title,
+                    poster = tvShow.poster,
+                    banner = tvShow.banner,
+                    releaseDate = tvShow.released?.format("yyyy-MM-dd"),
+                    imdbId = tvShow.imdbId,
+                ),
+                season = com.nextservices.nextvision.models.Video.Type.Episode.Season(
+                    number = selectedSeason.number,
+                    title = selectedSeason.title ?: "",
+                ),
+            ),
+        ))
+    }
+
+    private fun bindEpisodeView(
+        selectedEpisode: com.nextservices.nextvision.models.Episode,
+        currentSeason: com.nextservices.nextvision.models.Season,
+    ): View {
+        val episodeView = layoutInflater.inflate(
+            com.nextservices.nextvision.R.layout.item_detail_episode_preview,
+            binding.tvShowEpisodeList,
+            false,
+        )
+        episodeView.findViewById<TextView>(com.nextservices.nextvision.R.id.tv_detail_episode_title).text =
+            "${selectedEpisode.number}. ${selectedEpisode.title.orEmpty()}"
+        episodeView.findViewById<TextView>(com.nextservices.nextvision.R.id.tv_detail_episode_description).text =
+            selectedEpisode.overview.orEmpty()
+        episodeView.findViewById<TextView>(com.nextservices.nextvision.R.id.tv_detail_episode_duration).text =
+            selectedEpisode.runtime?.let { minutes -> "${minutes / 60}h ${minutes % 60}min" }.orEmpty()
+        Glide.with(this@TvShowMobileFragment)
+            .load(selectedEpisode.poster)
+            .placeholder(com.nextservices.nextvision.R.drawable.detail_preview_episode)
+            .centerCrop()
+            .into(episodeView.findViewById(com.nextservices.nextvision.R.id.iv_detail_episode_image))
+        val history = selectedEpisode.watchHistory
+        val progress = episodeView.findViewById<View>(com.nextservices.nextvision.R.id.view_detail_episode_progress)
+        progress.visibility = if (history != null && history.durationMillis > 0) View.VISIBLE else View.GONE
+        progress.scaleX = if (history != null && history.durationMillis > 0) {
+            (history.lastPlaybackPositionMillis.toFloat() / history.durationMillis).coerceIn(0f, 1f)
+        } else 0f
+        progress.pivotX = 0f
+        episodeView.setOnClickListener { openEpisode(selectedEpisode, currentSeason) }
+        episodeView.findViewById<View>(com.nextservices.nextvision.R.id.btn_detail_episode_play)
+            .setOnClickListener { openEpisode(selectedEpisode, currentSeason) }
+        return episodeView
+    }
+
+    // Renders episodes up to upToCount, keeping already-rendered views intact (called on initial page and on scroll-triggered loads).
+    private fun appendEpisodePage(currentSeason: com.nextservices.nextvision.models.Season, upToCount: Int) {
+        val sortedEpisodes = currentSeason.episodes.sortedBy { it.number }
+        episodeLoadMoreSentinel?.let { binding.tvShowEpisodeList.removeView(it) }
+        val targetCount = upToCount.coerceAtMost(sortedEpisodes.size)
+        sortedEpisodes.subList(renderedEpisodeCount, targetCount).forEach { selectedEpisode ->
+            binding.tvShowEpisodeList.addView(bindEpisodeView(selectedEpisode, currentSeason))
+        }
+        renderedEpisodeCount = targetCount
+        episodeLoadMoreSentinel = if (renderedEpisodeCount < sortedEpisodes.size) {
+            View(requireContext()).apply {
+                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1)
+            }.also { binding.tvShowEpisodeList.addView(it) }
+        } else null
+    }
+
+    // Loads the next page once the sentinel placed after the last rendered episode enters the viewport.
+    private fun loadMoreEpisodesIfSentinelVisible() {
+        val sentinel = episodeLoadMoreSentinel ?: return
+        val currentSeason = currentTvShow?.seasons?.firstOrNull { it.id == episodeSeasonId } ?: return
+        if (sentinel.getLocalVisibleRect(android.graphics.Rect())) {
+            appendEpisodePage(currentSeason, renderedEpisodeCount + EPISODE_PAGE_SIZE)
+        }
+    }
+
+    private fun renderEpisodes(currentSeason: com.nextservices.nextvision.models.Season?) {
+        binding.tvShowEpisodeList.removeAllViews()
+        episodeLoadMoreSentinel = null
+        if (currentSeason == null) {
+            episodeSeasonId = null
+            renderedEpisodeCount = 0
+            return
+        }
+        val isNewSeason = currentSeason.id != episodeSeasonId
+        episodeSeasonId = currentSeason.id
+        val initialCount = if (isNewSeason) EPISODE_PAGE_SIZE else renderedEpisodeCount.coerceAtLeast(EPISODE_PAGE_SIZE)
+        renderedEpisodeCount = 0
+        appendEpisodePage(currentSeason, initialCount)
+        binding.tvShowScrollView.post { loadMoreEpisodesIfSentinelVisible() }
+    }
+
     private fun displayTvShow(tvShow: TvShow) {
+        currentTvShow = tvShow
         binding.ivTvShowBanner.loadTvShowBanner(tvShow) {
             transition(DrawableTransitionOptions.withCrossFade())
         }
@@ -217,10 +331,12 @@ class TvShowMobileFragment : Fragment() {
             }
         }
         binding.btnTvShowWatchNow.apply {
-            text = if (episode?.watchHistory != null) getString(com.nextservices.nextvision.R.string.tv_show_resume_season_episode, season?.number ?: 1, episode.number)
-            else getString(com.nextservices.nextvision.R.string.tv_show_watch_season_episode, season?.number ?: 1, episode?.number ?: 1)
-            setOnClickListener {
-                if (episode != null) {
+            if (episode != null) {
+                isEnabled = true
+                alpha = 1f
+                text = if (episode.watchHistory != null) getString(com.nextservices.nextvision.R.string.tv_show_resume_season_episode, season?.number ?: 1, episode.number)
+                else getString(com.nextservices.nextvision.R.string.tv_show_watch_season_episode, season?.number ?: 1, episode.number)
+                setOnClickListener {
                     findNavController().navigate(TvShowMobileFragmentDirections.actionTvShowToPlayer(
                         id = episode.id,
                         title = tvShow.title,
@@ -246,71 +362,17 @@ class TvShowMobileFragment : Fragment() {
                         ),
                     ))
                 }
+            } else {
+                isEnabled = false
+                alpha = 0.6f
+                text = getString(com.nextservices.nextvision.R.string.tv_show_loading_episodes)
+                setOnClickListener(null)
             }
         }
         var selectedSeason = selectedSeasonId?.let { id -> tvShow.seasons.firstOrNull { it.id == id } }
             ?: season
             ?: tvShow.seasons.firstOrNull()
         selectedSeasonId = selectedSeason?.id
-        fun openEpisode(selectedEpisode: com.nextservices.nextvision.models.Episode, selectedSeason: com.nextservices.nextvision.models.Season) {
-            findNavController().navigate(TvShowMobileFragmentDirections.actionTvShowToPlayer(
-                id = selectedEpisode.id,
-                title = tvShow.title,
-                subtitle = "S${selectedSeason.number} E${selectedEpisode.number}  •  ${selectedEpisode.title}",
-                videoType = com.nextservices.nextvision.models.Video.Type.Episode(
-                    id = selectedEpisode.id,
-                    number = selectedEpisode.number,
-                    title = selectedEpisode.title,
-                    poster = selectedEpisode.poster,
-                    overview = selectedEpisode.overview,
-                    tvShow = com.nextservices.nextvision.models.Video.Type.Episode.TvShow(
-                        id = tvShow.id,
-                        title = tvShow.title,
-                        poster = tvShow.poster,
-                        banner = tvShow.banner,
-                        releaseDate = tvShow.released?.format("yyyy-MM-dd"),
-                        imdbId = tvShow.imdbId,
-                    ),
-                    season = com.nextservices.nextvision.models.Video.Type.Episode.Season(
-                        number = selectedSeason.number,
-                        title = selectedSeason.title ?: "",
-                    ),
-                ),
-            ))
-        }
-        fun renderEpisodes(currentSeason: com.nextservices.nextvision.models.Season?) {
-            binding.tvShowEpisodeList.removeAllViews()
-            if (currentSeason == null) return
-            currentSeason.episodes.sortedBy { it.number }.forEach { selectedEpisode ->
-                val episodeView = layoutInflater.inflate(
-                    com.nextservices.nextvision.R.layout.item_detail_episode_preview,
-                    binding.tvShowEpisodeList,
-                    false,
-                )
-                episodeView.findViewById<TextView>(com.nextservices.nextvision.R.id.tv_detail_episode_title).text =
-                    "${selectedEpisode.number}. ${selectedEpisode.title.orEmpty()}"
-                episodeView.findViewById<TextView>(com.nextservices.nextvision.R.id.tv_detail_episode_description).text =
-                    selectedEpisode.overview.orEmpty()
-                episodeView.findViewById<TextView>(com.nextservices.nextvision.R.id.tv_detail_episode_duration).text =
-                    selectedEpisode.runtime?.let { minutes -> "${minutes / 60}h ${minutes % 60}min" }.orEmpty()
-                Glide.with(this@TvShowMobileFragment)
-                    .load(selectedEpisode.poster)
-                    .placeholder(com.nextservices.nextvision.R.drawable.detail_preview_episode)
-                    .centerCrop()
-                    .into(episodeView.findViewById(com.nextservices.nextvision.R.id.iv_detail_episode_image))
-                val history = selectedEpisode.watchHistory
-                val progress = episodeView.findViewById<View>(com.nextservices.nextvision.R.id.view_detail_episode_progress)
-                progress.visibility = if (history != null && history.durationMillis > 0) View.VISIBLE else View.GONE
-                progress.scaleX = if (history != null && history.durationMillis > 0) {
-                    (history.lastPlaybackPositionMillis.toFloat() / history.durationMillis).coerceIn(0f, 1f)
-                } else 0f
-                progress.pivotX = 0f
-                episodeView.setOnClickListener { openEpisode(selectedEpisode, currentSeason) }
-                episodeView.findViewById<View>(com.nextservices.nextvision.R.id.btn_detail_episode_play)
-                    .setOnClickListener { openEpisode(selectedEpisode, currentSeason) }
-                binding.tvShowEpisodeList.addView(episodeView)
-            }
-        }
         binding.btnTvShowSeasonSelector.text = selectedSeason?.let {
             "Season ${it.number}    ${it.episodes.size} episodes"
         } ?: "Season 1    0 episodes"
